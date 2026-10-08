@@ -293,7 +293,6 @@ credenciais reais.
 ## Documentação da Sprint 2
 
 - [`docs/ARQUITETURA.md`](./docs/ARQUITETURA.md)
-- [`docs/CHECKLIST_SPRINT_2.md`](./docs/CHECKLIST_SPRINT_2.md)
 - [`docs/DICIONARIO_DADOS.md`](./docs/DICIONARIO_DADOS.md)
 - [`docs/GOVERNANCA_GIT.md`](./docs/GOVERNANCA_GIT.md)
 - [`docs/ROTAS.md`](./docs/ROTAS.md)
