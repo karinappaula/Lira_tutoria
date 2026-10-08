@@ -1,0 +1,386 @@
+generator client {
+provider = "prisma-client-js"
+}
+
+datasource db {
+provider = "mysql"
+url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// 1. USUÁRIOS, TURMAS E PAPÉIS (Especialização 1:1)
+// ============================================================
+
+model Usuario {
+id           Int      @id @default(autoincrement()) @map("id_usuario")
+nome         String   @db.VarChar(150)
+email        String   @unique @db.VarChar(150)
+senhaHash    String   @map("senha_hash") @db.VarChar(255)
+status       String   @default("ATIVO") @db.VarChar(20)
+criadoEm     DateTime @default(now()) @map("criado_em")
+atualizadoEm DateTime @default(now()) @updatedAt @map("atualizado_em")
+
+aluno                Aluno?
+tutor                Tutor?
+administrador        Administrador?
+convitesCriados      Convite[]                @relation("ConviteCriador")
+questoesCriadas      Questao[]
+comunicadosEnviados  Comunicado[]
+comunicadosRecebidos ComunicadoDestinatario[]
+auditorias           Auditoria[]
+
+@@map("USUARIO")
+}
+
+model Turma {
+id             Int      @id @default(autoincrement()) @map("id_turma")
+nome           String   @db.VarChar(100)
+anoLetivo      Int      @map("ano_letivo")
+vestibularFoco String   @default("ENEM") @map("vestibular_foco") @db.VarChar(20)
+status         String   @default("ATIVA") @db.VarChar(20)
+criadoEm       DateTime @default(now()) @map("criado_em")
+
+tutores  Tutor[]
+tarefas  Tarefa[]
+convites Convite[]
+
+@@map("TURMA")
+}
+
+model Tutor {
+idUsuario Int @id @map("id_usuario")
+idTurma   Int @map("id_turma")
+
+usuario Usuario @relation(fields: [idUsuario], references: [id], onDelete: Cascade)
+turma   Turma   @relation(fields: [idTurma], references: [id])
+
+alunos    Aluno[]
+convites  Convite[]
+tarefas   Tarefa[]
+correcoes Correcao[]
+
+@@map("TUTOR")
+}
+
+model Administrador {
+idUsuario Int @id @map("id_usuario")
+
+usuario Usuario @relation(fields: [idUsuario], references: [id], onDelete: Cascade)
+
+tarefas   Tarefa[]
+correcoes Correcao[]
+
+@@map("ADMINISTRADOR")
+}
+
+model Aluno {
+idUsuario Int @id @map("id_usuario")
+idTutor   Int @map("id_tutor")
+
+usuario Usuario @relation(fields: [idUsuario], references: [id], onDelete: Cascade)
+tutor   Tutor   @relation(fields: [idTutor], references: [idUsuario])
+
+redacoes     Redacao[]
+simulados    Simulado[]
+cadernoErros CadernoErros[]
+
+@@map("ALUNO")
+}
+
+model Convite {
+codigo      String   @id @db.VarChar(10)
+papel       String   @db.VarChar(20) // TUTOR, ALUNO
+idTurma     Int      @map("id_turma")
+idTutor     Int?     @map("id_tutor") // Preenchido quando papel = ALUNO
+idCriadoPor Int      @map("id_criado_por")
+usado       Boolean  @default(false)
+expiraEm    DateTime @map("expira_em")
+criadoEm    DateTime @default(now()) @map("criado_em")
+
+turma     Turma   @relation(fields: [idTurma], references: [id])
+tutor     Tutor?  @relation(fields: [idTutor], references: [idUsuario])
+criadoPor Usuario @relation("ConviteCriador", fields: [idCriadoPor], references: [id])
+
+@@map("CONVITE")
+}
+
+// ============================================================
+// 2. REDAÇÕES, VERSÕES E CORREÇÕES
+// ============================================================
+
+model Tema {
+id             Int     @id @default(autoincrement()) @map("id_tema")
+tituloTema     String  @map("titulo_tema") @db.VarChar(200)
+textoMotivador String? @map("texto_motivador") @db.Text
+origem         String? @db.VarChar(100)
+
+tarefas  Tarefa[]
+redacoes Redacao[]
+
+@@map("TEMA")
+}
+
+model Tarefa {
+id             Int      @id @default(autoincrement()) @map("id_tarefa")
+idTutor        Int?     @map("id_tutor")
+idAdm          Int?     @map("id_adm")
+idTurma        Int      @map("id_turma")
+idTema         Int?     @map("id_tema")
+idTarefaOrigem Int?     @map("id_tarefa_origem")
+tituloTarefa   String   @map("titulo_tarefa") @db.VarChar(200)
+descricao      String?  @db.Text
+prazoEntrega   DateTime @map("prazo_entrega")
+modalidade     String   @db.VarChar(20) // AVALIATIVA, GERAL
+criadoEm       DateTime @default(now()) @map("criado_em")
+
+tutor            Tutor?         @relation(fields: [idTutor], references: [idUsuario])
+administrador    Administrador? @relation(fields: [idAdm], references: [idUsuario])
+turma            Turma          @relation(fields: [idTurma], references: [id])
+tema             Tema?          @relation(fields: [idTema], references: [id])
+tarefaOrigem     Tarefa?        @relation("TarefaOrigem", fields: [idTarefaOrigem], references: [id])
+tarefasAplicadas Tarefa[]       @relation("TarefaOrigem")
+
+anexos   Anexo[]
+redacoes Redacao[]
+
+@@map("TAREFA")
+}
+
+model Anexo {
+id             Int      @id @default(autoincrement()) @map("id_anexo")
+idTarefa       Int      @map("id_tarefa")
+nomeArquivo    String   @map("nome_arquivo") @db.VarChar(255)
+caminhoArquivo String   @map("caminho_arquivo") @db.VarChar(500)
+tipoArquivo    String   @map("tipo_arquivo") @db.VarChar(20)
+criadoEm       DateTime @default(now()) @map("criado_em")
+
+tarefa Tarefa @relation(fields: [idTarefa], references: [id], onDelete: Cascade)
+
+@@map("ANEXO")
+}
+
+model Redacao {
+id        Int      @id @default(autoincrement()) @map("id_redacao")
+idAluno   Int      @map("id_aluno")
+idTarefa  Int?     @map("id_tarefa")
+idTema    Int?     @map("id_tema")
+tipoFluxo String   @map("tipo_fluxo") @db.VarChar(20) // TREINO, AVALIATIVA
+criadoEm  DateTime @default(now()) @map("criado_em")
+
+aluno  Aluno   @relation(fields: [idAluno], references: [idUsuario])
+tarefa Tarefa? @relation(fields: [idTarefa], references: [id])
+tema   Tema?   @relation(fields: [idTema], references: [id])
+
+versoes VersaoRedacao[]
+
+@@map("REDACAO")
+}
+
+model VersaoRedacao {
+id            Int       @id @default(autoincrement()) @map("id_versao")
+idRedacao     Int       @map("id_redacao")
+numeroVersao  Int       @map("numero_versao") // 1 ou 2
+conteudoTexto String    @map("conteudo_texto") @db.LongText
+statusVersao  String    @map("status_versao") @db.VarChar(30)
+criadoEm      DateTime  @default(now()) @map("criado_em")
+dataEnvio     DateTime? @map("data_envio")
+
+redacao   Redacao    @relation(fields: [idRedacao], references: [id], onDelete: Cascade)
+correcoes Correcao[]
+
+@@unique([idRedacao, numeroVersao])
+@@map("VERSAO_REDACAO")
+}
+
+model Correcao {
+id                    Int      @id @default(autoincrement()) @map("id_correcao")
+idVersao              Int      @map("id_versao")
+idTutor               Int      @map("id_tutor")
+idAdm                 Int?     @map("id_adm")
+numeroAjuste          Int      @default(0) @map("numero_ajuste")
+notaComp1             Decimal? @map("nota_comp1") @db.Decimal(5, 2)
+notaComp2             Decimal? @map("nota_comp2") @db.Decimal(5, 2)
+notaComp3             Decimal? @map("nota_comp3") @db.Decimal(5, 2)
+notaComp4             Decimal? @map("nota_comp4") @db.Decimal(5, 2)
+notaComp5             Decimal? @map("nota_comp5") @db.Decimal(5, 2)
+notaTotal             Decimal? @map("nota_total") @db.Decimal(6, 2)
+parecerGeral          String?  @map("parecer_geral") @db.Text
+recadoAdmin           String?  @map("recado_admin") @db.Text
+comentarioAjusteAdmin String?  @map("comentario_ajuste_admin") @db.Text
+statusAprovacao       String   @map("status_aprovacao") @db.VarChar(30)
+dataCorrecao          DateTime @default(now()) @map("data_correcao")
+
+versao        VersaoRedacao  @relation(fields: [idVersao], references: [id])
+tutor         Tutor          @relation(fields: [idTutor], references: [idUsuario])
+administrador Administrador? @relation(fields: [idAdm], references: [idUsuario])
+
+anotacoes Anotacao[]
+
+@@unique([idVersao, numeroAjuste])
+@@map("CORRECAO")
+}
+
+model Anotacao {
+id                 Int     @id @default(autoincrement()) @map("id_anotacao")
+idCorrecao         Int     @map("id_correcao")
+posicaoInicio      Int     @map("posicao_inicio")
+posicaoFinal       Int     @map("posicao_final")
+textoSelecionado   String  @map("texto_selecionado") @db.Text
+tipoErro           String  @map("tipo_erro") @db.VarChar(100)
+sugestaoComentario String? @map("sugestao_comentario") @db.Text
+
+correcao Correcao @relation(fields: [idCorrecao], references: [id], onDelete: Cascade)
+
+@@map("ANOTACAO")
+}
+
+// ============================================================
+// 3. BANCO DE QUESTÕES E SIMULADOS
+// ============================================================
+
+model Questao {
+id                 Int      @id @default(autoincrement()) @map("id_questao")
+enunciado          String   @db.Text
+imagemUrl          String?  @map("imagem_url") @db.VarChar(500)
+vestibular         String   @db.VarChar(20)
+ano                Int
+numeroQuestao      Int?     @map("numero_questao")
+grauDificuldade    String   @map("grau_dificuldade") @db.VarChar(20)
+explicacaoGabarito String?  @map("explicacao_gabarito") @db.Text
+criadoPor          Int      @map("criado_por")
+criadoEm           DateTime @default(now()) @map("criado_em")
+atualizadoEm       DateTime @default(now()) @updatedAt @map("atualizado_em")
+
+criador Usuario @relation(fields: [criadoPor], references: [id])
+
+alternativas Alternativa[]
+assuntos     QuestaoAssunto[]
+simulados    ContemQuestao[]
+cadernoErros CadernoErros[]
+
+@@map("QUESTAO")
+}
+
+model Alternativa {
+id                 Int     @id @default(autoincrement()) @map("id_alternativa")
+idQuestao          Int     @map("id_questao")
+letraOpcao         String  @map("letra_opcao") @db.Char(1)
+textoAlternativa   String  @map("texto_alternativa") @db.Text
+alternativaCorreta Boolean @default(false) @map("alternativa_correta")
+
+questao Questao @relation(fields: [idQuestao], references: [id], onDelete: Cascade)
+
+@@unique([idQuestao, letraOpcao])
+@@map("ALTERNATIVA")
+}
+
+model Assunto {
+id          Int    @id @default(autoincrement()) @map("id_assunto")
+nomeAssunto String @unique @map("nome_assunto") @db.VarChar(150)
+
+questoes QuestaoAssunto[]
+
+@@map("ASSUNTO")
+}
+
+model QuestaoAssunto {
+idQuestao Int @map("id_questao")
+idAssunto Int @map("id_assunto")
+
+questao Questao @relation(fields: [idQuestao], references: [id], onDelete: Cascade)
+assunto Assunto @relation(fields: [idAssunto], references: [id], onDelete: Cascade)
+
+@@id([idQuestao, idAssunto])
+@@map("QUESTAO_ASSUNTO")
+}
+
+model Simulado {
+id             Int       @id @default(autoincrement()) @map("id_simulado")
+idAluno        Int       @map("id_aluno")
+tipoSimulado   String    @map("tipo_simulado") @db.VarChar(30)
+dataInicio     DateTime  @map("data_inicio")
+dataFim        DateTime? @map("data_fim")
+tempoGastoSeg  Int?      @map("tempo_gasto_seg")
+statusSimulado String    @map("status_simulado") @db.VarChar(20)
+pontuacaoTotal Decimal?  @map("pontuacao_total") @db.Decimal(5, 2)
+
+aluno Aluno @relation(fields: [idAluno], references: [idUsuario])
+
+questoes ContemQuestao[]
+
+@@map("SIMULADO")
+}
+
+model ContemQuestao {
+idSimulado      Int       @map("id_simulado")
+idQuestao       Int       @map("id_questao")
+ordem           Int
+respostaAluno   String?   @map("resposta_aluno") @db.Char(1)
+indicadorAcerto Boolean?  @map("indicador_acerto")
+dataResposta    DateTime? @map("data_resposta")
+
+simulado Simulado @relation(fields: [idSimulado], references: [id], onDelete: Cascade)
+questao  Questao  @relation(fields: [idQuestao], references: [id])
+
+@@id([idSimulado, idQuestao])
+@@map("CONTEM_QUESTAO")
+}
+
+model CadernoErros {
+id               Int      @id @default(autoincrement()) @map("id_caderno")
+idAluno          Int      @map("id_aluno")
+idQuestao        Int      @map("id_questao")
+quantidadeErros  Int      @default(1) @map("quantidade_erros")
+statusRevisao    String   @default("ATIVO") @map("status_revisao") @db.VarChar(20)
+dataPrimeiroErro DateTime @map("data_primeiro_erro")
+dataUltimoErro   DateTime @map("data_ultimo_erro")
+
+aluno   Aluno   @relation(fields: [idAluno], references: [idUsuario])
+questao Questao @relation(fields: [idQuestao], references: [id])
+
+@@unique([idAluno, idQuestao])
+@@map("CADERNO_ERROS")
+}
+
+// ============================================================
+// 4. COMUNICAÇÃO E AUDITORIA
+// ============================================================
+
+model Comunicado {
+id                 Int      @id @default(autoincrement()) @map("id_comunicado")
+idUsuarioRemetente Int      @map("id_usuario_remetente")
+tituloComunicado   String   @map("titulo_comunicado") @db.VarChar(200)
+mensagem           String   @db.Text
+dataEnvio          DateTime @default(now()) @map("data_envio")
+
+remetente     Usuario                  @relation(fields: [idUsuarioRemetente], references: [id])
+destinatarios ComunicadoDestinatario[]
+
+@@map("COMUNICADO")
+}
+
+model ComunicadoDestinatario {
+idComunicado          Int     @map("id_comunicado")
+idUsuarioDestinatario Int     @map("id_usuario_destinatario")
+lido                  Boolean @default(false)
+
+comunicado  Comunicado @relation(fields: [idComunicado], references: [id], onDelete: Cascade)
+destinatario Usuario    @relation(fields: [idUsuarioDestinatario], references: [id])
+
+@@id([idComunicado, idUsuarioDestinatario])
+@@map("COMUNICADO_DESTINATARIO")
+}
+
+model Auditoria {
+id         Int      @id @default(autoincrement()) @map("id_auditoria")
+idUsuario  Int?     @map("id_usuario")
+acao       String   @db.VarChar(100)
+entidade   String   @db.VarChar(50)
+idRegistro Int?     @map("id_registro")
+descricao  String?  @db.Text
+dataHora   DateTime @default(now()) @map("data_hora")
+
+usuario Usuario? @relation(fields: [idUsuario], references: [id])
+
+@@map("AUDITORIA")
+}

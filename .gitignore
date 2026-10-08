@@ -1,0 +1,28 @@
+# Dependências e artefatos gerados
+node_modules/
+dist/
+backend/node_modules/
+backend/dist/
+
+# Segredos e arquivos de ambiente
+.env
+.env.*
+!.env.example
+backend/.env
+backend/.env.*
+!backend/.env.example
+backend/firebase-service-account.json
+
+# Exportações e backups locais
+backup*.sql
+*.sql
+!backend/prisma/migrations/**/*.sql
+backend/prisma/questoes-export.json
+
+# Configurações locais do editor
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Permite workflows versionados
+!.github/
