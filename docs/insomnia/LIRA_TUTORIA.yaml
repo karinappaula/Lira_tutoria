@@ -1,0 +1,438 @@
+﻿type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: LIRA_TUTORIA
+meta:
+  id: wrk_9853a192853f45d18321e4797e3945e7
+  created: 1791250265236
+  modified: 1791250265236
+  description: ""
+collection:
+  - name: 00-HEALTH
+    meta:
+      id: fld_9dddc86929894096b5c75c8478663367
+      created: 1791385174998
+      modified: 1791385174998
+      sortKey: -1791385174998
+      description: ""
+    children:
+      - url: http://localhost:3333/health
+        name: Verificar API
+        meta:
+          id: req_408ea6d67b324d638cef933a3f01d75a
+          created: 1791385181758
+          modified: 1791461788694
+          isPrivate: false
+          description: ""
+          sortKey: -1791385181758
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 01-AUTENTICAÃ‡ÃƒO
+    meta:
+      id: fld_ab00487769f34e9ab1e67be7f9504f52
+      created: 1791385226386
+      modified: 1791385226386
+      sortKey: -1791385226386
+      description: ""
+    children:
+      - url: http://localhost:3333/auth/login
+        name: Login - Administrador
+        meta:
+          id: req_445ff2e8dc834705b9b5e6749012f64c
+          created: 1791385230803
+          modified: 1791463479613
+          isPrivate: false
+          description: ""
+          sortKey: -1791385230803
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "email": "admin@lira.com",
+              "senha": "SENHA_DO_SEED"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3333/auth/login
+        name: Login - Tutor
+        meta:
+          id: req_6bafb609167e4ad0946904ea8d78b1b2
+          created: 1791385248686
+          modified: 1791465839169
+          isPrivate: false
+          description: ""
+          sortKey: -1791385248686
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "email": "tutor@lira.com",
+              "senha": "SENHA_DO_SEED"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3333/auth/login
+        name: Login - Aluno
+        meta:
+          id: req_df023c6dbfb24e87b6c0bda41da2de6e
+          created: 1791385268385
+          modified: 1791385274752
+          isPrivate: false
+          description: ""
+          sortKey: -1791385268385
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "email": "aluno@lira.com",
+              "senha": "SENHA_DO_SEED"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3333/auth/selecionar-papel
+        name: Selecionar Papel
+        meta:
+          id: req_996d80580cfb4185ab106413adfc1468
+          created: 1791385283479
+          modified: 1791466065950
+          isPrivate: false
+          description: ""
+          sortKey: -1791385283479
+        method: POST
+        body:
+          mimeType: application/json
+          text: >-
+            {
+              "tokenPendente": "COLE_O_TOKEN_PENDENTE_AQUI",
+              "papel": "TUTOR"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: none
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 02-CONVITES DE TUTOR
+    meta:
+      id: fld_a87d5f35d495410298db8d8a17c19a38
+      created: 1791385312817
+      modified: 1791385312817
+      sortKey: -1791385312817
+      description: ""
+    children:
+      - url: http://localhost:3333/turmas/1/convites/tutor
+        name: Gerar Convite de Tutor
+        meta:
+          id: req_2befe539d00345918caaf50a6ba7fff4
+          created: 1791385325857
+          modified: 1791463183770
+          isPrivate: false
+          description: ""
+          sortKey: -1791385325857
+        method: POST
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_OU_TUTOR_AQUI
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3333/convites
+        name: Listar Convites
+        meta:
+          id: req_cfb2798d0ec44d1198654fadbea13ae1
+          created: 1791385340247
+          modified: 1791463232506
+          isPrivate: false
+          description: ""
+          sortKey: -1791385340247
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_OU_TUTOR_AQUI
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 03-CADASTRO
+    meta:
+      id: fld_011af8abb816491ebae1b235e2530cd1
+      created: 1791385360606
+      modified: 1791385360606
+      sortKey: -1791385360606
+      description: ""
+    children:
+      - url: http://localhost:3333/auth/cadastro
+        name: Cadastrar Tutor via Convite
+        meta:
+          id: req_ed0ee5b7592b42a388d0d3a002c97271
+          created: 1791385372387
+          modified: 1791462896239
+          isPrivate: false
+          description: ""
+          sortKey: -1791385372387
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "codigo": "COLE_O_CODIGO_TUTOR_AQUI",
+              "nome": "Heloisa",
+              "email": "heloisa@lira.com",
+              "senha": "SENHA_DO_SEED"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3333/auth/cadastro
+        name: Cadastrar Aluno via Convite
+        meta:
+          id: req_c852ad8cb53849eba4d95390e8260c1f
+          created: 1791385387180
+          modified: 1791467309453
+          isPrivate: false
+          description: ""
+          sortKey: -1791385387180
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "codigo": "COLE_O_CODIGO_ALUNO_AQUI",
+              "nome": "Arthur",
+              "email": "arthur@lira.com",
+              "senha": "SENHA_DO_SEED"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 04-CONVITES DE ALUNO
+    meta:
+      id: fld_dded4a53d5e84626b1929600a7056ed3
+      created: 1791385413277
+      modified: 1791385413277
+      sortKey: -1791385413277
+      description: ""
+    children:
+      - url: http://localhost:3333/tutor/convites/aluno
+        name: Gerar Convite de Aluno
+        meta:
+          id: req_cad7a43f2b9f4f3ba73b91ad5d5524df
+          created: 1791385424056
+          modified: 1791466246614
+          isPrivate: false
+          description: ""
+          sortKey: -1791385424056
+        method: POST
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_OU_TUTOR_AQUI
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 05-MULTI-PAPEIS
+    meta:
+      id: fld_205ac4c38eb24e32b99a4b51e07fadd9
+      created: 1791385452231
+      modified: 1791385452231
+      sortKey: -1791385452231
+      description: ""
+    children:
+      - url: http://localhost:3333/auth/participar-como-aluno
+        name: Participar como Aluno
+        meta:
+          id: req_00d43799a8514fb0a581a09a7534f3d3
+          created: 1791385464992
+          modified: 1791385471980
+          isPrivate: false
+          description: ""
+          sortKey: -1791385464992
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "codigo": "COLE_O_CODIGO_ALUNO_AQUI"
+            }
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_TUTOR_AQUI
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3333/auth/selecionar-papel
+        name: Selecionar Papel - Tutor ou Aluno
+        meta:
+          id: req_611a560b796f44949db4de9a48bc150f
+          created: 1791385480874
+          modified: 1791385486843
+          isPrivate: false
+          description: ""
+          sortKey: -1791385480874
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "tokenPendente": "COLE_O_TOKEN_PENDENTE_AQUI",
+              "papel": "ALUNO"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 02-TURMAS
+    meta:
+      id: fld_1de2eaeceea243e3afdb40f1baf5a589
+      created: 1791461963705
+      modified: 1791461963705
+      sortKey: -1791461963705
+      description: ""
+    children:
+      - url: http://localhost:3333/turmas
+        name: Criar turma
+        meta:
+          id: req_f3714c1e8c8f4354a1a4ba498cbc0186
+          created: 1791461968575
+          modified: 1791462161484
+          isPrivate: false
+          description: ""
+          sortKey: -1791461981942
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "nome": "3º B",
+              "anoLetivo": 2026,
+              "vestibularFoco": "ENEM"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3333/turmas
+        name: Listar Turmas
+        meta:
+          id: req_7c71fc74282348e7b4be91db437a68c8
+          created: 1791461981842
+          modified: 1791462029848
+          isPrivate: false
+          description: ""
+          sortKey: -1791461981842
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_57c512239ff1fbad3ca8c3c0be62e44dd687b233
+    created: 1791250265258
+    modified: 1791250265258
+environments:
+  name: Base Environment
+  meta:
+    id: env_57c512239ff1fbad3ca8c3c0be62e44dd687b233
+    created: 1791250265252
+    modified: 1791250265252
+    isPrivate: false
+
+
+
