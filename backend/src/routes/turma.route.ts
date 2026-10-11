@@ -1,13 +1,44 @@
 import { Router } from "express";
-import { getTurmas, postTurma } from "../controllers/turma.controller";
+import {
+  getTurma,
+  getTurmas,
+  patchTurma,
+  postArquivarTurma,
+  postTurma,
+} from "../controllers/turma.controller";
+import { exigirAutenticacao, exigirPapel } from "../middlewares/auth.middleware";
 
 const router = Router();
 
-// NOTA: ainda sem middleware de autenticação/autorização — isso entra
-// assim que o módulo de auth (próximo passo) estiver pronto. Por ora,
-// estas rotas servem para validar a integração Express -> Prisma -> MySQL
-// exigida nesta sprint.
-router.get("/turmas", getTurmas);
-router.post("/turmas", postTurma);
+router.get(
+  "/turmas",
+  exigirAutenticacao,
+  exigirPapel("ADMINISTRADOR", "TUTOR", "ALUNO"),
+  getTurmas
+);
+router.get(
+  "/turmas/:idTurma",
+  exigirAutenticacao,
+  exigirPapel("ADMINISTRADOR", "TUTOR", "ALUNO"),
+  getTurma
+);
+router.post(
+  "/turmas",
+  exigirAutenticacao,
+  exigirPapel("ADMINISTRADOR"),
+  postTurma
+);
+router.patch(
+  "/turmas/:idTurma",
+  exigirAutenticacao,
+  exigirPapel("ADMINISTRADOR"),
+  patchTurma
+);
+router.post(
+  "/turmas/:idTurma/arquivar",
+  exigirAutenticacao,
+  exigirPapel("ADMINISTRADOR"),
+  postArquivarTurma
+);
 
 export default router;

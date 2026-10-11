@@ -155,7 +155,7 @@ collection:
             send: true
             store: true
           rebuildPath: true
-  - name: 02-CONVITES DE TUTOR
+  - name: 03-CONVITES DE TUTOR
     meta:
       id: fld_a87d5f35d495410298db8d8a17c19a38
       created: 1791385312817
@@ -205,7 +205,7 @@ collection:
             send: true
             store: true
           rebuildPath: true
-  - name: 03-CADASTRO
+  - name: 01-CADASTRO
     meta:
       id: fld_011af8abb816491ebae1b235e2530cd1
       created: 1791385360606
@@ -302,7 +302,7 @@ collection:
             send: true
             store: true
           rebuildPath: true
-  - name: 05-MULTI-PAPEIS
+  - name: 02-AUTENTICACAO-E-PAPEIS
     meta:
       id: fld_205ac4c38eb24e32b99a4b51e07fadd9
       created: 1791385452231
@@ -365,7 +365,7 @@ collection:
             send: true
             store: true
           rebuildPath: true
-  - name: 02-TURMAS
+  - name: 05-TURMAS
     meta:
       id: fld_1de2eaeceea243e3afdb40f1baf5a589
       created: 1791461963705
@@ -420,6 +420,527 @@ collection:
             send: true
             store: true
           rebuildPath: true
+      - url: http://localhost:3333/turmas/1
+        name: Consultar Turma
+        meta:
+          id: req_turma_consultar
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_AQUI
+      - url: http://localhost:3333/turmas
+        name: Criar Turma - Administrador
+        meta:
+          id: req_turma_criar_admin
+          isPrivate: false
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "nome": "3º A",
+              "anoLetivo": 2026,
+              "vestibularFoco": "ENEM"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+      - url: http://localhost:3333/turmas/1
+        name: Atualizar Turma - Administrador
+        meta:
+          id: req_turma_atualizar
+          isPrivate: false
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "nome": "3º A - Manhã",
+              "vestibularFoco": "ENEM"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+      - url: http://localhost:3333/turmas/1/arquivar
+        name: Arquivar Turma - Administrador
+        meta:
+          id: req_turma_arquivar
+          isPrivate: false
+        method: POST
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+  - name: 06-TEMAS
+    meta:
+      id: fld_temas
+      description: CRUD de temas motivadores
+    children:
+      - url: http://localhost:3333/temas
+        name: Listar Temas
+        meta:
+          id: req_temas_listar
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_AQUI
+      - url: http://localhost:3333/temas/1
+        name: Consultar Tema
+        meta:
+          id: req_temas_consultar
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_AQUI
+      - url: http://localhost:3333/temas
+        name: Criar Tema - Administrador
+        meta:
+          id: req_temas_criar
+          isPrivate: false
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "tituloTema": "Desafios da educação digital",
+              "textoMotivador": "Texto motivador do tema.",
+              "origem": "ENEM"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+      - url: http://localhost:3333/temas/1
+        name: Atualizar Tema - Administrador
+        meta:
+          id: req_temas_atualizar
+          isPrivate: false
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "tituloTema": "Novo título do tema"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+      - url: http://localhost:3333/temas/1
+        name: Excluir Tema - Administrador
+        meta:
+          id: req_temas_excluir
+          isPrivate: false
+        method: DELETE
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+  - name: 07-TAREFAS
+    meta:
+      id: fld_tarefas
+      description: Tarefas avaliativas e atividades gerais
+    children:
+      - url: http://localhost:3333/tarefas
+        name: Listar Tarefas
+        meta:
+          id: req_tarefas_listar
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_AQUI
+      - url: http://localhost:3333/tarefas/1
+        name: Consultar Tarefa
+        meta:
+          id: req_tarefas_consultar
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_AQUI
+      - url: http://localhost:3333/tarefas
+        name: Criar Tarefa
+        meta:
+          id: req_tarefas_criar
+          isPrivate: false
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "idTurma": 1,
+              "idTema": 1,
+              "tituloTarefa": "Redação avaliativa 1",
+              "descricao": "Produza uma redação dissertativo-argumentativa.",
+              "prazoEntrega": "2026-12-31T23:59:00.000Z",
+              "modalidade": "AVALIATIVA"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_TUTOR_AQUI
+      - url: http://localhost:3333/tarefas/1
+        name: Atualizar Tarefa - Administrador
+        meta:
+          id: req_tarefas_atualizar
+          isPrivate: false
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "tituloTarefa": "Redação avaliativa atualizada"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+      - url: http://localhost:3333/tarefas/1
+        name: Excluir Tarefa - Administrador
+        meta:
+          id: req_tarefas_excluir
+          isPrivate: false
+        method: DELETE
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+      - url: http://localhost:3333/tarefas/1/replicar
+        name: Replicar Tarefa Geral - Administrador
+        meta:
+          id: req_tarefas_replicar
+          isPrivate: false
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "idTurma": 1,
+              "prazoEntrega": "2026-12-31T23:59:00.000Z"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+  - name: 08-REDACOES
+    meta:
+      id: fld_redacoes
+      description: Ciclo de rascunho, envio e reescrita
+    children:
+      - url: http://localhost:3333/redacoes
+        name: Listar Redações
+        meta:
+          id: req_redacoes_listar
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_AQUI
+      - url: http://localhost:3333/redacoes/1
+        name: Consultar Redação
+        meta:
+          id: req_redacoes_consultar
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_AQUI
+      - url: http://localhost:3333/redacoes
+        name: Criar Rascunho de Treino
+        meta:
+          id: req_redacoes_criar_treino
+          isPrivate: false
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "tipoFluxo": "TREINO",
+              "idTema": 1,
+              "conteudoTexto": "Meu rascunho inicial."
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ALUNO_AQUI
+      - url: http://localhost:3333/redacoes
+        name: Criar Redação Avaliativa
+        meta:
+          id: req_redacoes_criar_avaliativa
+          isPrivate: false
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "tipoFluxo": "AVALIATIVA",
+              "idTarefa": 1,
+              "conteudoTexto": ""
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ALUNO_AQUI
+      - url: http://localhost:3333/redacoes/1/rascunho
+        name: Salvar Rascunho
+        meta:
+          id: req_redacoes_rascunho
+          isPrivate: false
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "conteudoTexto": "Texto atualizado do rascunho."
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ALUNO_AQUI
+      - url: http://localhost:3333/redacoes/1/enviar
+        name: Enviar Redação
+        meta:
+          id: req_redacoes_enviar
+          isPrivate: false
+        method: POST
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ALUNO_AQUI
+      - url: http://localhost:3333/redacoes/1/reescrita
+        name: Criar Reescrita
+        meta:
+          id: req_redacoes_reescrita
+          isPrivate: false
+        method: POST
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ALUNO_AQUI
+  - name: 09-CORRECOES
+    meta:
+      id: fld_correcoes
+      description: Correção ENEM e aprovação administrativa
+    children:
+      - url: http://localhost:3333/correcoes/pendentes
+        name: Listar Correções Pendentes
+        meta:
+          id: req_correcoes_pendentes
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_TUTOR_OU_ADMIN_AQUI
+      - url: http://localhost:3333/correcoes/1
+        name: Consultar Correção
+        meta:
+          id: req_correcoes_consultar
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_AQUI
+      - url: http://localhost:3333/redacoes/correcoes
+        name: Criar Correção - Tutor
+        meta:
+          id: req_correcoes_criar
+          isPrivate: false
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "idVersao": 1,
+              "notaComp1": 160,
+              "notaComp2": 160,
+              "notaComp3": 140,
+              "notaComp4": 160,
+              "notaComp5": 120,
+              "parecerGeral": "Parecer geral da correção.",
+              "anotacoes": [
+                {
+                  "posicaoInicio": 0,
+                  "posicaoFinal": 12,
+                  "textoSelecionado": "Meu texto aqui",
+                  "tipoErro": "Coesão",
+                  "sugestaoComentario": "Revise a conexão entre as ideias."
+                }
+              ]
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_TUTOR_AQUI
+      - url: http://localhost:3333/correcoes/1/aprovar
+        name: Aprovar Correção - Administrador
+        meta:
+          id: req_correcoes_aprovar
+          isPrivate: false
+        method: POST
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+      - url: http://localhost:3333/correcoes/1/solicitar-ajuste
+        name: Solicitar Ajuste - Administrador
+        meta:
+          id: req_correcoes_ajuste
+          isPrivate: false
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "recadoAdmin": "Revise a justificativa da competência 3."
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+  - name: 10-QUESTOES-E-SIMULADOS
+    meta:
+      id: fld_simulados
+      description: Questões, simulados e caderno de erros
+    children:
+      - url: http://localhost:3333/questoes?limite=5
+        name: Listar Questões
+        meta:
+          id: req_simulados_questoes
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_AQUI
+      - url: http://localhost:3333/assuntos
+        name: Listar Assuntos
+        meta:
+          id: req_simulados_assuntos
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_AQUI
+      - url: http://localhost:3333/simulados
+        name: Criar Simulado
+        meta:
+          id: req_simulados_criar
+          isPrivate: false
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "tipoSimulado": "PERSONALIZADO",
+              "quantidade": 3
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ALUNO_AQUI
+      - url: http://localhost:3333/simulados
+        name: Listar Simulados do Aluno
+        meta:
+          id: req_simulados_listar
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ALUNO_AQUI
+      - url: http://localhost:3333/simulados/1/iniciar
+        name: Iniciar Simulado
+        meta:
+          id: req_simulados_iniciar
+          isPrivate: false
+        method: POST
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ALUNO_AQUI
+      - url: http://localhost:3333/simulados/1/respostas
+        name: Responder Questão
+        meta:
+          id: req_simulados_responder
+          isPrivate: false
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "idQuestao": 1,
+              "resposta": "A"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ALUNO_AQUI
+      - url: http://localhost:3333/simulados/1/finalizar
+        name: Finalizar Simulado
+        meta:
+          id: req_simulados_finalizar
+          isPrivate: false
+        method: POST
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ALUNO_AQUI
+      - url: http://localhost:3333/caderno-erros
+        name: Listar Caderno de Erros
+        meta:
+          id: req_simulados_caderno
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ALUNO_AQUI
+      - url: http://localhost:3333/caderno-erros/1/revisar
+        name: Revisar Erro
+        meta:
+          id: req_simulados_revisar
+          isPrivate: false
+        method: POST
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ALUNO_AQUI
+  - name: 11-SESSAO
+    meta:
+      id: fld_auth_me
+      description: Dados do usuário autenticado
+    children:
+      - url: http://localhost:3333/auth/me
+        name: Consultar Usuário Autenticado
+        meta:
+          id: req_auth_me
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_AQUI
 cookieJar:
   name: Default Jar
   meta:
@@ -433,6 +954,3 @@ environments:
     created: 1791250265252
     modified: 1791250265252
     isPrivate: false
-
-
-

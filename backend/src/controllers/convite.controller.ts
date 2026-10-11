@@ -1,10 +1,13 @@
 import type { NextFunction, Request, Response } from "express";
 import { gerarConviteAluno, gerarConviteTutor, listarConvitesAtivos } from "../services/convite.service";
 import type { RequestAutenticada } from "../middlewares/auth.middleware";
+import { ErroValidacao } from "../errors/erros";
 
 function idTurma(req: Request): number {
   const valor = Number(req.params.idTurma);
-  if (!Number.isInteger(valor) || valor <= 0) throw new Error("ID de turma inválido.");
+  if (!Number.isInteger(valor) || valor <= 0) {
+    throw new ErroValidacao([{ campo: "idTurma", mensagem: "Informe um identificador inteiro positivo." }]);
+  }
   return valor;
 }
 
@@ -34,7 +37,9 @@ export async function listarConvites(req: Request, res: Response, next: NextFunc
     const turma = req.query.turmaId;
     const idTurmaFiltro = turma === undefined ? undefined : Number(turma);
     if (idTurmaFiltro !== undefined && (!Number.isInteger(idTurmaFiltro) || idTurmaFiltro <= 0)) {
-      throw new Error("ID de turma inválido.");
+      throw new ErroValidacao([
+        { campo: "turmaId", mensagem: "Informe um identificador inteiro positivo." },
+      ]);
     }
     const convites = await listarConvitesAtivos(
       autenticada.autenticacao.idUsuario,

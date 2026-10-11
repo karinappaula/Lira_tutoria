@@ -1,7 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
-import { autenticar, selecionarPapel } from "../services/login.service";
+import { autenticar, obterSessaoAtual, selecionarPapel } from "../services/login.service";
 import { cadastrarViaConvite } from "../services/cadastro.service";
-import type { PapelAtivo } from "../services/token.service";
+import type { PapelAtivo, PayloadSessao } from "../services/token.service";
+import type { RequestAutenticada } from "../middlewares/auth.middleware";
 import { ErroValidacao, type DetalheValidacao } from "../errors/erros";
 
 const PAPEIS: readonly PapelAtivo[] = ["ADMINISTRADOR", "TUTOR", "ALUNO"];
@@ -145,6 +146,20 @@ export async function selecionarPapelHandler(req: Request, res: Response, next: 
 
     const resultado = await selecionarPapel(tokenPendente, papel as PapelAtivo);
     res.status(200).json(resultado);
+  } catch (erro) {
+    next(erro);
+  }
+}
+
+// GET /auth/me
+export async function me(req: Request, res: Response, next: NextFunction) {
+  try {
+    const autenticada = req as RequestAutenticada;
+    const sessao = await obterSessaoAtual(
+      autenticada.autenticacao.idUsuario,
+      autenticada.autenticacao.papelAtivo
+    );
+    res.status(200).json(sessao);
   } catch (erro) {
     next(erro);
   }

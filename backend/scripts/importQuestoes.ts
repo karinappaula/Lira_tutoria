@@ -85,3 +85,33 @@ export async function importarQuestoes(idUsuarioAutor: number) {
 
   console.log(`Importação concluída: ${importadas} questões migradas do Firebase para o MySQL.`);
 }
+
+async function main() {
+  const emailAutor = process.env.QUESTOES_AUTOR_EMAIL ?? "admin@lira.com";
+  const autor = await prisma.usuario.findUnique({
+    where: { email: emailAutor },
+    select: { id: true, email: true, administrador: { select: { idUsuario: true } } },
+  });
+
+  if (!autor) {
+    throw new Error(
+      `Usuário autor não encontrado para o e-mail "${emailAutor}". ` +
+      "Execute o seed ou configure QUESTOES_AUTOR_EMAIL com um administrador existente."
+    );
+  }
+
+  if (!autor.administrador) {
+    throw new Error(
+      `O usuário "${emailAutor}" não possui perfil de administrador e não pode ser autor das questões.`
+    );
+  }
+
+  await importarQuestoes(autor.id);
+}
+
+main()
+  .catch((erro) => {
+    console.error("Erro ao importar questões:", erro);
+    process.exitCode = 1;
+  })
+  .finally(() => prisma.$disconnect());

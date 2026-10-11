@@ -1,4 +1,6 @@
 import { prisma } from "../db/prisma";
+import { ErroNegocio } from "../errors/erros";
+import type { PapelAtivo } from "./token.service";
 
 export interface CriarTurmaInput {
   nome: string;
@@ -24,6 +26,17 @@ export interface TurmaComContagem {
   totalAlunos: number;
 }
 
+export interface TurmaResumo {
+  id: number;
+  nome: string;
+  anoLetivo: number;
+  vestibularFoco: string;
+  status: string;
+  criadoEm: Date;
+  totalTutores: number;
+  totalAlunos: number;
+}
+
 /**
  * Cria uma nova turma no sistema.
  * Regra de negócio: a combinação de `nome` + `anoLetivo` deve ser única.
@@ -34,8 +47,10 @@ export async function criarTurma(input: CriarTurmaInput) {
   });
 
   if (jaExiste) {
-    throw new Error(
-      `Já existe uma turma "${input.nome}" cadastrada para o ano letivo ${input.anoLetivo}.`
+    throw new ErroNegocio(
+      `Já existe uma turma "${input.nome}" cadastrada para o ano letivo ${input.anoLetivo}.`,
+      409,
+      "TURMA_DUPLICADA"
     );
   }
 
@@ -88,6 +103,65 @@ export async function listarTurmas(): Promise<TurmaComContagem[]> {
   });
 }
 
+export async function listarTurmasVisiveis(
+  idUsuario: number,
+  papelAtivo: PapelAtivo
+): Promise<TurmaComContagem[]> {
+  if (papelAtivo === "ADMINISTRADOR") {
+    return listarTurmas();
+  }
+
+  if (papelAtivo === "TUTOR") {
+    const turmas = await prisma.turma.findMany({
+      where: { tutores: { some: { idUsuario } } },
+      orderBy: { anoLetivo: "desc" },
+      include: {
+        tutores: {
+          select: { idUsuario: true, _count: { select: { alunos: true } } },
+        },
+      },
+    });
+    return turmas.map((turma) => ({
+      id: turma.id,
+      nome: turma.nome,
+      anoLetivo: turma.anoLetivo,
+      vestibularFoco: turma.vestibularFoco,
+      status: turma.status,
+      criadoEm: turma.criadoEm,
+      totalTutores: turma.tutores.length,
+      totalAlunos: turma.tutores.reduce((total, tutor) => total + tutor._count.alunos, 0),
+    }));
+  }
+
+  const aluno = await prisma.aluno.findUnique({
+    where: { idUsuario },
+    select: { tutor: { select: { idTurma: true } } },
+  });
+
+  if (!aluno) return [];
+
+  const turmas = await prisma.turma.findMany({
+    where: { id: aluno.tutor.idTurma },
+    orderBy: { anoLetivo: "desc" },
+    include: {
+      tutores: {
+        select: { idUsuario: true, _count: { select: { alunos: true } } },
+      },
+    },
+  });
+
+  return turmas.map((turma) => ({
+    id: turma.id,
+    nome: turma.nome,
+    anoLetivo: turma.anoLetivo,
+    vestibularFoco: turma.vestibularFoco,
+    status: turma.status,
+    criadoEm: turma.criadoEm,
+    totalTutores: turma.tutores.length,
+    totalAlunos: turma.tutores.reduce((total, tutor) => total + tutor._count.alunos, 0),
+  }));
+}
+
 /**
  * Busca os detalhes completos de uma turma, incluindo tutores e alunos vinculados.
  */
@@ -116,7 +190,53 @@ export async function buscarTurmaPorId(idTurma: number) {
   });
 
   if (!turma) {
-    throw new Error(`Turma com ID ${idTurma} não foi encontrada.`);
+    throw new ErroNegocio(`Turma com ID ${idTurma} não foi encontrada.`, 404, "TURMA_NAO_ENCONTRADA");
+  }
+
+  return turma;
+}
+
+export async function buscarTurmaVisivelPorId(
+  idUsuario: number,
+  papelAtivo: PapelAtivo,
+  idTurma: number
+) {
+  const turma = await buscarTurmaPorId(idTurma);
+
+  if (papelAtivo === "ADMINISTRADOR") {
+    return turma;
+  }
+
+  const possuiAcesso =
+    papelAtivo === "TUTOR"
+      ? turma.tutores.some((tutor) => tutor.idUsuario === idUsuario)
+      : turma.tutores.some((tutor) =>
+          tutor.alunos.some((aluno) => aluno.idUsuario === idUsuario)
+        );
+
+  if (!possuiAcesso) {
+    throw new ErroNegocio(
+      "Você não possui acesso a esta turma.",
+      403,
+      "SEM_PERMISSAO"
+    );
+  }
+
+  if (papelAtivo === "ALUNO") {
+    const resumo: TurmaResumo = {
+      id: turma.id,
+      nome: turma.nome,
+      anoLetivo: turma.anoLetivo,
+      vestibularFoco: turma.vestibularFoco,
+      status: turma.status,
+      criadoEm: turma.criadoEm,
+      totalTutores: turma.tutores.length,
+      totalAlunos: turma.tutores.reduce(
+        (total, tutor) => total + tutor.alunos.length,
+        0
+      ),
+    };
+    return resumo;
   }
 
   return turma;
@@ -129,7 +249,7 @@ export async function atualizarTurma(idTurma: number, input: AtualizarTurmaInput
   const turmaExistente = await prisma.turma.findUnique({ where: { id: idTurma } });
 
   if (!turmaExistente) {
-    throw new Error(`Turma com ID ${idTurma} não encontrada.`);
+    throw new ErroNegocio(`Turma com ID ${idTurma} não encontrada.`, 404, "TURMA_NAO_ENCONTRADA");
   }
 
   if (input.nome || input.anoLetivo) {
@@ -145,8 +265,10 @@ export async function atualizarTurma(idTurma: number, input: AtualizarTurmaInput
     });
 
     if (duplicada) {
-      throw new Error(
-        `Já existe outra turma "${novoNome}" cadastrada para o ano ${novoAno}.`
+      throw new ErroNegocio(
+        `Já existe outra turma "${novoNome}" cadastrada para o ano ${novoAno}.`,
+        409,
+        "TURMA_DUPLICADA"
       );
     }
   }

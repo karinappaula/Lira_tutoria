@@ -50,6 +50,12 @@ export interface LoginComSelecaoPendente {
 
 export type ResultadoLogin = LoginComSessao | LoginComSelecaoPendente;
 
+export interface SessaoAtual {
+  usuario: UsuarioLogado;
+  papelAtivo: PapelAtivo;
+  papeisDisponiveis: PapelAtivo[];
+}
+
 // ---------- Helpers ----------
 
 // Hash descartável, usado só para gastar o mesmo tempo de bcrypt quando o
@@ -78,6 +84,40 @@ export async function buscarPapeisDoUsuario(idUsuario: number): Promise<PapelAti
   if (tutor) papeis.push("TUTOR");
   if (aluno) papeis.push("ALUNO");
   return papeis;
+}
+
+export async function obterSessaoAtual(
+  idUsuario: number,
+  papelAtivo: PapelAtivo
+): Promise<SessaoAtual> {
+  const usuario = await prisma.usuario.findUnique({
+    where: { id: idUsuario },
+  });
+
+  if (!usuario || usuario.status !== "ATIVO") {
+    throw new ErroAutenticacao(
+      "Usuário inativo ou não encontrado.",
+      "CONTA_INATIVA"
+    );
+  }
+
+  const papeisDisponiveis = await buscarPapeisDoUsuario(idUsuario);
+  if (!papeisDisponiveis.includes(papelAtivo)) {
+    throw new ErroAutenticacao(
+      "O papel desta sessão não está mais disponível.",
+      "TOKEN_INVALIDO"
+    );
+  }
+
+  return {
+    usuario: {
+      id: usuario.id,
+      nome: usuario.nome,
+      email: usuario.email,
+    },
+    papelAtivo,
+    papeisDisponiveis,
+  };
 }
 
 // ---------- Login ----------
