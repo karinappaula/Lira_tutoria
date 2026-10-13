@@ -92,6 +92,7 @@ export async function criarSimulado(idUsuario: number, input: CriarSimuladoInput
 
   const candidatas = await prisma.questao.findMany({
     where: {
+      status: "ATIVA",
       ...(input.vestibular ? { vestibular: input.vestibular } : {}),
       ...(input.ano !== undefined ? { ano: input.ano } : {}),
       ...(input.grauDificuldade ? { grauDificuldade: input.grauDificuldade } : {}),
@@ -295,7 +296,7 @@ export async function listarCadernoErros(idUsuario: number) {
 export async function criarSimuladoDoCaderno(idUsuario: number, quantidade?: number) {
   await obterAluno(idUsuario);
   const erros = await prisma.cadernoErros.findMany({
-    where: { idAluno: idUsuario, statusRevisao: "ATIVO" },
+    where: { idAluno: idUsuario, statusRevisao: "ATIVO", questao: { status: "ATIVA" } },
     orderBy: { quantidadeErros: "desc" },
     include: { questao: { select: { id: true } } },
   });
