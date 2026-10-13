@@ -310,6 +310,8 @@ model Simulado {
   dataInicio     DateTime  @map("data_inicio")
   dataFim        DateTime? @map("data_fim")
   tempoGastoSeg  Int?      @map("tempo_gasto_seg")
+  tempoAcumuladoSeg Int      @default(0) @map("tempo_acumulado_seg")
+  retomadoEm        DateTime? @map("retomado_em")
   statusSimulado String    @map("status_simulado") @db.VarChar(20)
   pontuacaoTotal Decimal?  @map("pontuacao_total") @db.Decimal(5, 2)
 

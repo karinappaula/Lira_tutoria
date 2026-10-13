@@ -2,12 +2,13 @@ import { Router } from "express";
 import { exigirAutenticacao, exigirPapel } from "../middlewares/auth.middleware";
 import {
   getCaderno,
+  getResultado,
   getSimulados,
   getSimulado,
   patchResposta,
   postFinalizar,
   postIniciar,
-  postRevisarErro,
+  postPausar,
   postRefazerErros,
   postSimulado,
 } from "../controllers/simulado.controller";
@@ -46,10 +47,11 @@ router.post("/simulados", ...aluno, postSimulado);
 router.get("/simulados", ...aluno, getSimulados);
 router.get("/simulados/:idSimulado", ...aluno, getSimulado);
 router.post("/simulados/:idSimulado/iniciar", ...aluno, postIniciar);
+router.post("/simulados/:idSimulado/pausar", ...aluno, postPausar);
+router.get("/simulados/:idSimulado/resultado", ...aluno, getResultado);
 router.patch("/simulados/:idSimulado/respostas", ...aluno, patchResposta);
 router.post("/simulados/:idSimulado/finalizar", ...aluno, postFinalizar);
 router.get("/caderno-erros", ...aluno, getCaderno);
 router.post("/caderno-erros/refazer", ...aluno, postRefazerErros);
-router.post("/caderno-erros/:idCaderno/revisar", ...aluno, postRevisarErro);
 
 export default router;

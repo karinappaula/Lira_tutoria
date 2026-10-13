@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `SIMULADO` ADD COLUMN `retomado_em` DATETIME(3) NULL,
+    ADD COLUMN `tempo_acumulado_seg` INTEGER NOT NULL DEFAULT 0;
