@@ -36,7 +36,36 @@ function embaralhar<T>(itens: T[]): T[] {
     const j = Math.floor(Math.random() * (i + 1));
     [copia[i], copia[j]] = [copia[j], copia[i]];
   }
+
   return copia;
+}
+
+function prefixoTextoBase(texto: string): string {
+  return texto.trim().slice(0, 150).toLowerCase();
+}
+
+function agruparEEmbaralharQuestoes<T extends { id: number; vestibular: string; ano: number; numeroQuestao: number | null; enunciado: string }>(questoes: T[]): T[] {
+  const ordenadas = [...questoes].sort((a, b) =>
+    a.vestibular.localeCompare(b.vestibular) ||
+    a.ano - b.ano ||
+    (a.numeroQuestao ?? 0) - (b.numeroQuestao ?? 0)
+  );
+  const grupos: T[][] = [];
+  for (const questao of ordenadas) {
+    const grupo = grupos[grupos.length - 1];
+    const anterior = grupo?.[grupo.length - 1];
+    if (
+      anterior &&
+      anterior.vestibular === questao.vestibular &&
+      anterior.ano === questao.ano &&
+      prefixoTextoBase(anterior.enunciado) === prefixoTextoBase(questao.enunciado)
+    ) {
+      grupo.push(questao);
+    } else {
+      grupos.push([questao]);
+    }
+  }
+  return embaralhar(grupos).flat();
 }
 
 async function obterAluno(idUsuario: number) {
@@ -70,7 +99,7 @@ export async function criarSimulado(idUsuario: number, input: CriarSimuladoInput
         ? { assuntos: { some: { idAssunto: input.idAssunto } } }
         : {}),
     },
-    select: { id: true },
+    select: { id: true, vestibular: true, ano: true, numeroQuestao: true, enunciado: true },
   });
 
   if (candidatas.length < input.quantidade) {
@@ -81,7 +110,7 @@ export async function criarSimulado(idUsuario: number, input: CriarSimuladoInput
     );
   }
 
-  const selecionadas = embaralhar(candidatas).slice(0, input.quantidade);
+  const selecionadas = agruparEEmbaralharQuestoes(candidatas).slice(0, input.quantidade);
   return prisma.simulado.create({
     data: {
       idAluno: idUsuario,
@@ -250,12 +279,46 @@ export async function listarSimulados(idUsuario: number) {
   });
 }
 
+export async function buscarSimulado(idUsuario: number, idSimulado: number) {
+  return obterSimulado(idUsuario, idSimulado);
+}
+
 export async function listarCadernoErros(idUsuario: number) {
   await obterAluno(idUsuario);
   return prisma.cadernoErros.findMany({
     where: { idAluno: idUsuario, statusRevisao: "ATIVO" },
     orderBy: { dataUltimoErro: "desc" },
     include: { questao: questaoPublica },
+  });
+}
+
+export async function criarSimuladoDoCaderno(idUsuario: number, quantidade?: number) {
+  await obterAluno(idUsuario);
+  const erros = await prisma.cadernoErros.findMany({
+    where: { idAluno: idUsuario, statusRevisao: "ATIVO" },
+    orderBy: { quantidadeErros: "desc" },
+    include: { questao: { select: { id: true } } },
+  });
+  const selecionadas = erros.slice(0, quantidade ?? QUESTOES_MAX);
+  if (selecionadas.length === 0) {
+    throw new ErroNegocio("O caderno de erros está vazio.", 409, "CADERNO_VAZIO");
+  }
+  return prisma.simulado.create({
+    data: {
+      idAluno: idUsuario,
+      tipoSimulado: "CADERNO_ERROS",
+      dataInicio: new Date(),
+      statusSimulado: "CRIADO",
+      questoes: {
+        create: selecionadas.map((item, index) => ({ idQuestao: item.idQuestao, ordem: index + 1 })),
+      },
+    },
+    include: {
+      questoes: {
+        orderBy: { ordem: "asc" },
+        include: { questao: questaoPublica },
+      },
+    },
   });
 }
 
