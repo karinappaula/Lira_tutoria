@@ -653,6 +653,15 @@ collection:
         authentication:
           type: bearer
           token: COLE_O_TOKEN_AQUI
+      - url: http://localhost:3333/redacoes/aguardando-correcao
+        name: Fila do Tutor - Aguardando Correção
+        meta:
+          id: req_redacoes_aguardando_correcao
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_TUTOR_AQUI
       - url: http://localhost:3333/redacoes/1
         name: Consultar Redação
         meta:
@@ -738,6 +747,24 @@ collection:
         authentication:
           type: bearer
           token: COLE_O_TOKEN_ALUNO_AQUI
+      - url: http://localhost:3333/redacoes/1/solicitar-reescrita
+        name: Solicitar Reescrita - Tutor
+        meta:
+          id: req_redacoes_solicitar_reescrita
+          isPrivate: false
+        method: POST
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_TUTOR_AQUI
+      - url: http://localhost:3333/redacoes/1
+        name: Excluir Rascunho
+        meta:
+          id: req_redacoes_excluir_rascunho
+          isPrivate: false
+        method: DELETE
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ALUNO_AQUI
   - name: 09-CORRECOES
     meta:
       id: fld_correcoes
@@ -777,7 +804,13 @@ collection:
               "notaComp3": 140,
               "notaComp4": 160,
               "notaComp5": 120,
+              "comentarioComp1": "Revise a norma-padrão.",
+              "comentarioComp2": "A tese está relacionada ao tema.",
+              "comentarioComp3": "Desenvolva melhor a argumentação.",
+              "comentarioComp4": "Varie os conectivos.",
+              "comentarioComp5": "Detalhe a proposta de intervenção.",
               "parecerGeral": "Parecer geral da correção.",
+              "recadoAdmin": "Recado do tutor para a Administração.",
               "anotacoes": [
                 {
                   "posicaoInicio": 0,
@@ -813,7 +846,7 @@ collection:
           mimeType: application/json
           text: |-
             {
-              "recadoAdmin": "Revise a justificativa da competência 3."
+              "comentarioAjuste": "Revise a justificativa da competência 3."
             }
         headers:
           - name: Content-Type
@@ -835,6 +868,85 @@ collection:
         authentication:
           type: bearer
           token: COLE_O_TOKEN_AQUI
+      - url: http://localhost:3333/questoes
+        name: Criar Questão - Administrador
+        meta:
+          id: req_questoes_criar
+          isPrivate: false
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "enunciado": "Texto da questão.",
+              "vestibular": "ENEM",
+              "ano": 2024,
+              "numeroQuestao": 45,
+              "grauDificuldade": "MEDIA",
+              "explicacaoGabarito": "Justificativa da resposta.",
+              "idAssuntos": [1],
+              "alternativas": [
+                { "letraOpcao": "A", "textoAlternativa": "Opção A", "alternativaCorreta": false },
+                { "letraOpcao": "B", "textoAlternativa": "Opção B", "alternativaCorreta": true },
+                { "letraOpcao": "C", "textoAlternativa": "Opção C", "alternativaCorreta": false },
+                { "letraOpcao": "D", "textoAlternativa": "Opção D", "alternativaCorreta": false },
+                { "letraOpcao": "E", "textoAlternativa": "Opção E", "alternativaCorreta": false }
+              ]
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+      - url: http://localhost:3333/questoes/1
+        name: Consultar Questão - Administrador
+        meta:
+          id: req_questoes_consultar_admin
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+      - url: http://localhost:3333/questoes/1
+        name: Editar Questão - Administrador
+        meta:
+          id: req_questoes_editar
+          isPrivate: false
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "enunciado": "Texto atualizado da questão.",
+              "vestibular": "ENEM",
+              "ano": 2024,
+              "numeroQuestao": 45,
+              "grauDificuldade": "MEDIA",
+              "idAssuntos": [1],
+              "alternativas": [
+                { "letraOpcao": "A", "textoAlternativa": "Opção A", "alternativaCorreta": false },
+                { "letraOpcao": "B", "textoAlternativa": "Opção B", "alternativaCorreta": true },
+                { "letraOpcao": "C", "textoAlternativa": "Opção C", "alternativaCorreta": false },
+                { "letraOpcao": "D", "textoAlternativa": "Opção D", "alternativaCorreta": false },
+                { "letraOpcao": "E", "textoAlternativa": "Opção E", "alternativaCorreta": false }
+              ]
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+      - url: http://localhost:3333/questoes/1
+        name: Excluir Questão - Administrador
+        meta:
+          id: req_questoes_excluir
+          isPrivate: false
+        method: DELETE
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
       - url: http://localhost:3333/assuntos
         name: Listar Assuntos
         meta:
@@ -867,6 +979,15 @@ collection:
         name: Listar Simulados do Aluno
         meta:
           id: req_simulados_listar
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ALUNO_AQUI
+      - url: http://localhost:3333/simulados/1
+        name: Consultar Simulado
+        meta:
+          id: req_simulados_consultar
           isPrivate: false
         method: GET
         authentication:
@@ -915,6 +1036,24 @@ collection:
           id: req_simulados_caderno
           isPrivate: false
         method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ALUNO_AQUI
+      - url: http://localhost:3333/caderno-erros/refazer
+        name: Refazer Questões Erradas
+        meta:
+          id: req_caderno_refazer
+          isPrivate: false
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "quantidade": 10
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
         authentication:
           type: bearer
           token: COLE_O_TOKEN_ALUNO_AQUI
