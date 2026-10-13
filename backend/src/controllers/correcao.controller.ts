@@ -33,6 +33,15 @@ function nota(body: Record<string, unknown>, campo: string): number {
   return valor;
 }
 
+function textoOpcional(body: Record<string, unknown>, campo: string): string | undefined {
+  const valor = body[campo];
+  if (valor === undefined || valor === null) return undefined;
+  if (typeof valor !== "string") {
+    throw new ErroValidacao([{ campo, mensagem: "Deve ser um texto." }]);
+  }
+  return valor;
+}
+
 function inputCorrecao(req: Request) {
   const body = corpo(req);
   const idVersao = Number(body.idVersao);
@@ -50,7 +59,13 @@ function inputCorrecao(req: Request) {
     notaComp3: nota(body, "notaComp3"),
     notaComp4: nota(body, "notaComp4"),
     notaComp5: nota(body, "notaComp5"),
-    parecerGeral: typeof body.parecerGeral === "string" ? body.parecerGeral : undefined,
+    comentarioComp1: textoOpcional(body, "comentarioComp1"),
+    comentarioComp2: textoOpcional(body, "comentarioComp2"),
+    comentarioComp3: textoOpcional(body, "comentarioComp3"),
+    comentarioComp4: textoOpcional(body, "comentarioComp4"),
+    comentarioComp5: textoOpcional(body, "comentarioComp5"),
+    parecerGeral: textoOpcional(body, "parecerGeral"),
+    recadoAdmin: textoOpcional(body, "recadoAdmin"),
     anotacoes: anotacoes as AnotacaoInput[] | undefined,
   };
 }
@@ -87,9 +102,12 @@ export async function postSolicitarAjuste(req: Request, res: Response, next: Nex
   try {
     const auth = (req as RequestAutenticada).autenticacao;
     const body = corpo(req);
-    if (typeof body.recadoAdmin !== "string") {
-      throw new ErroValidacao([{ campo: "recadoAdmin", mensagem: "Campo obrigatório." }]);
+    // "comentarioAjuste" é o nome correto; "recadoAdmin" segue aceito por
+    // compatibilidade com a collection antiga do Insomnia.
+    const comentario = body.comentarioAjuste ?? body.recadoAdmin;
+    if (typeof comentario !== "string") {
+      throw new ErroValidacao([{ campo: "comentarioAjuste", mensagem: "Campo obrigatório." }]);
     }
-    res.status(200).json(await solicitarAjuste(auth.idUsuario, id(req, "idCorrecao"), body.recadoAdmin));
+    res.status(200).json(await solicitarAjuste(auth.idUsuario, id(req, "idCorrecao"), comentario));
   } catch (erro) { next(erro); }
 }

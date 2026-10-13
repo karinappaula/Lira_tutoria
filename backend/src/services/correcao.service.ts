@@ -1,5 +1,24 @@
 import { prisma } from "../db/prisma";
 import { ErroNegocio } from "../errors/erros";
+import { registrarAuditoria } from "./auditoria.service";
+import type { PapelAtivo } from "./token.service";
+
+// Status da correção (coluna CORRECAO.status_aprovacao).
+// LIBERADA = correção de redação de TREINO: vai direto ao aluno (RN02).
+export const STATUS_CORRECAO = {
+  PENDENTE: "PENDENTE_APROVACAO",
+  APROVADA: "APROVADA",
+  AJUSTE: "AJUSTE_SOLICITADO",
+  LIBERADA: "LIBERADA",
+} as const;
+
+// Correções que o aluno pode enxergar (RN02 e RN03).
+export const STATUS_VISIVEIS_AO_ALUNO: string[] = [
+  STATUS_CORRECAO.APROVADA,
+  STATUS_CORRECAO.LIBERADA,
+];
+
+const TEXTO_MAXIMO = 5000;
 
 export interface AnotacaoInput {
   posicaoInicio: number;
@@ -16,7 +35,13 @@ export interface CriarCorrecaoInput {
   notaComp3: number;
   notaComp4: number;
   notaComp5: number;
+  comentarioComp1?: string;
+  comentarioComp2?: string;
+  comentarioComp3?: string;
+  comentarioComp4?: string;
+  comentarioComp5?: string;
   parecerGeral?: string;
+  recadoAdmin?: string;
   anotacoes?: AnotacaoInput[];
 }
 
@@ -44,6 +69,18 @@ function validarNota(valor: number, campo: string) {
       "NOTA_INVALIDA"
     );
   }
+}
+
+function validarTexto(valor: string | undefined, campo: string): string | undefined {
+  if (valor === undefined) return undefined;
+  if (valor.length > TEXTO_MAXIMO) {
+    throw new ErroNegocio(
+      `${campo} excede o limite de ${TEXTO_MAXIMO} caracteres.`,
+      400,
+      "TEXTO_MUITO_LONGO"
+    );
+  }
+  return valor;
 }
 
 function validarAnotacoes(anotacoes: AnotacaoInput[] | undefined, texto: string) {
@@ -115,6 +152,21 @@ export async function criarCorrecao(idUsuarioTutor: number, input: CriarCorrecao
   notas.forEach((nota, index) => validarNota(nota, `notaComp${index + 1}`));
   validarAnotacoes(input.anotacoes, versao.conteudoTexto);
 
+  const comentarios = [
+    validarTexto(input.comentarioComp1, "comentarioComp1"),
+    validarTexto(input.comentarioComp2, "comentarioComp2"),
+    validarTexto(input.comentarioComp3, "comentarioComp3"),
+    validarTexto(input.comentarioComp4, "comentarioComp4"),
+    validarTexto(input.comentarioComp5, "comentarioComp5"),
+  ];
+  const parecerGeral = validarTexto(input.parecerGeral, "parecerGeral");
+  const recadoAdmin = validarTexto(input.recadoAdmin, "recadoAdmin");
+
+  // RN02: treino não passa pela Administração; avaliativa passa (RN03).
+  const ehTreino = versao.redacao.tipoFluxo === "TREINO";
+  const statusAprovacao = ehTreino ? STATUS_CORRECAO.LIBERADA : STATUS_CORRECAO.PENDENTE;
+  const statusVersao = ehTreino ? "CORRIGIDA" : "EM_CORRECAO";
+
   const numeroAjuste = (versao.correcoes[0]?.numeroAjuste ?? -1) + 1;
   return prisma.$transaction(async (tx) => {
     const correcao = await tx.correcao.create({
@@ -128,8 +180,15 @@ export async function criarCorrecao(idUsuarioTutor: number, input: CriarCorrecao
         notaComp4: input.notaComp4,
         notaComp5: input.notaComp5,
         notaTotal: notas.reduce((total, nota) => total + nota, 0),
-        parecerGeral: input.parecerGeral,
-        statusAprovacao: "PENDENTE_APROVACAO",
+        comentarioComp1: comentarios[0],
+        comentarioComp2: comentarios[1],
+        comentarioComp3: comentarios[2],
+        comentarioComp4: comentarios[3],
+        comentarioComp5: comentarios[4],
+        parecerGeral,
+        // O recado só faz sentido quando existe aprovação da Administração.
+        recadoAdmin: ehTreino ? undefined : recadoAdmin,
+        statusAprovacao,
         anotacoes: {
           create: (input.anotacoes ?? []).map((anotacao) => ({
             posicaoInicio: anotacao.posicaoInicio,
@@ -144,8 +203,18 @@ export async function criarCorrecao(idUsuarioTutor: number, input: CriarCorrecao
     });
     await tx.versaoRedacao.update({
       where: { id: input.idVersao },
-      data: { statusVersao: "EM_CORRECAO" },
+      data: { statusVersao },
     });
+    await registrarAuditoria(
+      {
+        idUsuario: idUsuarioTutor,
+        acao: numeroAjuste === 0 ? "CORRECAO_CRIADA" : "CORRECAO_REENVIADA",
+        entidade: "CORRECAO",
+        idRegistro: correcao.id,
+        descricao: `Versão ${versao.numeroVersao} da redação ${versao.idRedacao} (${versao.redacao.tipoFluxo}), ajuste ${numeroAjuste}.`,
+      },
+      tx
+    );
     return correcao;
   });
 }
@@ -153,8 +222,8 @@ export async function criarCorrecao(idUsuarioTutor: number, input: CriarCorrecao
 export async function listarCorrecoesPendentes(idUsuario: number, administrador: boolean) {
   return prisma.correcao.findMany({
     where: administrador
-      ? { statusAprovacao: "PENDENTE_APROVACAO" }
-      : { idTutor: idUsuario, statusAprovacao: "PENDENTE_APROVACAO" },
+      ? { statusAprovacao: STATUS_CORRECAO.PENDENTE }
+      : { idTutor: idUsuario, statusAprovacao: STATUS_CORRECAO.PENDENTE },
     orderBy: { dataCorrecao: "asc" },
     include: correcaoInclude,
   });
@@ -173,24 +242,31 @@ async function obterCorrecao(idCorrecao: number) {
 
 export async function aprovarCorrecao(idUsuarioAdmin: number, idCorrecao: number) {
   const correcao = await obterCorrecao(idCorrecao);
-  if (correcao.statusAprovacao !== "PENDENTE_APROVACAO") {
+  if (correcao.statusAprovacao !== STATUS_CORRECAO.PENDENTE) {
     throw new ErroNegocio("Esta correção não está pendente de aprovação.", 409, "STATUS_INVALIDO");
   }
 
-  const statusVersao = correcao.versao.redacao.tipoFluxo === "AVALIATIVA"
-    ? "AGUARDANDO_REESCRITA"
-    : "CORRIGIDA";
-
+  // Aprovar libera o RESULTADO ao aluno. A reescrita NÃO é liberada aqui:
+  // quem decide pedir a reescrita é o Tutor (RF07), depois da liberação.
   return prisma.$transaction(async (tx) => {
     const aprovada = await tx.correcao.update({
       where: { id: idCorrecao },
-      data: { statusAprovacao: "APROVADA", idAdm: idUsuarioAdmin },
+      data: { statusAprovacao: STATUS_CORRECAO.APROVADA, idAdm: idUsuarioAdmin },
       include: correcaoInclude,
     });
     await tx.versaoRedacao.update({
       where: { id: correcao.idVersao },
-      data: { statusVersao },
+      data: { statusVersao: "CORRIGIDA" },
     });
+    await registrarAuditoria(
+      {
+        idUsuario: idUsuarioAdmin,
+        acao: "CORRECAO_APROVADA",
+        entidade: "CORRECAO",
+        idRegistro: idCorrecao,
+      },
+      tx
+    );
     return aprovada;
   });
 }
@@ -198,23 +274,26 @@ export async function aprovarCorrecao(idUsuarioAdmin: number, idCorrecao: number
 export async function solicitarAjuste(
   idUsuarioAdmin: number,
   idCorrecao: number,
-  recadoAdmin: string
+  comentarioAjuste: string
 ) {
   const correcao = await obterCorrecao(idCorrecao);
-  if (correcao.statusAprovacao !== "PENDENTE_APROVACAO") {
+  if (correcao.statusAprovacao !== STATUS_CORRECAO.PENDENTE) {
     throw new ErroNegocio("Esta correção não está pendente de ajuste.", 409, "STATUS_INVALIDO");
   }
-  if (!recadoAdmin.trim()) {
-    throw new ErroNegocio("O recado para o tutor é obrigatório.", 400, "RECADO_OBRIGATORIO");
+  if (!comentarioAjuste.trim()) {
+    throw new ErroNegocio("A observação para o tutor é obrigatória.", 400, "RECADO_OBRIGATORIO");
   }
+  validarTexto(comentarioAjuste, "comentarioAjuste");
 
   return prisma.$transaction(async (tx) => {
     const ajustada = await tx.correcao.update({
       where: { id: idCorrecao },
       data: {
-        statusAprovacao: "AJUSTE_SOLICITADO",
+        statusAprovacao: STATUS_CORRECAO.AJUSTE,
         idAdm: idUsuarioAdmin,
-        recadoAdmin,
+        // Texto da Administração fica em comentarioAjusteAdmin.
+        // recadoAdmin continua sendo exclusivamente o recado do Tutor.
+        comentarioAjusteAdmin: comentarioAjuste.trim(),
       },
       include: correcaoInclude,
     });
@@ -222,20 +301,60 @@ export async function solicitarAjuste(
       where: { id: correcao.idVersao },
       data: { statusVersao: "AJUSTE_SOLICITADO" },
     });
+    await registrarAuditoria(
+      {
+        idUsuario: idUsuarioAdmin,
+        acao: "AJUSTE_SOLICITADO",
+        entidade: "CORRECAO",
+        idRegistro: idCorrecao,
+      },
+      tx
+    );
     return ajustada;
   });
 }
 
-export async function buscarCorrecaoVisivel(idUsuario: number, papel: "ADMINISTRADOR" | "TUTOR" | "ALUNO", idCorrecao: number) {
+// Remove do que vai para o ALUNO os campos internos (recado do Tutor,
+// observação da Administração, dados da Administração e e-mails).
+export function paraVisaoDoAluno<
+  T extends {
+    recadoAdmin: string | null;
+    comentarioAjusteAdmin: string | null;
+    idAdm: number | null;
+  },
+>(correcao: T) {
+  const { recadoAdmin, comentarioAjusteAdmin, idAdm, ...publico } = correcao;
+  void recadoAdmin;
+  void comentarioAjusteAdmin;
+  void idAdm;
+  return publico;
+}
+
+export async function buscarCorrecaoVisivel(
+  idUsuario: number,
+  papel: PapelAtivo,
+  idCorrecao: number
+) {
   const correcao = await obterCorrecao(idCorrecao);
-  const alunoId = correcao.versao.redacao.aluno.idUsuario;
-  const tutorId = correcao.idTutor;
-  if (
-    (papel === "ADMINISTRADOR") ||
-    (papel === "TUTOR" && tutorId === idUsuario) ||
-    (papel === "ALUNO" && alunoId === idUsuario && correcao.statusAprovacao === "APROVADA")
-  ) {
-    return correcao;
+
+  if (papel === "ADMINISTRADOR") return correcao;
+
+  if (papel === "TUTOR") {
+    if (correcao.idTutor === idUsuario) return correcao;
   }
+
+  if (
+    papel === "ALUNO" &&
+    correcao.versao.redacao.aluno.idUsuario === idUsuario &&
+    STATUS_VISIVEIS_AO_ALUNO.includes(correcao.statusAprovacao)
+  ) {
+    const { administrador, tutor, ...resto } = paraVisaoDoAluno(correcao);
+    void administrador;
+    return {
+      ...resto,
+      tutor: { idUsuario: tutor.idUsuario, usuario: { nome: tutor.usuario.nome } },
+    };
+  }
+
   throw new ErroNegocio("Você não possui acesso a esta correção.", 403, "SEM_PERMISSAO");
 }
