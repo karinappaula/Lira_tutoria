@@ -1,0 +1,8 @@
+-- DropForeignKey
+ALTER TABLE `TAREFA` DROP FOREIGN KEY `TAREFA_id_turma_fkey`;
+
+-- AlterTable
+ALTER TABLE `TAREFA` MODIFY `id_turma` INTEGER NULL;
+
+-- AddForeignKey
+ALTER TABLE `TAREFA` ADD CONSTRAINT `TAREFA_id_turma_fkey` FOREIGN KEY (`id_turma`) REFERENCES `TURMA`(`id_turma`) ON DELETE SET NULL ON UPDATE CASCADE;

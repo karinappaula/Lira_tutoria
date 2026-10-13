@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
+import type { RequestAutenticada } from "../middlewares/auth.middleware";
 import {
   atualizarTema,
   buscarTemaPorId,
@@ -47,11 +48,17 @@ export async function postTema(req: Request, res: Response, next: NextFunction) 
   try { res.status(201).json(await criarTema(lerDados(req.body, false) as { tituloTema: string })); }
   catch (erro) { next(erro); }
 }
-export async function getTemas(_req: Request, res: Response, next: NextFunction) {
-  try { res.status(200).json(await listarTemas()); } catch (erro) { next(erro); }
+export async function getTemas(req: Request, res: Response, next: NextFunction) {
+  try {
+    const auth = (req as RequestAutenticada).autenticacao;
+    res.status(200).json(await listarTemas(auth.idUsuario, auth.papelAtivo));
+  } catch (erro) { next(erro); }
 }
 export async function getTema(req: Request, res: Response, next: NextFunction) {
-  try { res.status(200).json(await buscarTemaPorId(idTema(req))); } catch (erro) { next(erro); }
+  try {
+    const auth = (req as RequestAutenticada).autenticacao;
+    res.status(200).json(await buscarTemaPorId(idTema(req), auth.idUsuario, auth.papelAtivo));
+  } catch (erro) { next(erro); }
 }
 export async function patchTema(req: Request, res: Response, next: NextFunction) {
   try { res.status(200).json(await atualizarTema(idTema(req), lerDados(req.body, true))); } catch (erro) { next(erro); }
