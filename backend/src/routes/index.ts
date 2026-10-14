@@ -9,6 +9,8 @@ import tarefaRoute from "./tarefa.route";
 import redacaoRoute from "./redacao.route";
 import correcaoRoute from "./correcao.route";
 import simuladoRoute from "./simulado.route";
+import comunicadoRoute from "./comunicado.route";
+import indicadoresRoute from "./indicadores.route";
 
 const router = Router();
 
@@ -22,5 +24,7 @@ router.use(tarefaRoute);
 router.use(redacaoRoute);
 router.use(correcaoRoute);
 router.use(simuladoRoute);
+router.use(comunicadoRoute);
+router.use(indicadoresRoute);
 
 export default router;
