@@ -164,8 +164,9 @@ dependam de uma turma ativa.
 
 ## Temas
 
-Todas as rotas exigem autenticação. A criação, alteração e exclusão são
-exclusivas da Administração.
+Todas as rotas exigem autenticação. A Administração pode criar, alterar e
+excluir qualquer tema. O Tutor pode criar temas próprios e alterar ou excluir
+somente os temas que criou; seus tutorados também podem consultar esses temas.
 
 ```http
 GET    /temas
@@ -199,19 +200,18 @@ DELETE /tarefas/:idTarefa/anexos/:idAnexo
 ```
 
 Administradores criam atividades `GERAL`; tutores criam tarefas
-`AVALIATIVA` apenas para a própria turma. Alunos podem consultar somente
-tarefas da turma à qual estão vinculados.
+`AVALIATIVA` para a própria turma. O papel autenticado determina a modalidade
+e a turma do Tutor é obtida do vínculo. `idTurma` e `modalidade` não são
+campos aceitos no corpo. Alunos consultam somente as tarefas da própria turma.
 
 Exemplo de criação por tutor:
 
 ```json
 {
-  "idTurma": 1,
   "idTema": 1,
   "tituloTarefa": "Redação da semana",
   "descricao": "Escreva uma redação dissertativo-argumentativa.",
-  "prazoEntrega": "2026-11-01T23:59:00.000Z",
-  "modalidade": "AVALIATIVA"
+  "prazoEntrega": "2026-11-01T23:59:00.000Z"
 }
 ```
 
@@ -219,29 +219,48 @@ Exemplo de criação administrativa:
 
 ```json
 {
-  "idTurma": 1,
   "idTema": 1,
   "tituloTarefa": "Atividade institucional",
   "descricao": "Atividade geral da Administração.",
-  "prazoEntrega": "2026-11-01T23:59:00.000Z",
-  "modalidade": "GERAL"
+  "prazoEntrega": "2026-11-01T23:59:00.000Z"
 }
 ```
 
-Para replicar uma atividade geral criada pelo próprio administrador:
+Na criação da tarefa, é possível informar `novoTema` em vez de `idTema`:
+
+```json
+{
+  "tituloTarefa": "Redação da semana",
+  "descricao": "Leia os textos motivadores.",
+  "prazoEntrega": "2026-11-20T21:00:00.000Z",
+  "novoTema": {
+    "tituloTema": "Tema criado junto com a tarefa",
+    "textoMotivador": "Texto de apoio opcional."
+  }
+}
+```
+
+Não envie `idTema` e `novoTema` juntos. O tema criado pelo Tutor recebe
+origem `TUTOR` e fica associado ao Tutor; o criado pela Administração é
+oficial. Tutores só podem usar temas oficiais ou temas próprios.
+
+Para aplicar uma atividade geral criada pela Administração à turma do próprio
+Tutor:
 
 ```http
 POST /tarefas/1/replicar
-Authorization: Bearer <token-de-administrador>
+Authorization: Bearer <token-de-tutor>
 Content-Type: application/json
 ```
 
 ```json
 {
-  "idTurma": 2,
   "prazoEntrega": "2026-11-15T23:59:00.000Z"
 }
 ```
+
+Esta rota é exclusiva de tutores. A turma de destino é obtida do vínculo do
+Tutor; não envie `idTurma`.
 
 Tarefas não podem ser criadas ou replicadas para turmas arquivadas/inativas,
 e os prazos recebidos pela API devem estar no futuro.
@@ -538,11 +557,14 @@ removida para preservar o histórico.
 Filtros disponíveis em `/questoes`:
 
 ```text
+pagina
+limite
 vestibular
 ano
 grauDificuldade
 idAssunto
-limite (1 a 100; padrão 50)
+busca
+status (somente Administração)
 ```
 
 Exemplo:
@@ -769,7 +791,7 @@ POST /tutor/convites/aluno
 Authorization: Bearer <token-do-tutor>
 ```
 
-Convites têm validade de 30 dias 
+Convites têm validade de 30 dias.
 
 ## Erros
 
