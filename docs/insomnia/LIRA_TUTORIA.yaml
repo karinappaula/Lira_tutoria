@@ -276,7 +276,7 @@ collection:
         method: POST
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_OU_TUTOR_AQUI
+          token: "{{ _.token_admin }}"
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -297,7 +297,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_OU_TUTOR_AQUI
+          token: "{{ _.token_admin }}"
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -326,7 +326,7 @@ collection:
         method: POST
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_OU_TUTOR_AQUI
+          token: "{{ _.token_tutor }}"
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -361,7 +361,7 @@ collection:
             }
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_TUTOR_AQUI
+          token: "{{ _.token_tutor }}"
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -461,7 +461,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/turmas
         name: Criar Turma - Administrador
         meta:
@@ -481,7 +481,7 @@ collection:
             value: application/json
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/turmas/1
         name: Atualizar Turma - Administrador
         meta:
@@ -500,7 +500,7 @@ collection:
             value: application/json
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/turmas/1/arquivar
         name: Arquivar Turma - Administrador
         meta:
@@ -509,7 +509,7 @@ collection:
         method: POST
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
   - name: 07-TEMAS
     meta:
       id: fld_temas
@@ -523,16 +523,17 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_AQUI
-      - url: http://localhost:3333/temas/1
+          token: "{{ _.token_aluno }}"
+      - url: http://localhost:3333/temas/ID_DO_TEMA
         name: Consultar Tema
         meta:
           id: req_temas_consultar
           isPrivate: false
+          description: Troque ID_DO_TEMA pelo id retornado ao criar o tema com token_tutor.
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_AQUI
+          token: "{{ _.token_tutor2 }}"
       - url: http://localhost:3333/temas
         name: Criar Tema - Administrador
         meta:
@@ -552,7 +553,7 @@ collection:
             value: application/json
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/temas/1
         name: Atualizar Tema - Administrador
         meta:
@@ -570,7 +571,7 @@ collection:
             value: application/json
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/temas/1
         name: Excluir Tema - Administrador
         meta:
@@ -579,7 +580,55 @@ collection:
         method: DELETE
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
+      - url: http://localhost:3333/temas
+        name: Criar Tema - Tutor
+        meta:
+          id: req_temas_criar_tutor
+          isPrivate: false
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "tituloTema": "Desafios na escola",
+              "textoMotivador": "Texto de apoio..."
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: "{{ _.token_tutor }}"
+      - url: http://localhost:3333/temas/ID_DO_TEMA
+        name: Atualizar Tema - Tutor
+        meta:
+          id: req_temas_atualizar_tutor
+          isPrivate: false
+          description: Substitua ID_DO_TEMA pelo id numérico do tema próprio; use o id de um tema oficial para testar 403.
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "tituloTema": "Novo título"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: "{{ _.token_tutor }}"
+      - url: http://localhost:3333/temas/ID_DO_TEMA
+        name: Excluir Tema - Tutor
+        meta:
+          id: req_temas_excluir_tutor
+          isPrivate: false
+          description: Substitua ID_DO_TEMA pelo id numérico do tema próprio. Use tema oficial para testar 403 ou tema da tarefa com novoTema para testar 409.
+        method: DELETE
+        authentication:
+          type: bearer
+          token: "{{ _.token_tutor }}"
   - name: 08-TAREFAS
     meta:
       id: fld_tarefas
@@ -593,7 +642,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_AQUI
+          token: "{{ _.token_aluno }}"
       - url: http://localhost:3333/tarefas/1
         name: Consultar Tarefa
         meta:
@@ -602,30 +651,98 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_AQUI
+          token: "{{ _.token_aluno }}"
       - url: http://localhost:3333/tarefas
         name: Criar Tarefa
         meta:
           id: req_tarefas_criar
           isPrivate: false
+          description: Troque idTema pelo id de um tema existente; não presuma que seja 1.
         method: POST
         body:
           mimeType: application/json
           text: |-
             {
-              "idTurma": 1,
               "idTema": 1,
               "tituloTarefa": "Redação avaliativa 1",
               "descricao": "Produza uma redação dissertativo-argumentativa.",
-              "prazoEntrega": "2026-12-31T23:59:00.000Z",
-              "modalidade": "AVALIATIVA"
+              "prazoEntrega": "2026-12-31T23:59:00.000Z"
             }
         headers:
           - name: Content-Type
             value: application/json
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_TUTOR_AQUI
+          token: "{{ _.token_tutor }}"
+      - url: http://localhost:3333/tarefas
+        name: Criar Tarefa com novoTema - Tutor
+        meta:
+          id: req_tarefas_criar_novo_tema
+          isPrivate: false
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "tituloTarefa": "Redação da semana",
+              "descricao": "Leia os textos motivadores.",
+              "prazoEntrega": "2026-11-20T21:00:00.000Z",
+              "novoTema": {
+                "tituloTema": "Tema criado junto com a tarefa",
+                "textoMotivador": "Texto de apoio..."
+              }
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: "{{ _.token_tutor }}"
+      - url: http://localhost:3333/tarefas
+        name: Validar idTema e novoTema juntos - Tutor
+        meta:
+          id: req_tarefas_temas_duplicados
+          isPrivate: false
+          description: Deve retornar 400 com codigo TEMA_DUPLICADO.
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "idTema": 1,
+              "tituloTarefa": "Teste de validação",
+              "prazoEntrega": "2026-11-20T21:00:00.000Z",
+              "novoTema": {
+                "tituloTema": "Tema duplicado"
+              }
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: "{{ _.token_tutor }}"
+      - url: http://localhost:3333/tarefas
+        name: Criar Tarefa com Tema de Outro Tutor
+        meta:
+          id: req_tarefas_tema_outro_tutor
+          isPrivate: false
+          description: Troque o valor 0 pelo id numérico retornado ao criar o tema do primeiro Tutor. Deve retornar 404.
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "idTema": 0,
+              "tituloTarefa": "Teste de escopo entre tutores",
+              "prazoEntrega": "2026-11-20T21:00:00.000Z"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: "{{ _.token_tutor2 }}"
       - url: http://localhost:3333/tarefas/1
         name: Atualizar Tarefa - Administrador
         meta:
@@ -643,7 +760,7 @@ collection:
             value: application/json
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/tarefas/1
         name: Excluir Tarefa - Administrador
         meta:
@@ -652,9 +769,9 @@ collection:
         method: DELETE
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/tarefas/1/replicar
-        name: Replicar Tarefa Geral - Administrador
+        name: Aplicar Tarefa Geral - Tutor
         meta:
           id: req_tarefas_replicar
           isPrivate: false
@@ -663,7 +780,6 @@ collection:
           mimeType: application/json
           text: |-
             {
-              "idTurma": 1,
               "prazoEntrega": "2026-12-31T23:59:00.000Z"
             }
         headers:
@@ -671,7 +787,7 @@ collection:
             value: application/json
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_tutor }}"
   - name: 09-REDACOES
     meta:
       id: fld_redacoes
@@ -685,7 +801,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_AQUI
+          token: "{{ _.token_aluno }}"
       - url: http://localhost:3333/redacoes/aguardando-correcao
         name: Fila do Tutor - Aguardando Correção
         meta:
@@ -694,7 +810,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_TUTOR_AQUI
+          token: "{{ _.token_tutor }}"
       - url: http://localhost:3333/redacoes/1
         name: Consultar Redação
         meta:
@@ -703,7 +819,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_AQUI
+          token: "{{ _.token_aluno }}"
       - url: http://localhost:3333/redacoes
         name: Criar Rascunho de Treino
         meta:
@@ -723,19 +839,20 @@ collection:
             value: application/json
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ALUNO_AQUI
+          token: "{{ _.token_aluno }}"
       - url: http://localhost:3333/redacoes
         name: Criar Redação Avaliativa
         meta:
           id: req_redacoes_criar_avaliativa
           isPrivate: false
+          description: Troque ID_DA_TAREFA pelo id numérico da tarefa avaliativa criada para a turma do aluno.
         method: POST
         body:
           mimeType: application/json
           text: |-
             {
               "tipoFluxo": "AVALIATIVA",
-              "idTarefa": 1,
+              "idTarefa": "ID_DA_TAREFA",
               "conteudoTexto": ""
             }
         headers:
@@ -743,7 +860,7 @@ collection:
             value: application/json
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ALUNO_AQUI
+          token: "{{ _.token_aluno }}"
       - url: http://localhost:3333/redacoes/1/rascunho
         name: Salvar Rascunho
         meta:
@@ -761,7 +878,7 @@ collection:
             value: application/json
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ALUNO_AQUI
+          token: "{{ _.token_aluno }}"
       - url: http://localhost:3333/redacoes/1/enviar
         name: Enviar Redação
         meta:
@@ -770,7 +887,7 @@ collection:
         method: POST
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ALUNO_AQUI
+          token: "{{ _.token_aluno }}"
       - url: http://localhost:3333/redacoes/1/reescrita
         name: Criar Reescrita
         meta:
@@ -779,7 +896,7 @@ collection:
         method: POST
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ALUNO_AQUI
+          token: "{{ _.token_aluno }}"
       - url: http://localhost:3333/redacoes/1/solicitar-reescrita
         name: Solicitar Reescrita - Tutor
         meta:
@@ -788,7 +905,7 @@ collection:
         method: POST
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_TUTOR_AQUI
+          token: "{{ _.token_tutor }}"
       - url: http://localhost:3333/redacoes/1
         name: Excluir Rascunho
         meta:
@@ -797,7 +914,7 @@ collection:
         method: DELETE
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ALUNO_AQUI
+          token: "{{ _.token_aluno }}"
   - name: 10-CORRECOES
     meta:
       id: fld_correcoes
@@ -811,7 +928,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_TUTOR_OU_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/correcoes/1
         name: Consultar Correção
         meta:
@@ -820,7 +937,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/redacoes/correcoes
         name: Criar Correção - Tutor
         meta:
@@ -859,7 +976,7 @@ collection:
             value: application/json
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_TUTOR_AQUI
+          token: "{{ _.token_tutor }}"
       - url: http://localhost:3333/correcoes/1/aprovar
         name: Aprovar Correção - Administrador
         meta:
@@ -868,7 +985,7 @@ collection:
         method: POST
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/correcoes/1/solicitar-ajuste
         name: Solicitar Ajuste - Administrador
         meta:
@@ -886,7 +1003,7 @@ collection:
             value: application/json
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
   - name: 11-CONTROLES-QUESTOES-SIMULADOS
     meta:
       id: fld_questoes_controles
@@ -900,7 +1017,7 @@ collection:
         method: POST
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/questoes/1/ativar
         name: Ativar Questão - Administrador
         meta:
@@ -909,7 +1026,7 @@ collection:
         method: POST
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/assuntos
         name: Criar Assunto - Administrador
         meta:
@@ -927,7 +1044,7 @@ collection:
             value: application/json
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/assuntos/1
         name: Editar Assunto - Administrador
         meta:
@@ -945,7 +1062,7 @@ collection:
             value: application/json
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/assuntos/1
         name: Excluir Assunto - Administrador
         meta:
@@ -954,7 +1071,7 @@ collection:
         method: DELETE
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/tarefas/1/anexos
         name: Adicionar Anexo à Tarefa
         meta:
@@ -974,7 +1091,7 @@ collection:
             value: application/json
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_OU_TUTOR_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/tarefas/1/anexos/1
         name: Remover Anexo da Tarefa
         meta:
@@ -983,7 +1100,7 @@ collection:
         method: DELETE
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_OU_TUTOR_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/simulados/1/pausar
         name: Pausar Simulado
         meta:
@@ -992,7 +1109,7 @@ collection:
         method: POST
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ALUNO_AQUI
+          token: "{{ _.token_aluno }}"
   - name: 11-QUESTOES-E-SIMULADOS
     meta:
       id: fld_simulados
@@ -1006,7 +1123,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/questoes
         name: Criar Questão - Administrador
         meta:
@@ -1037,7 +1154,7 @@ collection:
             value: application/json
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/questoes/1
         name: Consultar Questão - Administrador
         meta:
@@ -1046,7 +1163,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/questoes/1
         name: Editar Questão - Administrador
         meta:
@@ -1076,7 +1193,7 @@ collection:
             value: application/json
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/questoes/1
         name: Excluir Questão - Administrador
         meta:
@@ -1085,7 +1202,7 @@ collection:
         method: DELETE
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/assuntos
         name: Listar Assuntos
         meta:
@@ -1094,7 +1211,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/simulados
         name: Criar Simulado
         meta:
@@ -1113,7 +1230,7 @@ collection:
             value: application/json
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ALUNO_AQUI
+          token: "{{ _.token_aluno }}"
       - url: http://localhost:3333/simulados
         name: Listar Simulados do Aluno
         meta:
@@ -1122,7 +1239,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ALUNO_AQUI
+          token: "{{ _.token_aluno }}"
       - url: http://localhost:3333/simulados/1
         name: Consultar Simulado
         meta:
@@ -1131,7 +1248,16 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ALUNO_AQUI
+          token: "{{ _.token_aluno }}"
+      - url: http://localhost:3333/simulados/1/resultado
+        name: Consultar Resultado do Simulado
+        meta:
+          id: req_simulados_resultado
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: "{{ _.token_aluno }}"
       - url: http://localhost:3333/simulados/1/iniciar
         name: Iniciar Simulado
         meta:
@@ -1140,7 +1266,7 @@ collection:
         method: POST
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ALUNO_AQUI
+          token: "{{ _.token_aluno }}"
       - url: http://localhost:3333/simulados/1/respostas
         name: Responder Questão
         meta:
@@ -1159,7 +1285,7 @@ collection:
             value: application/json
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ALUNO_AQUI
+          token: "{{ _.token_aluno }}"
       - url: http://localhost:3333/simulados/1/finalizar
         name: Finalizar Simulado
         meta:
@@ -1168,7 +1294,7 @@ collection:
         method: POST
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ALUNO_AQUI
+          token: "{{ _.token_aluno }}"
       - url: http://localhost:3333/caderno-erros
         name: Listar Caderno de Erros
         meta:
@@ -1177,7 +1303,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ALUNO_AQUI
+          token: "{{ _.token_aluno }}"
       - url: http://localhost:3333/caderno-erros/refazer
         name: Refazer Questões Erradas
         meta:
@@ -1195,7 +1321,7 @@ collection:
             value: application/json
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ALUNO_AQUI
+          token: "{{ _.token_aluno }}"
   - name: 12-ADMIN-USUARIOS-VINCULOS
     meta:
       id: fld_admin_usuarios
@@ -1218,7 +1344,7 @@ collection:
             value: ana
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/usuarios/1
         name: Consultar Usuário - Administrador
         meta:
@@ -1227,7 +1353,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/usuarios/1/status
         name: Alterar Status do Usuário
         meta:
@@ -1245,7 +1371,7 @@ collection:
             value: application/json
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/usuarios/1/link-redefinicao
         name: Gerar Link de Redefinição - Administrador
         meta:
@@ -1254,7 +1380,7 @@ collection:
         method: POST
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/alunos/1/tutor
         name: Trocar Tutor do Aluno
         meta:
@@ -1272,7 +1398,7 @@ collection:
             value: application/json
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/tutores/2/turma
         name: Trocar Turma do Tutor
         meta:
@@ -1290,7 +1416,7 @@ collection:
             value: application/json
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
   - name: 13-COMUNICADOS
     meta:
       id: fld_comunicados
@@ -1315,7 +1441,7 @@ collection:
             value: application/json
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_TUTOR_OU_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/comunicados?naoLidos=true
         name: Listar Comunicados Recebidos
         meta:
@@ -1324,7 +1450,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_TUTOR_OU_ALUNO_AQUI
+          token: "{{ _.token_tutor }}"
       - url: http://localhost:3333/comunicados/nao-lidos
         name: Contar Comunicados Não Lidos
         meta:
@@ -1333,7 +1459,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_TUTOR_OU_ALUNO_AQUI
+          token: "{{ _.token_tutor }}"
       - url: http://localhost:3333/comunicados/enviados
         name: Listar Comunicados Enviados
         meta:
@@ -1342,7 +1468,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_TUTOR_OU_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/comunicados/1
         name: Consultar Comunicado
         meta:
@@ -1351,7 +1477,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/comunicados/1/lido
         name: Marcar Comunicado como Lido
         meta:
@@ -1360,7 +1486,7 @@ collection:
         method: POST
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_TUTOR_OU_ALUNO_AQUI
+          token: "{{ _.token_tutor }}"
   - name: 14-INDICADORES
     meta:
       id: fld_indicadores
@@ -1374,7 +1500,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ALUNO_AQUI
+          token: "{{ _.token_aluno }}"
       - url: http://localhost:3333/indicadores/tutor/alunos?busca=ana
         name: Tutorados do Tutor
         meta:
@@ -1383,7 +1509,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_TUTOR_AQUI
+          token: "{{ _.token_tutor }}"
       - url: http://localhost:3333/indicadores/tutor/redacoes
         name: Desempenho em Redações do Tutor
         meta:
@@ -1392,7 +1518,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_TUTOR_AQUI
+          token: "{{ _.token_tutor }}"
       - url: http://localhost:3333/indicadores/tutor/simulados
         name: Desempenho em Simulados do Tutor
         meta:
@@ -1401,7 +1527,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_TUTOR_AQUI
+          token: "{{ _.token_tutor }}"
       - url: http://localhost:3333/indicadores/alunos/1
         name: Indicadores de um Aluno - Gestão
         meta:
@@ -1410,7 +1536,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_OU_TUTOR_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/indicadores/historico-correcoes?mes=2026-10&idTutor=2&idTurma=1&tipoFluxo=AVALIATIVA
         name: Histórico de Correções
         meta:
@@ -1419,7 +1545,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_OU_TUTOR_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/indicadores/admin/turmas?idTurma=1
         name: Desempenho por Turmas - Administrador
         meta:
@@ -1428,7 +1554,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
       - url: http://localhost:3333/indicadores/admin/tutores
         name: Desempenho por Tutores - Administrador
         meta:
@@ -1437,7 +1563,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_ADMIN_AQUI
+          token: "{{ _.token_admin }}"
   - name: 15-SESSAO
     meta:
       id: fld_auth_me
@@ -1451,7 +1577,7 @@ collection:
         method: GET
         authentication:
           type: bearer
-          token: COLE_O_TOKEN_AQUI
+          token: "{{ _.token_admin }}"
 cookieJar:
   name: Default Jar
   meta:
@@ -1465,3 +1591,8 @@ environments:
     created: 1791250265252
     modified: 1791250265252
     isPrivate: false
+  data:
+    token_admin: ""
+    token_tutor: ""
+    token_tutor2: ""
+    token_aluno: ""

@@ -11,9 +11,11 @@ usando a collection
 Em um terminal:
 
 ```powershell
-cd C:\LIRA\backend
+cd C:\caminho\para\Lira_tutoria\backend
 npm run dev
 ```
+
+Substitua o caminho de exemplo pelo diretório onde clonou o repositório.
 
 Mantenha o terminal aberto. Ele exibirá erros de execução e, em
 desenvolvimento, o link de recuperação de senha quando nenhum serviço de
@@ -24,7 +26,7 @@ e-mail estiver configurado.
 1. Abra o Insomnia.
 2. Clique em **Import/Export**.
 3. Escolha **Import Data > From File**.
-4. Selecione `C:\LIRA\docs\insomnia\LIRA_TUTORIA.yaml`.
+4. Selecione `docs/insomnia/LIRA_TUTORIA.yaml` dentro do repositório.
 5. Abra a collection `LIRA_TUTORIA`.
 6. Use `http://localhost:3333` como URL-base.
 
@@ -35,21 +37,37 @@ esses valores pelos IDs retornados pelo seu banco.
 
 Para uma rota protegida:
 
-1. Execute a requisição de login do perfil necessário.
-2. Copie o campo `token` da resposta.
-3. Na requisição seguinte, abra **Auth > Bearer Token**.
-4. Cole somente o token, sem escrever `Bearer`.
+Na collection, abra **No Project Environment > Manage Environments** e preencha o
+**Base Environment** com os tokens que serão usados nos testes:
 
-Use nomes separados para não misturar permissões:
-
-```text
-TOKEN_ADMIN
-TOKEN_TUTOR
-TOKEN_ALUNO
+```json
+{
+  "token_admin": "",
+  "token_tutor": "",
+  "token_tutor2": "",
+  "token_aluno": ""
+}
 ```
 
-Quando a resposta do login contiver `tokenPendente`, execute
-`05-PAPEIS-E-SESSAO > Selecionar Papel` antes de usar as demais rotas.
+Execute os logins da pasta `01-AUTENTICACAO`, copie o campo `token` de cada
+resposta e preencha a variável correspondente. Se o login retornar
+`tokenPendente`, use `05-PAPEIS-E-SESSAO > Selecionar Papel` com o papel
+necessário; por exemplo:
+
+```json
+{
+  "tokenPendente": "COLE_O_TOKEN_PENDENTE",
+  "papel": "TUTOR"
+}
+```
+
+Copie o `token` retornado para `token_tutor`. Nas requisições novas da
+collection, o campo **Auth > Bearer Token** já referencia essas variáveis.
+Para a Parte B, prepare dois tutores distintos e um aluno vinculado ao primeiro.
+Se a mesma conta tiver mais de um papel, repita o login e a seleção para obter
+um token de sessão separado para cada papel.
+Nas rotas que aceitam mais de um papel, troque o valor de **Bearer Token**
+pela variável do perfil que deseja testar, por exemplo `{{ _.token_aluno }}`.
 
 ### 1.4 Formato das respostas de erro
 
@@ -211,7 +229,7 @@ Content-Type: application/json
 }
 ```
 
-**Esperado:** `201 Created` ou `200 OK`, com os dados do usuário criado.
+**Esperado:** `201 Created`, com os dados do usuário criado.
 
 ### 02.02 — Cadastrar aluno via convite
 
@@ -466,6 +484,11 @@ Authorization: Bearer TOKEN_ADMIN
 
 **Esperado:** `204 No Content`, desde que o tema não esteja em uso.
 
+Administradores podem gerenciar qualquer tema. Tutores podem criar temas
+próprios e alterar ou excluir somente os temas que criaram. Um tema do Tutor
+fica visível aos alunos vinculados a ele; para outro Tutor, a consulta retorna
+`404`.
+
 ---
 
 ## 08-TAREFAS
@@ -492,20 +515,29 @@ Content-Type: application/json
 
 ```json
 {
-  "idTurma": 1,
   "idTema": 1,
   "tituloTarefa": "Redação da semana",
   "descricao": "Produza uma redação dissertativo-argumentativa.",
-  "prazoEntrega": "2026-12-01T23:59:00.000Z",
-  "modalidade": "AVALIATIVA"
+  "prazoEntrega": "2026-12-01T23:59:00.000Z"
 }
 ```
 
-**Esperado:** `201 Created`.
+**Esperado:** `201 Created`. A API infere `AVALIATIVA` e a turma a partir do
+Tutor autenticado; não envie `idTurma` nem `modalidade`.
 
 ### 08.03 — Criar tarefa geral
 
-Use `TOKEN_ADMIN` e troque `modalidade` para `GERAL`.
+Use `TOKEN_ADMIN`. A API define a modalidade como `GERAL`; não envie
+`idTurma` nem `modalidade`.
+
+```json
+{
+  "idTema": 1,
+  "tituloTarefa": "Atividade institucional",
+  "descricao": "Atividade geral da Administração.",
+  "prazoEntrega": "2026-12-01T23:59:00.000Z"
+}
+```
 
 **Esperado:** `201 Created`.
 
@@ -531,12 +563,12 @@ Content-Type: application/json
 
 ```json
 {
-  "idTurma": 2,
   "prazoEntrega": "2026-12-15T23:59:00.000Z"
 }
 ```
 
-**Esperado:** `201 Created`.
+**Esperado:** `201 Created`. A tarefa geral é aplicada à turma do Tutor; não
+envie `idTurma`.
 
 ### 08.06 — Adicionar anexo
 
@@ -573,6 +605,62 @@ Authorization: Bearer TOKEN_ADMIN_OU_TUTOR
 ```
 
 **Esperado:** `204 No Content` quando a regra de negócio permitir.
+
+### 08.09 — Parte B: tema próprio do Tutor e tarefa com `novoTema`
+
+Prepare `token_admin`, `token_tutor`, `token_tutor2` e `token_aluno`. O aluno
+deve pertencer à turma do primeiro Tutor. Na pasta `07-TEMAS`, use as
+requisições duplicadas do Tutor; na pasta `08-TAREFAS`, use as requisições de
+criação de tarefa com `novoTema`. Ajuste qualquer prazo para uma data futura.
+
+| # | Ação | Token | Esperado |
+| --- | --- | --- | --- |
+| 1 | Criar tema próprio com `POST /temas` | `token_tutor` | `201`; `origem: "TUTOR"`. Guarde `idTema`. |
+| 2 | Repetir a criação enviando `"origem": "OFICIAL"` | `token_tutor` | `201`; origem permanece `TUTOR`. |
+| 3 | Criar tarefa com `novoTema` | `token_tutor` | `201`; tarefa inclui tema e `textoMotivador`. Guarde `idTarefa`. |
+| 4 | Enviar `idTema` e `novoTema` juntos | `token_tutor` | `400`, código `TEMA_DUPLICADO`. |
+| 5 | Listar temas | `token_aluno` | `200`; o tema do Tutor vinculado aparece. |
+| 6 | Consultar o tema do passo 1 | `token_tutor2` | `404`, tema fora do escopo. |
+| 7 | Criar tarefa usando o `idTema` do passo 1 | `token_tutor2` | `404`, código `TEMA_NAO_ENCONTRADO`. |
+| 8 | Atualizar ou excluir um tema oficial | `token_tutor` | `403`. |
+| 9 | Excluir o tema criado junto à tarefa do passo 3 | `token_tutor` | `409`, tema em uso. |
+| 10 | Criar redação avaliativa para a tarefa do passo 3 | `token_aluno` | `201`. Este teste confirma o fluxo completo. |
+| 11 | Criar tema | `token_aluno` | `403`. |
+| 12 | Criar tema com `"origem": "TUTOR"` | `token_admin` | `400`, origem reservada. |
+
+No passo 4, use qualquer ID numérico válido: a validação de `idTema` junto
+com `novoTema` ocorre antes da consulta do tema. Nos passos 7 e 10, substitua
+os valores pelos IDs numéricos reais; não presuma que sejam `1`.
+
+Para o passo 10, envie:
+
+```http
+POST /redacoes
+Authorization: Bearer TOKEN_ALUNO
+Content-Type: application/json
+```
+
+```json
+{
+  "tipoFluxo": "AVALIATIVA",
+  "idTarefa": 123
+}
+```
+
+Troque `123` pelo `idTarefa` retornado no passo 3. A tarefa deve estar ativa,
+dentro do prazo e vinculada à turma do aluno.
+
+Para conferir a autoria no MySQL:
+
+```sql
+SELECT id_tema, origem, id_criador
+FROM TEMA
+ORDER BY id_tema DESC
+LIMIT 5;
+```
+
+Temas criados por Tutor devem apresentar `origem = 'TUTOR'` e `id_criador`
+preenchido.
 
 ---
 
