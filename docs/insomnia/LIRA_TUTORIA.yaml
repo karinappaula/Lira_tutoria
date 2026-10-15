@@ -33,7 +33,7 @@ collection:
             send: true
             store: true
           rebuildPath: true
-  - name: 01-AUTENTICAÃ‡ÃƒO
+  - name: 01-AUTENTICACAO
     meta:
       id: fld_ab00487769f34e9ab1e67be7f9504f52
       created: 1791385226386
@@ -155,57 +155,40 @@ collection:
             send: true
             store: true
           rebuildPath: true
-  - name: 03-CONVITES DE TUTOR
-    meta:
-      id: fld_a87d5f35d495410298db8d8a17c19a38
-      created: 1791385312817
-      modified: 1791385312817
-      sortKey: -1791385312817
-      description: ""
-    children:
-      - url: http://localhost:3333/turmas/1/convites/tutor
-        name: Gerar Convite de Tutor
+      - url: http://localhost:3333/auth/esqueci-senha
+        name: Solicitar Recuperação de Senha
         meta:
-          id: req_2befe539d00345918caaf50a6ba7fff4
-          created: 1791385325857
-          modified: 1791463183770
+          id: req_auth_esqueci_senha
           isPrivate: false
-          description: ""
-          sortKey: -1791385325857
+          description: Sem Brevo/SMTP, copie o link exibido no terminal.
         method: POST
-        authentication:
-          type: bearer
-          token: COLE_O_TOKEN_ADMIN_OU_TUTOR_AQUI
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-      - url: http://localhost:3333/convites
-        name: Listar Convites
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "email": "aluno@lira.com"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+      - url: http://localhost:3333/auth/redefinir-senha
+        name: Redefinir Senha com Token
         meta:
-          id: req_cfb2798d0ec44d1198654fadbea13ae1
-          created: 1791385340247
-          modified: 1791463232506
+          id: req_auth_redefinir_senha
           isPrivate: false
-          description: ""
-          sortKey: -1791385340247
-        method: GET
-        authentication:
-          type: bearer
-          token: COLE_O_TOKEN_ADMIN_OU_TUTOR_AQUI
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
-  - name: 01-CADASTRO
+          description: Use o token do e-mail ou do terminal. O token é de uso único.
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "token": "COLE_O_TOKEN_AQUI",
+              "novaSenha": "NovaSenha123"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+  - name: 02-CADASTRO
     meta:
       id: fld_011af8abb816491ebae1b235e2530cd1
       created: 1791385360606
@@ -273,7 +256,57 @@ collection:
             send: true
             store: true
           rebuildPath: true
-  - name: 04-CONVITES DE ALUNO
+  - name: 03-CONVITES-TUTOR
+    meta:
+      id: fld_a87d5f35d495410298db8d8a17c19a38
+      created: 1791385312817
+      modified: 1791385312817
+      sortKey: -1791385312817
+      description: ""
+    children:
+      - url: http://localhost:3333/turmas/1/convites/tutor
+        name: Gerar Convite de Tutor
+        meta:
+          id: req_2befe539d00345918caaf50a6ba7fff4
+          created: 1791385325857
+          modified: 1791463183770
+          isPrivate: false
+          description: ""
+          sortKey: -1791385325857
+        method: POST
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_OU_TUTOR_AQUI
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3333/convites
+        name: Listar Convites
+        meta:
+          id: req_cfb2798d0ec44d1198654fadbea13ae1
+          created: 1791385340247
+          modified: 1791463232506
+          isPrivate: false
+          description: ""
+          sortKey: -1791385340247
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_OU_TUTOR_AQUI
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 04-CONVITES-ALUNO
     meta:
       id: fld_dded4a53d5e84626b1929600a7056ed3
       created: 1791385413277
@@ -302,7 +335,7 @@ collection:
             send: true
             store: true
           rebuildPath: true
-  - name: 02-AUTENTICACAO-E-PAPEIS
+  - name: 05-PAPEIS-E-SESSAO
     meta:
       id: fld_205ac4c38eb24e32b99a4b51e07fadd9
       created: 1791385452231
@@ -365,7 +398,7 @@ collection:
             send: true
             store: true
           rebuildPath: true
-  - name: 05-TURMAS
+  - name: 06-TURMAS
     meta:
       id: fld_1de2eaeceea243e3afdb40f1baf5a589
       created: 1791461963705
@@ -477,7 +510,7 @@ collection:
         authentication:
           type: bearer
           token: COLE_O_TOKEN_ADMIN_AQUI
-  - name: 06-TEMAS
+  - name: 07-TEMAS
     meta:
       id: fld_temas
       description: CRUD de temas motivadores
@@ -547,7 +580,7 @@ collection:
         authentication:
           type: bearer
           token: COLE_O_TOKEN_ADMIN_AQUI
-  - name: 07-TAREFAS
+  - name: 08-TAREFAS
     meta:
       id: fld_tarefas
       description: Tarefas avaliativas e atividades gerais
@@ -639,7 +672,7 @@ collection:
         authentication:
           type: bearer
           token: COLE_O_TOKEN_ADMIN_AQUI
-  - name: 08-REDACOES
+  - name: 09-REDACOES
     meta:
       id: fld_redacoes
       description: Ciclo de rascunho, envio e reescrita
@@ -765,7 +798,7 @@ collection:
         authentication:
           type: bearer
           token: COLE_O_TOKEN_ALUNO_AQUI
-  - name: 09-CORRECOES
+  - name: 10-CORRECOES
     meta:
       id: fld_correcoes
       description: Correção ENEM e aprovação administrativa
@@ -854,7 +887,113 @@ collection:
         authentication:
           type: bearer
           token: COLE_O_TOKEN_ADMIN_AQUI
-  - name: 10-QUESTOES-E-SIMULADOS
+  - name: 11-CONTROLES-QUESTOES-SIMULADOS
+    meta:
+      id: fld_questoes_controles
+      description: Ativação de questões e pausa do cronômetro.
+    children:
+      - url: http://localhost:3333/questoes/1/inativar
+        name: Inativar Questão - Administrador
+        meta:
+          id: req_questao_inativar
+          isPrivate: false
+        method: POST
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+      - url: http://localhost:3333/questoes/1/ativar
+        name: Ativar Questão - Administrador
+        meta:
+          id: req_questao_ativar
+          isPrivate: false
+        method: POST
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+      - url: http://localhost:3333/assuntos
+        name: Criar Assunto - Administrador
+        meta:
+          id: req_assunto_criar
+          isPrivate: false
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "nomeAssunto": "Competência leitora"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+      - url: http://localhost:3333/assuntos/1
+        name: Editar Assunto - Administrador
+        meta:
+          id: req_assunto_editar
+          isPrivate: false
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "nomeAssunto": "Competência leitora atualizada"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+      - url: http://localhost:3333/assuntos/1
+        name: Excluir Assunto - Administrador
+        meta:
+          id: req_assunto_excluir
+          isPrivate: false
+        method: DELETE
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+      - url: http://localhost:3333/tarefas/1/anexos
+        name: Adicionar Anexo à Tarefa
+        meta:
+          id: req_tarefa_anexo
+          isPrivate: false
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "nomeArquivo": "material.pdf",
+              "url": "https://exemplo.com/material.pdf",
+              "tipoArquivo": "application/pdf"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_OU_TUTOR_AQUI
+      - url: http://localhost:3333/tarefas/1/anexos/1
+        name: Remover Anexo da Tarefa
+        meta:
+          id: req_tarefa_anexo_excluir
+          isPrivate: false
+        method: DELETE
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_OU_TUTOR_AQUI
+      - url: http://localhost:3333/simulados/1/pausar
+        name: Pausar Simulado
+        meta:
+          id: req_simulado_pausar
+          isPrivate: false
+        method: POST
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ALUNO_AQUI
+  - name: 11-QUESTOES-E-SIMULADOS
     meta:
       id: fld_simulados
       description: Questões, simulados e caderno de erros
@@ -1057,16 +1196,249 @@ collection:
         authentication:
           type: bearer
           token: COLE_O_TOKEN_ALUNO_AQUI
-      - url: http://localhost:3333/caderno-erros/1/revisar
-        name: Revisar Erro
+  - name: 12-ADMIN-USUARIOS-VINCULOS
+    meta:
+      id: fld_admin_usuarios
+      description: Gestão de contas, tutores, alunos e redefinição manual.
+    children:
+      - url: http://localhost:3333/usuarios
+        name: Listar Usuários - Administrador
         meta:
-          id: req_simulados_revisar
+          id: req_usuarios_listar
+          isPrivate: false
+        method: GET
+        parameters:
+          - name: papel
+            value: ALUNO
+          - name: status
+            value: ATIVO
+          - name: idTurma
+            value: "1"
+          - name: busca
+            value: ana
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+      - url: http://localhost:3333/usuarios/1
+        name: Consultar Usuário - Administrador
+        meta:
+          id: req_usuario_detalhe
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+      - url: http://localhost:3333/usuarios/1/status
+        name: Alterar Status do Usuário
+        meta:
+          id: req_usuario_status
+          isPrivate: false
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "status": "INATIVO"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+      - url: http://localhost:3333/usuarios/1/link-redefinicao
+        name: Gerar Link de Redefinição - Administrador
+        meta:
+          id: req_usuario_link_redefinicao
           isPrivate: false
         method: POST
         authentication:
           type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+      - url: http://localhost:3333/alunos/1/tutor
+        name: Trocar Tutor do Aluno
+        meta:
+          id: req_aluno_tutor
+          isPrivate: false
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "idTutor": 2
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+      - url: http://localhost:3333/tutores/2/turma
+        name: Trocar Turma do Tutor
+        meta:
+          id: req_tutor_turma
+          isPrivate: false
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "idTurma": 2
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+  - name: 13-COMUNICADOS
+    meta:
+      id: fld_comunicados
+      description: Envio, caixa de entrada e leitura de comunicados.
+    children:
+      - url: http://localhost:3333/comunicados
+        name: Enviar Comunicado - Tutor ou Administrador
+        meta:
+          id: req_comunicado_enviar
+          isPrivate: false
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "tituloComunicado": "Aviso da semana",
+              "mensagem": "A correção será liberada amanhã.",
+              "idTurma": 1
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_TUTOR_OU_ADMIN_AQUI
+      - url: http://localhost:3333/comunicados?naoLidos=true
+        name: Listar Comunicados Recebidos
+        meta:
+          id: req_comunicado_recebidos
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_TUTOR_OU_ALUNO_AQUI
+      - url: http://localhost:3333/comunicados/nao-lidos
+        name: Contar Comunicados Não Lidos
+        meta:
+          id: req_comunicado_nao_lidos
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_TUTOR_OU_ALUNO_AQUI
+      - url: http://localhost:3333/comunicados/enviados
+        name: Listar Comunicados Enviados
+        meta:
+          id: req_comunicado_enviados
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_TUTOR_OU_ADMIN_AQUI
+      - url: http://localhost:3333/comunicados/1
+        name: Consultar Comunicado
+        meta:
+          id: req_comunicado_detalhe
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_AQUI
+      - url: http://localhost:3333/comunicados/1/lido
+        name: Marcar Comunicado como Lido
+        meta:
+          id: req_comunicado_lido
+          isPrivate: false
+        method: POST
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_TUTOR_OU_ALUNO_AQUI
+  - name: 14-INDICADORES
+    meta:
+      id: fld_indicadores
+      description: Indicadores de alunos, tutores e administração.
+    children:
+      - url: http://localhost:3333/indicadores/aluno
+        name: Indicadores do Aluno
+        meta:
+          id: req_indicadores_aluno
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
           token: COLE_O_TOKEN_ALUNO_AQUI
-  - name: 11-SESSAO
+      - url: http://localhost:3333/indicadores/tutor/alunos?busca=ana
+        name: Tutorados do Tutor
+        meta:
+          id: req_indicadores_tutor_alunos
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_TUTOR_AQUI
+      - url: http://localhost:3333/indicadores/tutor/redacoes
+        name: Desempenho em Redações do Tutor
+        meta:
+          id: req_indicadores_tutor_redacoes
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_TUTOR_AQUI
+      - url: http://localhost:3333/indicadores/tutor/simulados
+        name: Desempenho em Simulados do Tutor
+        meta:
+          id: req_indicadores_tutor_simulados
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_TUTOR_AQUI
+      - url: http://localhost:3333/indicadores/alunos/1
+        name: Indicadores de um Aluno - Gestão
+        meta:
+          id: req_indicadores_aluno_gestao
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_OU_TUTOR_AQUI
+      - url: http://localhost:3333/indicadores/historico-correcoes?mes=2026-10&idTutor=2&idTurma=1&tipoFluxo=AVALIATIVA
+        name: Histórico de Correções
+        meta:
+          id: req_indicadores_historico
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_OU_TUTOR_AQUI
+      - url: http://localhost:3333/indicadores/admin/turmas?idTurma=1
+        name: Desempenho por Turmas - Administrador
+        meta:
+          id: req_indicadores_admin_turmas
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+      - url: http://localhost:3333/indicadores/admin/tutores
+        name: Desempenho por Tutores - Administrador
+        meta:
+          id: req_indicadores_admin_tutores
+          isPrivate: false
+        method: GET
+        authentication:
+          type: bearer
+          token: COLE_O_TOKEN_ADMIN_AQUI
+  - name: 15-SESSAO
     meta:
       id: fld_auth_me
       description: Dados do usuário autenticado

@@ -90,6 +90,38 @@ Resposta:
 }
 ```
 
+### Recuperação de senha
+
+```http
+POST /auth/esqueci-senha
+Content-Type: application/json
+```
+
+```json
+{
+  "email": "aluno@lira.com"
+}
+```
+
+Sem `BREVO_API_KEY` e sem `SMTP_HOST`, o link é exibido no terminal em
+ambiente de desenvolvimento. Com Brevo ou SMTP configurado, ele é enviado
+por e-mail. A resposta é sempre genérica.
+
+```http
+POST /auth/redefinir-senha
+Content-Type: application/json
+```
+
+```json
+{
+  "token": "TOKEN_RECEBIDO_NO_EMAIL",
+  "novaSenha": "NovaSenha123"
+}
+```
+
+O token expira em uma hora e só pode ser usado uma vez. Reutilizá-lo retorna
+`400` com o código `LINK_INVALIDO`.
+
 ### Participar como aluno
 
 ```http
@@ -162,6 +194,8 @@ POST   /tarefas
 PATCH  /tarefas/:idTarefa
 DELETE /tarefas/:idTarefa
 POST   /tarefas/:idTarefa/replicar
+POST   /tarefas/:idTarefa/anexos
+DELETE /tarefas/:idTarefa/anexos/:idAnexo
 ```
 
 Administradores criam atividades `GERAL`; tutores criam tarefas
@@ -466,6 +500,15 @@ PATCH  /questoes/:idQuestao
 DELETE /questoes/:idQuestao
 ```
 
+O catálogo de assuntos possui as seguintes operações:
+
+```http
+GET    /assuntos
+POST   /assuntos
+PATCH  /assuntos/:idAssunto
+DELETE /assuntos/:idAssunto
+```
+
 O detalhe e as operações de alteração são exclusivos do administrador. O
 payload de criação/edição exige cinco alternativas (`A` a `E`), exatamente um
 gabarito e pelo menos um assunto:
@@ -511,6 +554,16 @@ Authorization: Bearer <token>
 
 O gabarito não é retornado nessa consulta.
 
+O administrador pode alterar o status sem apagar a questão:
+
+```http
+POST /questoes/:idQuestao/inativar
+POST /questoes/:idQuestao/ativar
+```
+
+Questões `INATIVA` não entram em novos simulados nem em simulados criados a
+partir do caderno de erros.
+
 ## Simulados
 
 As operações de simulados são exclusivas de alunos:
@@ -520,6 +573,7 @@ POST  /simulados
 GET   /simulados
 GET   /simulados/:idSimulado
 POST  /simulados/:idSimulado/iniciar
+POST  /simulados/:idSimulado/pausar
 PATCH /simulados/:idSimulado/respostas
 POST  /simulados/:idSimulado/finalizar
 ```
@@ -598,26 +652,98 @@ Ao finalizar, o backend:
 - registra `dataFim` e `tempoGastoSeg`;
 - cria ou atualiza o caderno de erros para questões respondidas incorretamente.
 
+### Pausar e retomar
+
+```http
+POST /simulados/1/pausar
+Authorization: ******
+```
+
+A pausa acumula o tempo usado em `tempoAcumuladoSeg`. Ao chamar novamente
+`POST /simulados/:idSimulado/iniciar`, o cronômetro continua do ponto salvo.
+O tempo total permitido continua sendo 60 minutos.
+
 ## Caderno de erros
 
 ```http
 GET  /caderno-erros
-POST /caderno-erros/:idCaderno/revisar
+POST /caderno-erros/refazer
 Authorization: Bearer <token-de-aluno>
 ```
 
 O caderno utiliza uma chave única por aluno e questão. Cada novo erro
 incrementa `quantidadeErros` e atualiza `dataUltimoErro`.
 
-Body de criação:
+O refazimento aceita:
 
 ```json
 {
-  "nome": "3º A",
-  "anoLetivo": 2026,
-  "vestibularFoco": "ENEM"
+  "quantidade": 10
 }
 ```
+
+## Administração de usuários e vínculos
+
+Todas as rotas desta seção exigem token de sessão com papel
+`ADMINISTRADOR`.
+
+```http
+GET   /usuarios
+GET   /usuarios/:idUsuario
+PATCH /usuarios/:idUsuario/status
+POST  /usuarios/:idUsuario/link-redefinicao
+PATCH /alunos/:idAluno/tutor
+PATCH /tutores/:idTutor/turma
+```
+
+Filtros de `GET /usuarios`: `papel`, `status`, `idTurma` e `busca`.
+Para alterar o status, envie `{ "status": "INATIVO" }`. Para trocar o tutor
+de um aluno, envie `{ "idTutor": 3 }`; para trocar a turma de um tutor,
+envie `{ "idTurma": 2 }`. Alterações de status e vínculos são auditadas.
+
+`POST /usuarios/:idUsuario/link-redefinicao` retorna `201` com link de uso
+único para aluno ou tutor. Para outra conta administradora retorna `409`.
+
+## Comunicados
+
+```http
+POST /comunicados
+GET  /comunicados
+GET  /comunicados/nao-lidos
+GET  /comunicados/enviados
+GET  /comunicados/:idComunicado
+POST /comunicados/:idComunicado/lido
+```
+
+Administradores e tutores enviam comunicados. Tutores e alunos recebem.
+
+```json
+{
+  "tituloComunicado": "Aviso da semana",
+  "mensagem": "A correção será liberada amanhã.",
+  "idTurma": 1
+}
+```
+
+O campo `idTurma` é opcional para a Administração. Para filtrar a caixa de
+entrada, use `GET /comunicados?naoLidos=true`.
+
+## Indicadores
+
+```http
+GET /indicadores/aluno
+GET /indicadores/tutor/alunos?busca=ana
+GET /indicadores/tutor/redacoes
+GET /indicadores/tutor/simulados
+GET /indicadores/alunos/:idAluno
+GET /indicadores/historico-correcoes?mes=2026-10&idTutor=3&idTurma=1&tipoFluxo=AVALIATIVA
+GET /indicadores/admin/turmas?idTurma=1
+GET /indicadores/admin/tutores
+```
+
+A rota de aluno é exclusiva do aluno autenticado. As rotas de tutor mostram
+somente seus tutorados. As rotas administrativas são exclusivas da
+Administração e o desempenho individual respeita o vínculo do tutor.
 
 ## Convites
 

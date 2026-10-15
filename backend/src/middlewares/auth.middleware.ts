@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
+import { prisma } from "../db/prisma";
 import {
   ErroTokenInvalido,
   type PapelAtivo,
@@ -11,11 +12,11 @@ export interface RequestAutenticada extends Request {
   autenticacao: PayloadSessao;
 }
 
-export function exigirAutenticacao(
+export async function exigirAutenticacao(
   req: Request,
   _res: Response,
   next: NextFunction
-): void {
+): Promise<void> {
   const cabecalho = req.header("authorization");
   const token = cabecalho?.startsWith("Bearer ") ? cabecalho.slice(7).trim() : "";
 
@@ -28,6 +29,17 @@ export function exigirAutenticacao(
     const payload = verificarToken(token);
     if (payload.tipo !== "sessao") {
       next(new ErroTokenInvalido("Use um token de sessão completo."));
+      return;
+    }
+
+    // Conta inativada depois do login perde o acesso na hora, sem esperar o
+    // token expirar (RF02 / RNF03).
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: payload.idUsuario },
+      select: { status: true },
+    });
+    if (!usuario || usuario.status !== "ATIVO") {
+      next(new ErroTokenInvalido("Conta inativa ou inexistente."));
       return;
     }
 

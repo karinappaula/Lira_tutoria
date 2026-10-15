@@ -23,11 +23,11 @@ const redacaoInclude = {
   },
   tarefa: {
     include: {
-      tema: { select: { id: true, tituloTema: true } },
+      tema: { select: { id: true, tituloTema: true, textoMotivador: true } },
       turma: { select: { id: true, nome: true, anoLetivo: true, status: true } },
     },
   },
-  tema: { select: { id: true, tituloTema: true } },
+  tema: { select: { id: true, tituloTema: true, textoMotivador: true } },
   versoes: {
     orderBy: { numeroVersao: "asc" as const },
   },
@@ -167,8 +167,14 @@ export async function criarRascunho(
       throw new ErroNegocio("Informe o tema da redação.", 400, "TEMA_OBRIGATORIO");
     }
     const tema = await prisma.tema.findUnique({ where: { id: idTema } });
-    // Tema próprio de outro aluno é tratado como inexistente.
-    if (!tema || (tema.idCriador !== null && tema.idCriador !== aluno.idUsuario)) {
+    // Pode usar: tema oficial, o próprio tema ou tema do seu Tutor.
+    // Tema de outro aluno ou de outro Tutor é tratado como inexistente.
+    const visivel =
+      !!tema &&
+      (tema.idCriador === null ||
+        tema.idCriador === aluno.idUsuario ||
+        (tema.origem === "TUTOR" && tema.idCriador === aluno.idTutor));
+    if (!visivel) {
       throw new ErroNegocio("Tema não encontrado.", 404, "TEMA_NAO_ENCONTRADO");
     }
   }

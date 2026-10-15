@@ -45,12 +45,34 @@ function validarPrazo(valor: unknown, detalhes: Detalhe[]): Date | undefined {
 function dadosTarefa(body: unknown, parcial = false) {
   const dados = corpo(body);
   const detalhes: Detalhe[] = [];
-  const resultado: { idTema?: number; tituloTarefa?: string; descricao?: string; prazoEntrega?: Date } = {};
+  const resultado: {
+    idTema?: number;
+    novoTema?: { tituloTema: string; textoMotivador?: string };
+    tituloTarefa?: string;
+    descricao?: string;
+    prazoEntrega?: Date;
+  } = {};
 
   if (dados.idTema !== undefined && dados.idTema !== null) {
     if (!Number.isInteger(dados.idTema) || Number(dados.idTema) <= 0) {
       detalhes.push({ campo: "idTema", mensagem: "Informe um identificador válido." });
     } else resultado.idTema = dados.idTema as number;
+  }
+  // novoTema só vale na criação; para trocar o tema depois, use idTema.
+  if (!parcial && dados.novoTema !== undefined && dados.novoTema !== null) {
+    const bruto = typeof dados.novoTema === "object" ? (dados.novoTema as Record<string, unknown>) : {};
+    const titulo = typeof bruto.tituloTema === "string" ? bruto.tituloTema.trim() : "";
+    const motivador = bruto.textoMotivador;
+    if (!titulo || titulo.length > 200) {
+      detalhes.push({ campo: "novoTema.tituloTema", mensagem: "Informe um título de até 200 caracteres." });
+    }
+    if (motivador !== undefined && (typeof motivador !== "string" || motivador.length > 10000)) {
+      detalhes.push({ campo: "novoTema.textoMotivador", mensagem: "Deve ser um texto de até 10000 caracteres." });
+    }
+    resultado.novoTema = {
+      tituloTema: titulo,
+      textoMotivador: typeof motivador === "string" && motivador.trim() ? motivador.trim() : undefined,
+    };
   }
   if (!parcial || dados.tituloTarefa !== undefined) {
     if (typeof dados.tituloTarefa !== "string" || dados.tituloTarefa.trim() === "") {
@@ -100,6 +122,7 @@ export async function postTarefa(req: Request, res: Response, next: NextFunction
     const auth = (req as RequestAutenticada).autenticacao;
     const dados = dadosTarefa(req.body) as {
       idTema?: number;
+      novoTema?: { tituloTema: string; textoMotivador?: string };
       tituloTarefa: string;
       descricao?: string;
       prazoEntrega: Date;

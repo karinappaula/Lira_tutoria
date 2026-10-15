@@ -45,8 +45,10 @@ function lerDados(body: unknown, parcial: boolean) {
 }
 
 export async function postTema(req: Request, res: Response, next: NextFunction) {
-  try { res.status(201).json(await criarTema(lerDados(req.body, false) as { tituloTema: string })); }
-  catch (erro) { next(erro); }
+  try {
+    const auth = (req as RequestAutenticada).autenticacao;
+    res.status(201).json(await criarTema(auth.idUsuario, auth.papelAtivo, lerDados(req.body, false) as { tituloTema: string }));
+  } catch (erro) { next(erro); }
 }
 export async function getTemas(req: Request, res: Response, next: NextFunction) {
   try {
@@ -61,8 +63,15 @@ export async function getTema(req: Request, res: Response, next: NextFunction) {
   } catch (erro) { next(erro); }
 }
 export async function patchTema(req: Request, res: Response, next: NextFunction) {
-  try { res.status(200).json(await atualizarTema(idTema(req), lerDados(req.body, true))); } catch (erro) { next(erro); }
+  try {
+    const auth = (req as RequestAutenticada).autenticacao;
+    res.status(200).json(await atualizarTema(auth.idUsuario, auth.papelAtivo, idTema(req), lerDados(req.body, true)));
+  } catch (erro) { next(erro); }
 }
 export async function deleteTema(req: Request, res: Response, next: NextFunction) {
-  try { await excluirTema(idTema(req)); res.status(204).send(); } catch (erro) { next(erro); }
+  try {
+    const auth = (req as RequestAutenticada).autenticacao;
+    await excluirTema(auth.idUsuario, auth.papelAtivo, idTema(req));
+    res.status(204).send();
+  } catch (erro) { next(erro); }
 }

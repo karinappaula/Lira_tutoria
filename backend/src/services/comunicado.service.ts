@@ -164,7 +164,9 @@ export async function listarEnviados(idUsuario: number) {
   }));
 }
 
-// Pode ver: o remetente, um destinatário ou a Administração (visão geral, RN13).
+// Pode ver: quem enviou, quem recebeu (na caixa do papel ativo) ou a
+// Administração (visão geral, RN13). Quem é Tutor e Aluno na mesma conta vê
+// cada comunicado somente pelo papel correspondente, como nas listas.
 export async function buscarComunicado(
   idUsuario: number,
   papelAtivo: PapelAtivo,
@@ -172,14 +174,22 @@ export async function buscarComunicado(
 ) {
   const comunicado = await prisma.comunicado.findUnique({
     where: { id: idComunicado },
-    include: { remetente: remetenteSelect, destinatarios: { select: { idUsuarioDestinatario: true, lido: true } } },
+    include: {
+      remetente: { select: { id: true, nome: true, administrador: { select: { idUsuario: true } } } },
+      destinatarios: { select: { idUsuarioDestinatario: true, lido: true } },
+    },
   });
   if (!comunicado) {
     throw new ErroNegocio("Comunicado não encontrado.", 404, "COMUNICADO_NAO_ENCONTRADO");
   }
-  const ehRemetente = comunicado.idUsuarioRemetente === idUsuario;
+  const { administrador, ...remetente } = comunicado.remetente;
+  const remetenteEhAdmin = administrador !== null;
   const meuRegistro = comunicado.destinatarios.find((item) => item.idUsuarioDestinatario === idUsuario);
-  if (!ehRemetente && !meuRegistro && papelAtivo !== "ADMINISTRADOR") {
+
+  const comoRemetente = comunicado.idUsuarioRemetente === idUsuario && papelAtivo !== "ALUNO";
+  const comoDestinatario =
+    !!meuRegistro && (papelAtivo === "TUTOR" ? remetenteEhAdmin : papelAtivo === "ALUNO" && !remetenteEhAdmin);
+  if (!comoRemetente && !comoDestinatario && papelAtivo !== "ADMINISTRADOR") {
     // 404 de propósito: não revela que o comunicado existe.
     throw new ErroNegocio("Comunicado não encontrado.", 404, "COMUNICADO_NAO_ENCONTRADO");
   }
@@ -187,7 +197,8 @@ export async function buscarComunicado(
   const { destinatarios, ...dados } = comunicado;
   return {
     ...dados,
-    ...(ehRemetente || papelAtivo === "ADMINISTRADOR"
+    remetente,
+    ...(comoRemetente || papelAtivo === "ADMINISTRADOR"
       ? {
           quantidadeDestinatarios: destinatarios.length,
           quantidadeLidos: destinatarios.filter((item) => item.lido).length,

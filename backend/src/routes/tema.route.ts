@@ -5,7 +5,7 @@ import { deleteTema, getTema, getTemas, patchTema, postTema } from "../controlle
 const router = Router();
 router.get("/temas", exigirAutenticacao, exigirPapel("ADMINISTRADOR", "TUTOR", "ALUNO"), getTemas);
 router.get("/temas/:idTema", exigirAutenticacao, exigirPapel("ADMINISTRADOR", "TUTOR", "ALUNO"), getTema);
-router.post("/temas", exigirAutenticacao, exigirPapel("ADMINISTRADOR"), postTema);
-router.patch("/temas/:idTema", exigirAutenticacao, exigirPapel("ADMINISTRADOR"), patchTema);
-router.delete("/temas/:idTema", exigirAutenticacao, exigirPapel("ADMINISTRADOR"), deleteTema);
+router.post("/temas", exigirAutenticacao, exigirPapel("ADMINISTRADOR", "TUTOR"), postTema);
+router.patch("/temas/:idTema", exigirAutenticacao, exigirPapel("ADMINISTRADOR", "TUTOR"), patchTema);
+router.delete("/temas/:idTema", exigirAutenticacao, exigirPapel("ADMINISTRADOR", "TUTOR"), deleteTema);
 export default router;

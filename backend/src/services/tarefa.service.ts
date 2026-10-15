@@ -4,8 +4,14 @@ import { ErroNegocio } from "../errors/erros";
 import { registrarAuditoria } from "./auditoria.service";
 import type { PapelAtivo } from "./token.service";
 
+export interface NovoTemaInput {
+  tituloTema: string;
+  textoMotivador?: string;
+}
+
 export interface CriarTarefaInput {
   idTema?: number;
+  novoTema?: NovoTemaInput; // cria o tema junto com a tarefa (alternativa a idTema)
   tituloTarefa: string;
   descricao?: string;
   prazoEntrega: Date;
@@ -38,7 +44,7 @@ const STATUS_EM_CORRECAO = ["ENVIADA", "EM_CORRECAO", "AJUSTE_SOLICITADO"];
 
 const tarefaInclude = {
   turma: { select: { id: true, nome: true, anoLetivo: true, status: true } },
-  tema: { select: { id: true, tituloTema: true } },
+  tema: { select: { id: true, tituloTema: true, textoMotivador: true } },
   tutor: { select: { idUsuario: true, usuario: { select: { nome: true } } } },
   administrador: { select: { idUsuario: true, usuario: { select: { nome: true } } } },
   anexos: {
@@ -69,12 +75,23 @@ function exigirTurmaAtiva(turma: { status: string }) {
   }
 }
 
-async function validarTema(idTema: number | undefined) {
+// Tema de tarefa: oficial (qualquer um) ou criado pelo próprio Tutor.
+// Tema de aluno e tema de outro Tutor nunca servem.
+async function validarTema(idTema: number | undefined, idUsuario: number, papelAtivo: PapelAtivo) {
   if (idTema === undefined) return;
   const tema = await prisma.tema.findUnique({ where: { id: idTema } });
-  // Tema próprio de aluno (idCriador preenchido) não pode virar tema de tarefa.
-  if (!tema || tema.idCriador !== null) {
+  const permitido =
+    !!tema &&
+    (tema.idCriador === null ||
+      (papelAtivo === "TUTOR" && tema.origem === "TUTOR" && tema.idCriador === idUsuario));
+  if (!permitido) {
     throw new ErroNegocio("Tema não encontrado.", 404, "TEMA_NAO_ENCONTRADO");
+  }
+}
+
+function exigirApenasUmTema(input: CriarTarefaInput) {
+  if (input.novoTema && input.idTema !== undefined) {
+    throw new ErroNegocio("Informe idTema ou novoTema, não os dois.", 400, "TEMA_DUPLICADO");
   }
 }
 
@@ -83,14 +100,28 @@ async function validarTema(idTema: number | undefined) {
 export async function criarTarefaPorTutor(idUsuarioTutor: number, input: CriarTarefaInput) {
   const tutor = await obterTutor(idUsuarioTutor);
   exigirTurmaAtiva(tutor.turma);
-  await validarTema(input.idTema);
+  exigirApenasUmTema(input);
+  await validarTema(input.idTema, idUsuarioTutor, "TUTOR");
 
   return prisma.$transaction(async (tx) => {
+    // O Tutor pode criar o tema na hora de criar a tarefa.
+    let idTema = input.idTema;
+    if (input.novoTema) {
+      const tema = await tx.tema.create({
+        data: {
+          tituloTema: input.novoTema.tituloTema,
+          textoMotivador: input.novoTema.textoMotivador,
+          origem: "TUTOR",
+          idCriador: idUsuarioTutor,
+        },
+      });
+      idTema = tema.id;
+    }
     const tarefa = await tx.tarefa.create({
       data: {
         idTutor: idUsuarioTutor,
         idTurma: tutor.idTurma,
-        idTema: input.idTema,
+        idTema,
         tituloTarefa: input.tituloTarefa,
         descricao: input.descricao,
         prazoEntrega: input.prazoEntrega,
@@ -109,13 +140,26 @@ export async function criarTarefaPorTutor(idUsuarioTutor: number, input: CriarTa
 // Administração: cria atividade GERAL (RF09 / RN07). Funciona como modelo:
 // não pertence a uma turma e os Tutores a aplicam aos seus grupos.
 export async function criarTarefaGeral(idUsuarioAdmin: number, input: CriarTarefaInput) {
-  await validarTema(input.idTema);
+  exigirApenasUmTema(input);
+  await validarTema(input.idTema, idUsuarioAdmin, "ADMINISTRADOR");
 
   return prisma.$transaction(async (tx) => {
+    // Na Administração, o tema criado junto é oficial.
+    let idTema = input.idTema;
+    if (input.novoTema) {
+      const tema = await tx.tema.create({
+        data: {
+          tituloTema: input.novoTema.tituloTema,
+          textoMotivador: input.novoTema.textoMotivador,
+          origem: "OFICIAL",
+        },
+      });
+      idTema = tema.id;
+    }
     const tarefa = await tx.tarefa.create({
       data: {
         idAdm: idUsuarioAdmin,
-        idTema: input.idTema,
+        idTema,
         tituloTarefa: input.tituloTarefa,
         descricao: input.descricao,
         prazoEntrega: input.prazoEntrega,
@@ -276,7 +320,7 @@ export async function atualizarTarefa(
   input: AtualizarTarefaInput
 ) {
   await obterTarefaDoCriador(idUsuario, papelAtivo, idTarefa);
-  await validarTema(input.idTema);
+  await validarTema(input.idTema, idUsuario, papelAtivo);
 
   return prisma.$transaction(async (tx) => {
     // Lista explícita: modalidade, turma e criador nunca mudam por aqui.
