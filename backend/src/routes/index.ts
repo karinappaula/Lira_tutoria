@@ -9,12 +9,16 @@ import tarefaRoute from "./tarefa.route";
 import redacaoRoute from "./redacao.route";
 import correcaoRoute from "./correcao.route";
 import simuladoRoute from "./simulado.route";
+import comunicadoRoute from "./comunicado.route";
+import indicadoresRoute from "./indicadores.route";
+import vinculoRoute from "./vinculo.route";
 
 const router = Router();
 
 router.use(healthRoute);
 router.use(turmaRoute);
 router.use("/auth", authRoute);
+router.use(vinculoRoute);
 router.use(conviteRoute);
 router.use(participacaoRoute);
 router.use(temaRoute);
@@ -22,5 +26,7 @@ router.use(tarefaRoute);
 router.use(redacaoRoute);
 router.use(correcaoRoute);
 router.use(simuladoRoute);
+router.use(comunicadoRoute);
+router.use(indicadoresRoute);
 
 export default router;

@@ -6,8 +6,11 @@ import {
   criarReescrita,
   criarRascunho,
   enviarVersao,
+  excluirRascunho,
+  listarAguardandoCorrecao,
   listarRedacoesVisiveis,
   salvarRascunho,
+  solicitarReescrita,
   type TipoFluxoRedacao,
 } from "../services/redacao.service";
 
@@ -46,11 +49,29 @@ function criarInput(body: unknown) {
       detalhes.push({ campo, mensagem: "Informe um identificador inteiro positivo." });
     }
   }
+  let temaProprio: { tituloTema: string; textoMotivador?: string } | undefined;
+  if (dados.temaProprio !== undefined && dados.temaProprio !== null) {
+    const bruto =
+      typeof dados.temaProprio === "object" ? (dados.temaProprio as Record<string, unknown>) : {};
+    const titulo = typeof bruto.tituloTema === "string" ? bruto.tituloTema.trim() : "";
+    const motivador = bruto.textoMotivador;
+    if (!titulo || titulo.length > 200) {
+      detalhes.push({ campo: "temaProprio.tituloTema", mensagem: "Informe um título de até 200 caracteres." });
+    }
+    if (motivador !== undefined && (typeof motivador !== "string" || motivador.length > 10000)) {
+      detalhes.push({ campo: "temaProprio.textoMotivador", mensagem: "Deve ser um texto de até 10000 caracteres." });
+    }
+    temaProprio = {
+      tituloTema: titulo,
+      textoMotivador: typeof motivador === "string" && motivador.trim() ? motivador.trim() : undefined,
+    };
+  }
   if (detalhes.length) throw new ErroValidacao(detalhes);
   return {
     tipoFluxo: dados.tipoFluxo as TipoFluxoRedacao,
     idTarefa,
     idTema,
+    temaProprio,
     conteudoTexto: dados.conteudoTexto === undefined ? undefined : texto(body, "conteudoTexto", false),
   };
 }
@@ -104,6 +125,34 @@ export async function postReescrita(req: Request, res: Response, next: NextFunct
   try {
     const auth = (req as RequestAutenticada).autenticacao;
     res.status(201).json(await criarReescrita(auth.idUsuario, id(req)));
+  } catch (erro) {
+    next(erro);
+  }
+}
+
+export async function postSolicitarReescrita(req: Request, res: Response, next: NextFunction) {
+  try {
+    const auth = (req as RequestAutenticada).autenticacao;
+    res.status(200).json(await solicitarReescrita(auth.idUsuario, id(req)));
+  } catch (erro) {
+    next(erro);
+  }
+}
+
+export async function deleteRedacao(req: Request, res: Response, next: NextFunction) {
+  try {
+    const auth = (req as RequestAutenticada).autenticacao;
+    await excluirRascunho(auth.idUsuario, id(req));
+    res.status(204).send();
+  } catch (erro) {
+    next(erro);
+  }
+}
+
+export async function getAguardandoCorrecao(req: Request, res: Response, next: NextFunction) {
+  try {
+    const auth = (req as RequestAutenticada).autenticacao;
+    res.status(200).json(await listarAguardandoCorrecao(auth.idUsuario));
   } catch (erro) {
     next(erro);
   }

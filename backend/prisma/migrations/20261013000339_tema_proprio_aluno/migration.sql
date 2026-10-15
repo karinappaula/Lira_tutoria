@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE `TEMA` ADD COLUMN `id_criador` INTEGER NULL;
+
+-- AddForeignKey
+ALTER TABLE `TEMA` ADD CONSTRAINT `TEMA_id_criador_fkey` FOREIGN KEY (`id_criador`) REFERENCES `USUARIO`(`id_usuario`) ON DELETE SET NULL ON UPDATE CASCADE;

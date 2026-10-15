@@ -90,6 +90,38 @@ Resposta:
 }
 ```
 
+### Recuperação de senha
+
+```http
+POST /auth/esqueci-senha
+Content-Type: application/json
+```
+
+```json
+{
+  "email": "aluno@lira.com"
+}
+```
+
+Sem `BREVO_API_KEY` e sem `SMTP_HOST`, o link é exibido no terminal em
+ambiente de desenvolvimento. Com Brevo ou SMTP configurado, ele é enviado
+por e-mail. A resposta é sempre genérica.
+
+```http
+POST /auth/redefinir-senha
+Content-Type: application/json
+```
+
+```json
+{
+  "token": "TOKEN_RECEBIDO_NO_EMAIL",
+  "novaSenha": "NovaSenha123"
+}
+```
+
+O token expira em uma hora e só pode ser usado uma vez. Reutilizá-lo retorna
+`400` com o código `LINK_INVALIDO`.
+
 ### Participar como aluno
 
 ```http
@@ -162,6 +194,8 @@ POST   /tarefas
 PATCH  /tarefas/:idTarefa
 DELETE /tarefas/:idTarefa
 POST   /tarefas/:idTarefa/replicar
+POST   /tarefas/:idTarefa/anexos
+DELETE /tarefas/:idTarefa/anexos/:idAnexo
 ```
 
 Administradores criam atividades `GERAL`; tutores criam tarefas
@@ -221,12 +255,27 @@ próprias redações.
 
 ```http
 GET   /redacoes
+GET   /redacoes/aguardando-correcao
 GET   /redacoes/:idRedacao
 POST  /redacoes
 PATCH /redacoes/:idRedacao/rascunho
 POST  /redacoes/:idRedacao/enviar
 POST  /redacoes/:idRedacao/reescrita
+POST  /redacoes/:idRedacao/solicitar-reescrita
+DELETE /redacoes/:idRedacao
 ```
+
+### Fila do tutor
+
+```http
+GET /redacoes/aguardando-correcao
+Authorization: ******
+```
+
+Disponível somente para tutores. Retorna as versões dos próprios tutorados
+com status `ENVIADA` (primeira correção) ou `AJUSTE_SOLICITADO` (revisão
+devolvida pela Administração), incluindo aluno, tema, tarefa e a última
+observação administrativa quando houver.
 
 ### Criar redação de treino
 
@@ -296,6 +345,30 @@ Authorization: Bearer <token-de-aluno>
 A versão 2 só pode ser criada quando a versão 1 estiver com status
 `AGUARDANDO_REESCRITA`. A API impede a criação de uma terceira versão.
 
+### Solicitar reescrita
+
+```http
+POST /redacoes/:idRedacao/solicitar-reescrita
+Authorization: ******
+```
+
+Operação exclusiva do tutor responsável pela redação. Depois que uma correção
+de treino é criada, ou que uma correção avaliativa é aprovada pela
+Administração, a versão 1 fica `CORRIGIDA`. O tutor pode então solicitar a
+reescrita; a versão 1 passa para `AGUARDANDO_REESCRITA` e o aluno pode criar a
+única versão 2. O tutor de outra turma recebe `403`.
+
+### Excluir rascunho
+
+```http
+DELETE /redacoes/:idRedacao
+Authorization: ******
+```
+
+Operação exclusiva do aluno proprietário. Só redações com uma única versão em
+`RASCUNHO` podem ser excluídas. Uma redação enviada, corrigida ou com reescrita
+retorna `409`.
+
 Estados utilizados nesta etapa:
 
 ```text
@@ -335,7 +408,13 @@ Content-Type: application/json
   "notaComp3": 160,
   "notaComp4": 180,
   "notaComp5": 160,
+  "comentarioComp1": "Use a norma-padrão na construção do período.",
+  "comentarioComp2": "A tese está relacionada ao tema.",
+  "comentarioComp3": "Desenvolva melhor a relação entre causa e consequência.",
+  "comentarioComp4": "Varie os conectivos entre os parágrafos.",
+  "comentarioComp5": "Detalhe o agente e o meio da proposta.",
   "parecerGeral": "A redação apresenta boa organização argumentativa.",
+  "recadoAdmin": "Mensagem do tutor para a Administração.",
   "anotacoes": [
     {
       "posicaoInicio": 0,
@@ -349,8 +428,11 @@ Content-Type: application/json
 ```
 
 Cada competência aceita valores de `0` a `200`, em incrementos de `10`. A
-nota total é calculada pelo backend. As posições das anotações são conferidas
-contra o conteúdo real da versão.
+nota total é calculada pelo backend. Os campos `comentarioComp1` a
+`comentarioComp5`, `parecerGeral` e `recadoAdmin` são opcionais e aceitam
+textos de até 5.000 caracteres. `recadoAdmin` é interno e não é exibido ao
+aluno. As posições das anotações são conferidas contra o conteúdo real da
+versão.
 
 ### Consultar correção
 
@@ -369,9 +451,10 @@ POST /correcoes/:idCorrecao/aprovar
 Authorization: Bearer <token-de-administrador>
 ```
 
-Para redações avaliativas, a aprovação altera a versão para
-`AGUARDANDO_REESCRITA`, liberando a única versão 2. Para redações de treino, a
-versão passa para `CORRIGIDA`.
+Para redações avaliativas, a aprovação libera a correção ao aluno e altera a
+versão para `CORRIGIDA`. A reescrita não é liberada automaticamente: o tutor
+responsável deve chamar `POST /redacoes/:idRedacao/solicitar-reescrita`, que
+altera a versão para `AGUARDANDO_REESCRITA`.
 
 ### Solicitar ajuste
 
@@ -383,13 +466,21 @@ Content-Type: application/json
 
 ```json
 {
-  "recadoAdmin": "Revise a justificativa da competência 3 antes de reenviar."
+  "comentarioAjuste": "Revise a justificativa da competência 3 antes de reenviar."
 }
 ```
 
 A solicitação altera o status da correção e da versão para
 `AJUSTE_SOLICITADO`, permitindo que o tutor faça uma nova correção da mesma
-versão.
+versão. `recadoAdmin` continua aceito por compatibilidade.
+
+As filas têm finalidades diferentes:
+
+| Endpoint | Usuário | Conteúdo |
+| --- | --- | --- |
+| `GET /redacoes/aguardando-correcao` | Tutor | Versões que precisam de correção ou revisão |
+| `GET /correcoes/pendentes` | Tutor | Correções próprias aguardando aprovação |
+| `GET /correcoes/pendentes` | Administrador | Correções aguardando aprovação |
 
 ## Banco de questões
 
@@ -399,6 +490,50 @@ As questões podem ser consultadas por usuários autenticados:
 GET /questoes
 GET /assuntos
 ```
+
+Administradores também possuem o CRUD do banco:
+
+```http
+GET    /questoes/:idQuestao
+POST   /questoes
+PATCH  /questoes/:idQuestao
+DELETE /questoes/:idQuestao
+```
+
+O catálogo de assuntos possui as seguintes operações:
+
+```http
+GET    /assuntos
+POST   /assuntos
+PATCH  /assuntos/:idAssunto
+DELETE /assuntos/:idAssunto
+```
+
+O detalhe e as operações de alteração são exclusivos do administrador. O
+payload de criação/edição exige cinco alternativas (`A` a `E`), exatamente um
+gabarito e pelo menos um assunto:
+
+```json
+{
+  "enunciado": "Texto da questão.",
+  "vestibular": "ENEM",
+  "ano": 2024,
+  "numeroQuestao": 45,
+  "grauDificuldade": "MEDIA",
+  "explicacaoGabarito": "Justificativa da resposta.",
+  "idAssuntos": [1],
+  "alternativas": [
+    { "letraOpcao": "A", "textoAlternativa": "Opção A", "alternativaCorreta": false },
+    { "letraOpcao": "B", "textoAlternativa": "Opção B", "alternativaCorreta": true },
+    { "letraOpcao": "C", "textoAlternativa": "Opção C", "alternativaCorreta": false },
+    { "letraOpcao": "D", "textoAlternativa": "Opção D", "alternativaCorreta": false },
+    { "letraOpcao": "E", "textoAlternativa": "Opção E", "alternativaCorreta": false }
+  ]
+}
+```
+
+Uma questão usada em simulado ou no caderno de erros retorna `409` e não é
+removida para preservar o histórico.
 
 Filtros disponíveis em `/questoes`:
 
@@ -419,6 +554,16 @@ Authorization: Bearer <token>
 
 O gabarito não é retornado nessa consulta.
 
+O administrador pode alterar o status sem apagar a questão:
+
+```http
+POST /questoes/:idQuestao/inativar
+POST /questoes/:idQuestao/ativar
+```
+
+Questões `INATIVA` não entram em novos simulados nem em simulados criados a
+partir do caderno de erros.
+
 ## Simulados
 
 As operações de simulados são exclusivas de alunos:
@@ -426,10 +571,24 @@ As operações de simulados são exclusivas de alunos:
 ```http
 POST  /simulados
 GET   /simulados
+GET   /simulados/:idSimulado
 POST  /simulados/:idSimulado/iniciar
+POST  /simulados/:idSimulado/pausar
 PATCH /simulados/:idSimulado/respostas
 POST  /simulados/:idSimulado/finalizar
 ```
+
+Para refazer as questões ativas do caderno de erros:
+
+```http
+POST /caderno-erros/refazer
+Authorization: ******
+Content-Type: application/json
+```
+
+O corpo pode informar `quantidade` (de 1 a 50). Sem corpo, são selecionadas
+até 50 questões com erro. O endpoint cria um novo simulado
+`CADERNO_ERROS`; se não houver erros ativos, retorna `409`.
 
 ### Criar simulado personalizado
 
@@ -493,26 +652,98 @@ Ao finalizar, o backend:
 - registra `dataFim` e `tempoGastoSeg`;
 - cria ou atualiza o caderno de erros para questões respondidas incorretamente.
 
+### Pausar e retomar
+
+```http
+POST /simulados/1/pausar
+Authorization: ******
+```
+
+A pausa acumula o tempo usado em `tempoAcumuladoSeg`. Ao chamar novamente
+`POST /simulados/:idSimulado/iniciar`, o cronômetro continua do ponto salvo.
+O tempo total permitido continua sendo 60 minutos.
+
 ## Caderno de erros
 
 ```http
 GET  /caderno-erros
-POST /caderno-erros/:idCaderno/revisar
+POST /caderno-erros/refazer
 Authorization: Bearer <token-de-aluno>
 ```
 
 O caderno utiliza uma chave única por aluno e questão. Cada novo erro
 incrementa `quantidadeErros` e atualiza `dataUltimoErro`.
 
-Body de criação:
+O refazimento aceita:
 
 ```json
 {
-  "nome": "3º A",
-  "anoLetivo": 2026,
-  "vestibularFoco": "ENEM"
+  "quantidade": 10
 }
 ```
+
+## Administração de usuários e vínculos
+
+Todas as rotas desta seção exigem token de sessão com papel
+`ADMINISTRADOR`.
+
+```http
+GET   /usuarios
+GET   /usuarios/:idUsuario
+PATCH /usuarios/:idUsuario/status
+POST  /usuarios/:idUsuario/link-redefinicao
+PATCH /alunos/:idAluno/tutor
+PATCH /tutores/:idTutor/turma
+```
+
+Filtros de `GET /usuarios`: `papel`, `status`, `idTurma` e `busca`.
+Para alterar o status, envie `{ "status": "INATIVO" }`. Para trocar o tutor
+de um aluno, envie `{ "idTutor": 3 }`; para trocar a turma de um tutor,
+envie `{ "idTurma": 2 }`. Alterações de status e vínculos são auditadas.
+
+`POST /usuarios/:idUsuario/link-redefinicao` retorna `201` com link de uso
+único para aluno ou tutor. Para outra conta administradora retorna `409`.
+
+## Comunicados
+
+```http
+POST /comunicados
+GET  /comunicados
+GET  /comunicados/nao-lidos
+GET  /comunicados/enviados
+GET  /comunicados/:idComunicado
+POST /comunicados/:idComunicado/lido
+```
+
+Administradores e tutores enviam comunicados. Tutores e alunos recebem.
+
+```json
+{
+  "tituloComunicado": "Aviso da semana",
+  "mensagem": "A correção será liberada amanhã.",
+  "idTurma": 1
+}
+```
+
+O campo `idTurma` é opcional para a Administração. Para filtrar a caixa de
+entrada, use `GET /comunicados?naoLidos=true`.
+
+## Indicadores
+
+```http
+GET /indicadores/aluno
+GET /indicadores/tutor/alunos?busca=ana
+GET /indicadores/tutor/redacoes
+GET /indicadores/tutor/simulados
+GET /indicadores/alunos/:idAluno
+GET /indicadores/historico-correcoes?mes=2026-10&idTutor=3&idTurma=1&tipoFluxo=AVALIATIVA
+GET /indicadores/admin/turmas?idTurma=1
+GET /indicadores/admin/tutores
+```
+
+A rota de aluno é exclusiva do aluno autenticado. As rotas de tutor mostram
+somente seus tutorados. As rotas administrativas são exclusivas da
+Administração e o desempenho individual respeita o vínculo do tutor.
 
 ## Convites
 
