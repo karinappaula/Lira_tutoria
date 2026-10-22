@@ -252,6 +252,10 @@ export async function atualizarTurma(idTurma: number, input: AtualizarTurmaInput
     throw new ErroNegocio(`Turma com ID ${idTurma} não encontrada.`, 404, "TURMA_NAO_ENCONTRADA");
   }
 
+  if (input.status === "ARQUIVADA" && turmaExistente.status === "ARQUIVADA") {
+    throw new ErroNegocio("Esta turma já está arquivada.", 409, "TURMA_JA_ARQUIVADA");
+  }
+
   if (input.nome || input.anoLetivo) {
     const novoNome = input.nome ?? turmaExistente.nome;
     const novoAno = input.anoLetivo ?? turmaExistente.anoLetivo;
