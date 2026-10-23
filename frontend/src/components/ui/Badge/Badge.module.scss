@@ -1,0 +1,33 @@
+﻿.badge {
+  display: inline-block;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: $radius-full;
+  text-align: center;
+}
+
+.success {
+  background-color: $color-success-bg;
+  color: $color-success;
+}
+
+.warning {
+  background-color: $color-warning-bg;
+  color: $color-warning;
+}
+
+.error {
+  background-color: $color-error-bg;
+  color: $color-error;
+}
+
+.info {
+  background-color: $color-info-bg;
+  color: $color-info;
+}
+
+.neutral {
+  background-color: #e0e0e0;
+  color: #424242;
+}

@@ -1,0 +1,72 @@
+.container {
+  min-height: 100vh;
+  @include flex-center;
+  @include flex-column;
+  background-color: $color-bg-light;
+  padding: 1.5rem;
+}
+
+.brandHeader {
+  @include flex-center;
+  gap: 0.5rem;
+  color: $color-primary-teal;
+  margin-bottom: 2rem;
+
+  .brandText {
+    font-size: 3rem;
+    font-weight: 800;
+    letter-spacing: 4px;
+  }
+}
+
+.card {
+  background-color: #8da49f; // Tom do card de login no Figma
+  border-radius: $radius-lg;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: $shadow-md;
+  text-align: center;
+}
+
+.title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: $color-text-main;
+  margin-bottom: 0.25rem;
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  color: $color-text-main;
+  opacity: 0.85;
+  margin-bottom: 2rem;
+}
+
+.form {
+  @include flex-column;
+  gap: 1.25rem;
+  text-align: left;
+}
+
+.passwordWrapper {
+  position: relative;
+  
+  .eyeButton {
+    position: absolute;
+    right: 1rem;
+    top: 2.3rem;
+    color: $color-text-muted;
+  }
+}
+
+.forgotLink {
+  display: inline-block;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: $color-text-main;
+  text-decoration: underline;
+  text-align: center;
+  width: 100%;
+}

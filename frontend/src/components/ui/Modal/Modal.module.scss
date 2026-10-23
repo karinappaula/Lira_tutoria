@@ -1,0 +1,40 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  @include flex-center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.content {
+  background-color: $color-bg-white;
+  border-radius: $radius-lg;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: $shadow-lg;
+  overflow: hidden;
+}
+
+.header {
+  @include flex-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid $color-border-light;
+  background-color: $color-bg-light;
+
+  h2 {
+    font-size: 1.1rem;
+    color: $color-primary-teal;
+  }
+}
+
+.closeButton {
+  color: $color-text-muted;
+  &:hover {
+    color: $color-text-main;
+  }
+}
+
+.body {
+  padding: 1.5rem;
+}

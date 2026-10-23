@@ -1,0 +1,31 @@
+﻿.spinner {
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: currentColor;
+  animation: spin 0.8s linear infinite;
+}
+
+.small {
+  width: 16px;
+  height: 16px;
+}
+
+.medium {
+  width: 32px;
+  height: 32px;
+  border-color: rgba(0, 94, 93, 0.2);
+  border-top-color: $color-primary-teal;
+}
+
+.large {
+  width: 48px;
+  height: 48px;
+  border-color: rgba(0, 94, 93, 0.2);
+  border-top-color: $color-primary-teal;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

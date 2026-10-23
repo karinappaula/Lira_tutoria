@@ -1,0 +1,53 @@
+﻿.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: $radius-full;
+  transition: all 0.2s ease-in-out;
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.primary {
+  background-color: $color-primary-teal;
+  color: $color-text-light;
+  
+  &:hover:not(:disabled) {
+    background-color: $color-primary-dark;
+  }
+}
+
+.secondary {
+  background-color: $color-bg-card-teal;
+  color: $color-primary-dark;
+  
+  &:hover:not(:disabled) {
+    background-color: darken($color-bg-card-teal, 5%);
+  }
+}
+
+.outline {
+  border: 1px solid $color-primary-teal;
+  color: $color-primary-teal;
+  background-color: transparent;
+  
+  &:hover:not(:disabled) {
+    background-color: rgba(0, 94, 93, 0.05);
+  }
+}
+
+.danger {
+  background-color: $color-error;
+  color: $color-text-light;
+  
+  &:hover:not(:disabled) {
+    background-color: darken($color-error, 10%);
+  }
+}

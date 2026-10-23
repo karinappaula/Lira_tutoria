@@ -1,0 +1,38 @@
+﻿.wrapper {
+  @include flex-column;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: $color-text-main;
+  letter-spacing: 0.5px;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid $color-border-light;
+  border-radius: $radius-md;
+  background-color: $color-bg-white;
+  font-size: 0.95rem;
+  color: $color-text-main;
+  outline: none;
+  transition: border-color 0.2s;
+
+  &:focus {
+    border-color: $color-primary-teal;
+  }
+}
+
+.hasError {
+  border-color: $color-error;
+}
+
+.errorMessage {
+  font-size: 0.78rem;
+  color: $color-error;
+}
