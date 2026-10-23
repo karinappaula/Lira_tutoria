@@ -1,6 +1,7 @@
 # Dicionário de Dados Físico
 
-Fonte: `backend/prisma/schema.prisma` e migration inicial do Prisma.
+Fonte principal: `backend/prisma/schema.prisma`. As migrations em
+`backend/prisma/migrations/` registram a evolução física do banco.
 
 ## Convenções
 
@@ -81,6 +82,7 @@ Fonte: `backend/prisma/schema.prisma` e migration inicial do Prisma.
 | `titulo_tema` | VARCHAR(200) | Não | Não | Não | Não | — | Título |
 | `texto_motivador` | TEXT | Sim | Não | Não | Não | NULL | Texto motivador |
 | `origem` | VARCHAR(100) | Sim | Não | Não | Não | NULL | Origem do tema |
+| `id_criador` | INTEGER | Sim | Não | `USUARIO.id_usuario` | — | NULL | Usuário que criou tema próprio |
 
 ## TAREFA
 
@@ -89,7 +91,7 @@ Fonte: `backend/prisma/schema.prisma` e migration inicial do Prisma.
 | `id_tarefa` | INTEGER | Não | Sim | Não | Não | AI | Identificador |
 | `id_tutor` | INTEGER | Sim | Não | `TUTOR.id_usuario` | — | NULL | Tutor criador |
 | `id_adm` | INTEGER | Sim | Não | `ADMINISTRADOR.id_usuario` | — | NULL | Administrador criador |
-| `id_turma` | INTEGER | Não | Não | `TURMA.id_turma` | — | — | Turma alvo |
+| `id_turma` | INTEGER | Sim | Não | `TURMA.id_turma` | — | NULL | Turma alvo; nula para tarefa geral |
 | `id_tema` | INTEGER | Sim | Não | `TEMA.id_tema` | — | NULL | Tema associado |
 | `id_tarefa_origem` | INTEGER | Sim | Não | `TAREFA.id_tarefa` | — | NULL | Tarefa original |
 | `titulo_tarefa` | VARCHAR(200) | Não | Não | Não | Não | — | Título |
@@ -146,6 +148,11 @@ Fonte: `backend/prisma/schema.prisma` e migration inicial do Prisma.
 | `nota_comp3` | DECIMAL(5,2) | Sim | Não | Não | — | NULL | Competência 3 |
 | `nota_comp4` | DECIMAL(5,2) | Sim | Não | Não | — | NULL | Competência 4 |
 | `nota_comp5` | DECIMAL(5,2) | Sim | Não | Não | — | NULL | Competência 5 |
+| `comentario_comp1` | TEXT | Sim | Não | Não | — | NULL | Comentário da competência 1 |
+| `comentario_comp2` | TEXT | Sim | Não | Não | — | NULL | Comentário da competência 2 |
+| `comentario_comp3` | TEXT | Sim | Não | Não | — | NULL | Comentário da competência 3 |
+| `comentario_comp4` | TEXT | Sim | Não | Não | — | NULL | Comentário da competência 4 |
+| `comentario_comp5` | TEXT | Sim | Não | Não | — | NULL | Comentário da competência 5 |
 | `nota_total` | DECIMAL(6,2) | Sim | Não | Não | — | NULL | Nota total |
 | `parecer_geral` | TEXT | Sim | Não | Não | — | NULL | Parecer |
 | `recado_admin` | TEXT | Sim | Não | Não | — | NULL | Recado |
@@ -177,6 +184,7 @@ Fonte: `backend/prisma/schema.prisma` e migration inicial do Prisma.
 | `numero_questao` | INTEGER | Sim | Não | Não | — | NULL | Número |
 | `grau_dificuldade` | VARCHAR(20) | Não | Não | Não | — | — | Dificuldade |
 | `explicacao_gabarito` | TEXT | Sim | Não | Não | — | NULL | Explicação |
+| `status` | VARCHAR(20) | Não | Não | Não | — | `'ATIVA'` | Situação da questão |
 | `criado_por` | INTEGER | Não | Não | `USUARIO.id_usuario` | — | — | Autor |
 | `criado_em` | DATETIME(3) | Não | Não | Não | — | CURRENT_TIMESTAMP(3) | Criação |
 | `atualizado_em` | DATETIME(3) | Não | Não | Não | — | CURRENT_TIMESTAMP(3) / atualização automática | Atualização |
@@ -217,6 +225,8 @@ PK composta: `id_questao` + `id_assunto`.
 | `data_inicio` | DATETIME(3) | Não | Não | Não | — | — | Início |
 | `data_fim` | DATETIME(3) | Sim | Não | Não | — | NULL | Fim |
 | `tempo_gasto_seg` | INTEGER | Sim | Não | Não | — | NULL | Tempo em segundos |
+| `tempo_acumulado_seg` | INTEGER | Não | Não | Não | — | `0` | Tempo acumulado entre pausas |
+| `retomado_em` | DATETIME(3) | Sim | Não | Não | — | NULL | Início do período atual em andamento |
 | `status_simulado` | VARCHAR(20) | Não | Não | Não | — | — | Estado |
 | `pontuacao_total` | DECIMAL(5,2) | Sim | Não | Não | — | NULL | Pontuação |
 

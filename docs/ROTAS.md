@@ -143,7 +143,7 @@ PATCH /turmas/:idTurma
 POST /turmas/:idTurma/arquivar
 ```
 
-As duas rotas exigem autenticação. A listagem respeita o escopo do usuário:
+Todas as rotas exigem autenticação. A listagem respeita o escopo do usuário:
 administradores veem todas as turmas, enquanto tutores e alunos veem somente
 suas turmas vinculadas. A criação é exclusiva de administradores.
 
@@ -159,8 +159,10 @@ Exemplo de atualização:
 }
 ```
 
-O arquivamento altera o status para `ARQUIVADA` e impede novos fluxos que
-dependam de uma turma ativa.
+O primeiro arquivamento altera o status para `ARQUIVADA` e impede novos fluxos
+que dependam de uma turma ativa. Tentar arquivar novamente uma turma que já
+está nesse status retorna `409 Conflict`, com o código
+`TURMA_JA_ARQUIVADA`; a turma não é atualizada novamente.
 
 ## Temas
 
