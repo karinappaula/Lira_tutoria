@@ -83,10 +83,9 @@ confirmados ou revertidos juntos.
 
 ## Decisões e limites atuais
 
-- frontend Next.js ainda será adicionado em `frontend/`;
-- o backend e o frontend serão aplicações separadas no mesmo repositório;
+- o repositório contém o backend; não há aplicação frontend implementada nesta
+  estrutura;
 - o monólito é adequado ao escopo da POC;
-- não há necessidade de microsserviços nesta sprint;
 - regras como limite de alunos por tutor são aplicadas no service;
 - o banco possui PK, FK, UNIQUE e DEFAULT; valores de domínio são validados
   também na aplicação.

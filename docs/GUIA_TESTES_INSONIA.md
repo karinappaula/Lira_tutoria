@@ -417,6 +417,10 @@ Authorization: Bearer TOKEN_ADMIN
 
 **Esperado:** `200 OK`, com status `ARQUIVADA`.
 
+Repita a mesma requisição para a mesma turma. **Esperado:** `409 Conflict`,
+com `codigo: "TURMA_JA_ARQUIVADA"`. A resposta confirma que a turma já estava
+arquivada e não deve ser tratada como um novo arquivamento.
+
 ---
 
 ## 07-TEMAS
