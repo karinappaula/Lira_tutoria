@@ -1,0 +1,6 @@
+{
+  "/login/page": "app/login/page.js",
+  "/aluno/redacoes/[id]/page": "app/aluno/redacoes/[id]/page.js",
+  "/aluno/redacoes/nova/page": "app/aluno/redacoes/nova/page.js",
+  "/aluno/redacoes/page": "app/aluno/redacoes/page.js"
+}

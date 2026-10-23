@@ -1,0 +1,66 @@
+.container {
+  min-height: calc(100vh - 80px);
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.topBar {
+  @include flex-between;
+  margin-bottom: 2rem;
+
+  h1 {
+    font-size: 1.8rem;
+    color: $color-primary-teal;
+  }
+
+  p {
+    color: $color-text-muted;
+    font-size: 0.95rem;
+    margin-top: 0.25rem;
+  }
+}
+
+.tableCard {
+  @include card-base;
+  padding: 0;
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+
+  th, td {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid $color-border-light;
+  }
+
+  th {
+    background-color: $color-bg-light;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: $color-text-muted;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+.titleCol {
+  font-weight: 600;
+  color: $color-text-main;
+}
+
+.actionButton {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: $color-primary-teal;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

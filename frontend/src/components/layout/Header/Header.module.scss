@@ -1,0 +1,80 @@
+.header {
+  @include flex-between;
+  background-color: $color-bg-card-teal;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid darken($color-bg-card-teal, 10%);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: $color-primary-teal;
+
+  .brandTitle {
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+  }
+}
+
+.userSection {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.greeting {
+  @include flex-column;
+  align-items: flex-end;
+
+  .hello {
+    font-size: 1rem;
+    color: $color-text-main;
+  }
+
+  .turmaTag {
+    font-size: 0.8rem;
+    color: $color-text-muted;
+    font-weight: 600;
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.iconButton {
+  position: relative;
+  color: $color-primary-dark;
+  padding: 0.4rem;
+
+  .badgeCount {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background-color: $color-error;
+    color: $color-text-light;
+    font-size: 0.65rem;
+    font-weight: 700;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    @include flex-center;
+  }
+}
+
+.logoutButton {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: $color-primary-dark;
+  font-weight: 700;
+  font-size: 0.9rem;
+
+  &:hover {
+    color: $color-error;
+  }
+}

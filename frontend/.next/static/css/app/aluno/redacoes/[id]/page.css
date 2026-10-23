@@ -1,0 +1,350 @@
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[9].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[9].use[3]!./node_modules/next/dist/build/webpack/loaders/resolve-url-loader/index.js??ruleSet[1].rules[14].oneOf[9].use[4]!./node_modules/next/dist/compiled/sass-loader/cjs.js??ruleSet[1].rules[14].oneOf[9].use[5]!./src/app/aluno/redacoes/[id]/page.module.scss ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.page_container__LI6Pf {
+  min-height: calc(100vh - 80px);
+  padding: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.page_headerCard__6HHqg {
+  background-color: #ffffff;
+  border: 1px solid #d1dad8;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.page_headerCard__6HHqg h1 {
+  font-size: 1.4rem;
+  color: #005e5d;
+}
+.page_headerCard__6HHqg .page_statusArea__NO56p {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.page_editorGrid__sIvun {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-gap: 1.5rem;
+  gap: 1.5rem;
+}
+@media (max-width: 768px) {
+  .page_editorGrid__sIvun {
+    grid-template-columns: 1fr;
+  }
+}
+
+.page_editorArea__yzprr {
+  background-color: #ffffff;
+  border: 1px solid #d1dad8;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.page_textarea__4z_Xm {
+  width: 100%;
+  min-height: 420px;
+  padding: 1rem;
+  border: 1px solid #d1dad8;
+  border-radius: 10px;
+  font-family: "Segoe UI", serif;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+}
+.page_textarea__4z_Xm:focus {
+  border-color: #005e5d;
+}
+.page_textarea__4z_Xm:disabled {
+  background-color: #f4f7f6;
+}
+
+.page_counterBar__Gc73o {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #5a6b68;
+}
+
+.page_sidebar__Xcuja {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.page_infoCard__pnAWH {
+  background-color: #ffffff;
+  border: 1px solid #d1dad8;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.page_infoCard__pnAWH h3 {
+  font-size: 1rem;
+  color: #005e5d;
+  border-bottom: 1px solid #d1dad8;
+  padding-bottom: 0.5rem;
+}
+.page_infoCard__pnAWH p {
+  font-size: 0.9rem;
+  color: #1c2826;
+  line-height: 1.4;
+}
+
+.page_compGrade___gWvl {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed #d1dad8;
+  font-size: 0.85rem;
+}
+.page_compGrade___gWvl strong {
+  color: #003d3c;
+}
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[9].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[9].use[3]!./node_modules/next/dist/build/webpack/loaders/resolve-url-loader/index.js??ruleSet[1].rules[14].oneOf[9].use[4]!./node_modules/next/dist/compiled/sass-loader/cjs.js??ruleSet[1].rules[14].oneOf[9].use[5]!./src/components/layout/Header/Header.module.scss ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.Header_header__i_Usm {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #d8e5e4;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid rgb(72.7058823529%, 81.8039215686%, 81.1040723982%);
+}
+
+.Header_brand__OXXgA {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #005e5d;
+}
+.Header_brand__OXXgA .Header_brandTitle__bhw2j {
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.Header_userSection__6yCMr {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.Header_greeting__hjVhg {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.Header_greeting__hjVhg .Header_hello__UslUd {
+  font-size: 1rem;
+  color: #1c2826;
+}
+.Header_greeting__hjVhg .Header_turmaTag__9FCc_ {
+  font-size: 0.8rem;
+  color: #5a6b68;
+  font-weight: 600;
+}
+
+.Header_actions__w1cQ2 {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.Header_iconButton__xm_gH {
+  position: relative;
+  color: #003d3c;
+  padding: 0.4rem;
+}
+.Header_iconButton__xm_gH .Header_badgeCount__kUXcP {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background-color: #c62828;
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.Header_logoutButton__X6Z_y {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #003d3c;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.Header_logoutButton__X6Z_y:hover {
+  color: #c62828;
+}
+/*!***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[9].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[9].use[3]!./node_modules/next/dist/build/webpack/loaders/resolve-url-loader/index.js??ruleSet[1].rules[14].oneOf[9].use[4]!./node_modules/next/dist/compiled/sass-loader/cjs.js??ruleSet[1].rules[14].oneOf[9].use[5]!./src/components/ui/Button/Button.module.scss ***!
+  \***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.Button_button__5Fngg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  transition: all 0.2s ease-in-out;
+}
+.Button_button__5Fngg:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.Button_primary__swzAa {
+  background-color: #005e5d;
+  color: #ffffff;
+}
+.Button_primary__swzAa:hover:not(:disabled) {
+  background-color: #003d3c;
+}
+
+.Button_secondary__pFIlL {
+  background-color: #d8e5e4;
+  color: #003d3c;
+}
+.Button_secondary__pFIlL:hover:not(:disabled) {
+  background-color: rgb(78.7058823529%, 85.8039215686%, 85.257918552%);
+}
+
+.Button_outline__tvaA1 {
+  border: 1px solid #005e5d;
+  color: #005e5d;
+  background-color: transparent;
+}
+.Button_outline__tvaA1:hover:not(:disabled) {
+  background-color: rgba(0, 94, 93, 0.05);
+}
+
+.Button_danger__5gJwK {
+  background-color: #c62828;
+  color: #ffffff;
+}
+.Button_danger__5gJwK:hover:not(:disabled) {
+  background-color: rgb(61.0084033613%, 12.324929972%, 12.324929972%);
+}
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[9].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[9].use[3]!./node_modules/next/dist/build/webpack/loaders/resolve-url-loader/index.js??ruleSet[1].rules[14].oneOf[9].use[4]!./node_modules/next/dist/compiled/sass-loader/cjs.js??ruleSet[1].rules[14].oneOf[9].use[5]!./src/components/ui/Spinner/Spinner.module.scss ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.Spinner_spinner__MTHrT {
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: currentColor;
+  animation: Spinner_spin__L1iCD 0.8s linear infinite;
+}
+
+.Spinner_small__8tJnI {
+  width: 16px;
+  height: 16px;
+}
+
+.Spinner_medium___IFCu {
+  width: 32px;
+  height: 32px;
+  border-color: rgba(0, 94, 93, 0.2);
+  border-top-color: #005e5d;
+}
+
+.Spinner_large__rPRSB {
+  width: 48px;
+  height: 48px;
+  border-color: rgba(0, 94, 93, 0.2);
+  border-top-color: #005e5d;
+}
+
+@keyframes Spinner_spin__L1iCD {
+  to {
+    transform: rotate(360deg);
+  }
+}
+/*!*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[9].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[9].use[3]!./node_modules/next/dist/build/webpack/loaders/resolve-url-loader/index.js??ruleSet[1].rules[14].oneOf[9].use[4]!./node_modules/next/dist/compiled/sass-loader/cjs.js??ruleSet[1].rules[14].oneOf[9].use[5]!./src/components/ui/Badge/Badge.module.scss ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.Badge_badge__bHml6 {
+  display: inline-block;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  text-align: center;
+}
+
+.Badge_success__udv9J {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.Badge_warning__ULUyW {
+  background-color: #fff3e0;
+  color: #ed6c02;
+}
+
+.Badge_error__qvtkQ {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.Badge_info__bSqjB {
+  background-color: #e1f5fe;
+  color: #0288d1;
+}
+
+.Badge_neutral__VzPrB {
+  background-color: #e0e0e0;
+  color: #424242;
+}
+/*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[9].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[9].use[3]!./node_modules/next/dist/build/webpack/loaders/resolve-url-loader/index.js??ruleSet[1].rules[14].oneOf[9].use[4]!./node_modules/next/dist/compiled/sass-loader/cjs.js??ruleSet[1].rules[14].oneOf[9].use[5]!./src/components/ui/ErrorState/ErrorState.module.scss ***!
+  \***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.ErrorState_container__icUKA {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  padding: 3rem 1.5rem;
+  color: #c62828;
+  gap: 0.75rem;
+}
+.ErrorState_container__icUKA p {
+  font-size: 0.95rem;
+}
+.ErrorState_container__icUKA .ErrorState_retryButton__dezV8 {
+  padding: 0.5rem 1rem;
+  background-color: #c62828;
+  color: #ffffff;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}

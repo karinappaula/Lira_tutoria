@@ -1,0 +1,275 @@
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[9].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[9].use[3]!./node_modules/next/dist/build/webpack/loaders/resolve-url-loader/index.js??ruleSet[1].rules[14].oneOf[9].use[4]!./node_modules/next/dist/compiled/sass-loader/cjs.js??ruleSet[1].rules[14].oneOf[9].use[5]!./src/app/aluno/redacoes/nova/page.module.scss ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.page_container__oAOQE {
+  min-height: calc(100vh - 80px);
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.page_card__gnBNZ {
+  background-color: #ffffff;
+  border: 1px solid #d1dad8;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.page_card__gnBNZ h1 {
+  font-size: 1.5rem;
+  color: #005e5d;
+}
+
+.page_typeSelector__k2uIn {
+  display: flex;
+  gap: 1rem;
+}
+.page_typeSelector__k2uIn button {
+  flex: 1 1;
+  padding: 1rem;
+  border: 1px solid #d1dad8;
+  border-radius: 10px;
+  font-weight: 700;
+  color: #5a6b68;
+  background-color: #f4f7f6;
+}
+.page_typeSelector__k2uIn button.page_active__FHRGF {
+  border-color: #005e5d;
+  background-color: #d8e5e4;
+  color: #005e5d;
+}
+
+.page_formGroup__BOSAo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.page_formGroup__BOSAo label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #1c2826;
+}
+.page_formGroup__BOSAo select {
+  padding: 0.75rem;
+  border: 1px solid #d1dad8;
+  border-radius: 10px;
+  background-color: #ffffff;
+  font-size: 0.95rem;
+  outline: none;
+}
+.page_formGroup__BOSAo select:focus {
+  border-color: #005e5d;
+}
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[9].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[9].use[3]!./node_modules/next/dist/build/webpack/loaders/resolve-url-loader/index.js??ruleSet[1].rules[14].oneOf[9].use[4]!./node_modules/next/dist/compiled/sass-loader/cjs.js??ruleSet[1].rules[14].oneOf[9].use[5]!./src/components/layout/Header/Header.module.scss ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.Header_header__i_Usm {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #d8e5e4;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid rgb(72.7058823529%, 81.8039215686%, 81.1040723982%);
+}
+
+.Header_brand__OXXgA {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #005e5d;
+}
+.Header_brand__OXXgA .Header_brandTitle__bhw2j {
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.Header_userSection__6yCMr {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.Header_greeting__hjVhg {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.Header_greeting__hjVhg .Header_hello__UslUd {
+  font-size: 1rem;
+  color: #1c2826;
+}
+.Header_greeting__hjVhg .Header_turmaTag__9FCc_ {
+  font-size: 0.8rem;
+  color: #5a6b68;
+  font-weight: 600;
+}
+
+.Header_actions__w1cQ2 {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.Header_iconButton__xm_gH {
+  position: relative;
+  color: #003d3c;
+  padding: 0.4rem;
+}
+.Header_iconButton__xm_gH .Header_badgeCount__kUXcP {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background-color: #c62828;
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.Header_logoutButton__X6Z_y {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #003d3c;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.Header_logoutButton__X6Z_y:hover {
+  color: #c62828;
+}
+/*!***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[9].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[9].use[3]!./node_modules/next/dist/build/webpack/loaders/resolve-url-loader/index.js??ruleSet[1].rules[14].oneOf[9].use[4]!./node_modules/next/dist/compiled/sass-loader/cjs.js??ruleSet[1].rules[14].oneOf[9].use[5]!./src/components/ui/Button/Button.module.scss ***!
+  \***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.Button_button__5Fngg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  transition: all 0.2s ease-in-out;
+}
+.Button_button__5Fngg:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.Button_primary__swzAa {
+  background-color: #005e5d;
+  color: #ffffff;
+}
+.Button_primary__swzAa:hover:not(:disabled) {
+  background-color: #003d3c;
+}
+
+.Button_secondary__pFIlL {
+  background-color: #d8e5e4;
+  color: #003d3c;
+}
+.Button_secondary__pFIlL:hover:not(:disabled) {
+  background-color: rgb(78.7058823529%, 85.8039215686%, 85.257918552%);
+}
+
+.Button_outline__tvaA1 {
+  border: 1px solid #005e5d;
+  color: #005e5d;
+  background-color: transparent;
+}
+.Button_outline__tvaA1:hover:not(:disabled) {
+  background-color: rgba(0, 94, 93, 0.05);
+}
+
+.Button_danger__5gJwK {
+  background-color: #c62828;
+  color: #ffffff;
+}
+.Button_danger__5gJwK:hover:not(:disabled) {
+  background-color: rgb(61.0084033613%, 12.324929972%, 12.324929972%);
+}
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[9].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[9].use[3]!./node_modules/next/dist/build/webpack/loaders/resolve-url-loader/index.js??ruleSet[1].rules[14].oneOf[9].use[4]!./node_modules/next/dist/compiled/sass-loader/cjs.js??ruleSet[1].rules[14].oneOf[9].use[5]!./src/components/ui/Spinner/Spinner.module.scss ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.Spinner_spinner__MTHrT {
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: currentColor;
+  animation: Spinner_spin__L1iCD 0.8s linear infinite;
+}
+
+.Spinner_small__8tJnI {
+  width: 16px;
+  height: 16px;
+}
+
+.Spinner_medium___IFCu {
+  width: 32px;
+  height: 32px;
+  border-color: rgba(0, 94, 93, 0.2);
+  border-top-color: #005e5d;
+}
+
+.Spinner_large__rPRSB {
+  width: 48px;
+  height: 48px;
+  border-color: rgba(0, 94, 93, 0.2);
+  border-top-color: #005e5d;
+}
+
+@keyframes Spinner_spin__L1iCD {
+  to {
+    transform: rotate(360deg);
+  }
+}
+/*!*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[9].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[9].use[3]!./node_modules/next/dist/build/webpack/loaders/resolve-url-loader/index.js??ruleSet[1].rules[14].oneOf[9].use[4]!./node_modules/next/dist/compiled/sass-loader/cjs.js??ruleSet[1].rules[14].oneOf[9].use[5]!./src/components/ui/Input/Input.module.scss ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.Input_wrapper__Fx_33 {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.Input_label__q7b80 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #1c2826;
+  letter-spacing: 0.5px;
+}
+
+.Input_input__5WxBl {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1dad8;
+  border-radius: 10px;
+  background-color: #ffffff;
+  font-size: 0.95rem;
+  color: #1c2826;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.Input_input__5WxBl:focus {
+  border-color: #005e5d;
+}
+
+.Input_hasError__bV4co {
+  border-color: #c62828;
+}
+
+.Input_errorMessage__QbR5k {
+  font-size: 0.78rem;
+  color: #c62828;
+}

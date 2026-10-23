@@ -1,0 +1,34 @@
+{
+  "pages": {
+    "/login/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/login/page.css",
+      "static/chunks/app/login/page.js"
+    ],
+    "/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/layout.css",
+      "static/chunks/app/layout.js"
+    ],
+    "/aluno/redacoes/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/aluno/redacoes/page.css",
+      "static/chunks/app/aluno/redacoes/page.js"
+    ],
+    "/aluno/redacoes/nova/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/aluno/redacoes/nova/page.css",
+      "static/chunks/app/aluno/redacoes/nova/page.js"
+    ],
+    "/aluno/redacoes/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/aluno/redacoes/[id]/page.css",
+      "static/chunks/app/aluno/redacoes/[id]/page.js"
+    ]
+  }
+}

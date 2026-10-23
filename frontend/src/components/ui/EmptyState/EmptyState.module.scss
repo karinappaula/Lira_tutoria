@@ -1,0 +1,15 @@
+.container {
+  @include flex-center;
+  @include flex-column;
+  padding: 3rem 1.5rem;
+  color: $color-text-muted;
+  gap: 0.75rem;
+
+  .icon {
+    opacity: 0.5;
+  }
+
+  p {
+    font-size: 0.95rem;
+  }
+}

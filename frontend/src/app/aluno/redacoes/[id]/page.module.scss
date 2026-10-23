@@ -1,0 +1,102 @@
+.container {
+  min-height: calc(100vh - 80px);
+  padding: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  @include flex-column;
+  gap: 1.5rem;
+}
+
+.headerCard {
+  @include card-base;
+  @include flex-between;
+
+  h1 {
+    font-size: 1.4rem;
+    color: $color-primary-teal;
+  }
+
+  .statusArea {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+}
+
+.editorGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.editorArea {
+  @include card-base;
+  @include flex-column;
+  gap: 1rem;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 420px;
+  padding: 1rem;
+  border: 1px solid $color-border-light;
+  border-radius: $radius-md;
+  font-family: 'Segoe UI', serif;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+
+  &:focus {
+    border-color: $color-primary-teal;
+  }
+
+  &:disabled {
+    background-color: $color-bg-light;
+  }
+}
+
+.counterBar {
+  @include flex-between;
+  font-size: 0.85rem;
+  color: $color-text-muted;
+}
+
+.sidebar {
+  @include flex-column;
+  gap: 1.5rem;
+}
+
+.infoCard {
+  @include card-base;
+  @include flex-column;
+  gap: 0.75rem;
+
+  h3 {
+    font-size: 1rem;
+    color: $color-primary-teal;
+    border-bottom: 1px solid $color-border-light;
+    padding-bottom: 0.5rem;
+  }
+
+  p {
+    font-size: 0.9rem;
+    color: $color-text-main;
+    line-height: 1.4;
+  }
+}
+
+.compGrade {
+  @include flex-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed $color-border-light;
+  font-size: 0.85rem;
+
+  strong {
+    color: $color-primary-dark;
+  }
+}
