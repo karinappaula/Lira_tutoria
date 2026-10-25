@@ -1,0 +1,62 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.moldura {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100dvh;
+  background: $cor-fundo;
+}
+
+.faixa {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 138px;
+  background: linear-gradient(180deg, #9cbdba 0%, $cor-auth-faixa 100%);
+  border-bottom: 1px solid rgba(23, 41, 45, 0.12);
+
+  @media (min-width: 768px) {
+    height: 160px;
+  }
+
+  @include celular {
+    height: 104px;
+  }
+}
+
+.logo {
+  height: 118px;
+  width: auto;
+
+  @media (min-width: 768px) {
+    height: 140px;
+  }
+
+  @include celular {
+    height: 88px;
+  }
+}
+
+.centro {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $esp-7 $esp-4;
+
+  @include celular {
+    padding: $esp-5 $esp-4;
+  }
+}
+
+.rodape {
+  padding: $esp-5 $esp-8;
+  background: $cor-rodape;
+  color: $cor-rodape-texto;
+  font-size: 0.9rem;
+
+  @include celular {
+    padding: $esp-4;
+    text-align: center;
+  }
+}

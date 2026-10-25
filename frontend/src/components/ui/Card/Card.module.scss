@@ -1,0 +1,31 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.card {
+  background: $cor-superficie;
+  border-radius: $raio-lg;
+  padding: $esp-5;
+  box-shadow: $sombra-cartao;
+
+  @include celular {
+    padding: $esp-4;
+  }
+}
+
+.semPreenchimento {
+  padding: 0;
+  overflow: hidden;
+}
+
+.cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-4;
+  margin-bottom: $esp-4;
+}
+
+.titulo {
+  font-size: 1.15rem;
+  font-weight: 700;
+}

@@ -1,0 +1,76 @@
+@use 'variables' as *;
+
+.cartao {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-2;
+  height: 100%;
+  padding: $esp-4;
+  background: $cor-superficie;
+  border-radius: $raio-lg;
+  box-shadow: $sombra-cartao;
+
+  > :last-child {
+    margin-top: auto;
+  }
+}
+
+.topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $esp-3;
+}
+
+.titulo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.tema {
+  font-weight: 500;
+  color: $cor-primaria;
+}
+
+.descricao {
+  color: $cor-texto-suave;
+  font-size: 0.92rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.prazo {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  font-size: 0.88rem;
+  color: $cor-texto-suave;
+}
+
+.anexos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $esp-2;
+  margin: 0 0 $esp-2;
+  padding: 0;
+  list-style: none;
+}
+
+.anexo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: $cor-primaria-suave;
+  color: $cor-primaria;
+  font-size: 0.82rem;
+  font-weight: 500;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}

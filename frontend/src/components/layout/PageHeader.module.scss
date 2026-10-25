@@ -1,0 +1,30 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $esp-4;
+  margin-bottom: $esp-6;
+
+  @include celular {
+    flex-direction: column;
+  }
+}
+
+.titulo {
+  font-size: 2.1rem;
+  font-weight: 700;
+  line-height: 1.2;
+
+  @include celular {
+    font-size: 1.6rem;
+  }
+}
+
+.descricao {
+  margin-top: $esp-1;
+  color: $cor-texto-suave;
+  font-size: 1.05rem;
+}

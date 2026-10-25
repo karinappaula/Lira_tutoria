@@ -1,32 +1,71 @@
-﻿$color-primary-teal: #005e5d;
-$color-primary-dark: #003d3c;
-$color-primary-light: #008280;
-$color-bg-card-teal: #d8e5e4;
-$color-bg-light: #f4f7f6;
-$color-bg-white: #ffffff;
-$color-bg-footer: #1e282a;
+// Tokens de design do LIRA.
+// Cores medidas diretamente no PDF do protótipo (prototipo_lira_v5). Quando o Figma
+// for exportado, confira estes valores. Tipografia: Rubik (a mesma do protótipo).
 
-$color-text-main: #1c2826;
-$color-text-muted: #5a6b68;
-$color-text-light: #ffffff;
+// Marca
+$cor-primaria: #006b70;
+$cor-primaria-hover: #005a5e;
+$cor-primaria-suave: #e5f3f1;
 
-$color-success: #2e7d32;
-$color-success-bg: #e8f5e9;
-$color-warning: #ed6c02;
-$color-warning-bg: #fff3e0;
-$color-error: #c62828;
-$color-error-bg: #ffebee;
-$color-info: #0288d1;
-$color-info-bg: #e1f5fe;
+// Superfícies
+$cor-fundo: #f3f7f6;
+$cor-superficie: #ffffff;
+$cor-borda: #dce6e4;
+$cor-borda-forte: #c2d1ce;
 
-$color-border-light: #d1dad8;
-$color-border-focus: #005e5d;
-$radius-sm: 6px;
-$radius-md: 10px;
-$radius-lg: 16px;
-$radius-full: 9999px;
+// Texto
+$cor-texto: #17292d;
+$cor-texto-suave: #6b7d80;
+$cor-texto-invertido: #ffffff;
 
-$shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
-$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);$shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+// Telas de autenticação
+$cor-auth-faixa: #94b7b4;
+$cor-auth-cartao: #8ca3a0;
+$cor-rodape: #17292d;
+$cor-rodape-texto: #b9c7c9;
 
-$font-sans: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+// Estados (o texto usa tons mais escuros que o fundo suave para manter a leitura)
+$cor-alerta: #f6a400;
+$cor-alerta-suave: #fff3c9;
+$cor-alerta-texto: #8a5a00;
+$cor-perigo: #f04c55;
+$cor-perigo-suave: #feeced;
+$cor-perigo-texto: #c8343d;
+$cor-sucesso-texto: $cor-primaria;
+$cor-sucesso-suave: $cor-primaria-suave;
+$cor-neutro-suave: #eaf0ef;
+
+// Tipografia
+$fonte: 'Rubik Variable', 'Rubik', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+// Formas e sombras
+$raio-sm: 8px;
+$raio-md: 12px;
+$raio-lg: 16px;
+$raio-xl: 32px;
+$raio-pilula: 999px;
+$sombra-cartao: 0 1px 2px rgba(23, 41, 45, 0.04), 0 1px 1px rgba(23, 41, 45, 0.03);
+$sombra-auth: 0 24px 48px -12px rgba(23, 41, 45, 0.28), 0 4px 12px rgba(23, 41, 45, 0.1);
+$sombra-modal: 0 24px 64px -16px rgba(23, 41, 45, 0.4);
+
+// Espaçamento (escala de 4px)
+$esp-1: 4px;
+$esp-2: 8px;
+$esp-3: 12px;
+$esp-4: 16px;
+$esp-5: 24px;
+$esp-6: 32px;
+$esp-7: 48px;
+$esp-8: 64px;
+
+// Layout
+$largura-conteudo: 1440px;
+$gutter-pagina: 64px;
+$gutter-pagina-mobile: 16px;
+
+// Pontos de quebra
+$bp-tablet: 900px;
+$bp-celular: 600px;
+
+// Foco acessível
+$anel-foco: 0 0 0 3px rgba(0, 107, 112, 0.35);

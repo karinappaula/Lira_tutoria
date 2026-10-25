@@ -1,0 +1,30 @@
+@use 'variables' as *;
+
+.alerta {
+  display: flex;
+  gap: $esp-3;
+  align-items: flex-start;
+  padding: $esp-3 $esp-4;
+  border-radius: $raio-md;
+  background: $cor-superficie;
+  border-left: 4px solid $cor-primaria;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: $cor-texto;
+}
+
+.icone {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.erro {
+  border-left-color: $cor-perigo;
+  .icone {
+    color: $cor-perigo-texto;
+  }
+}
+.sucesso .icone,
+.info .icone {
+  color: $cor-primaria;
+}

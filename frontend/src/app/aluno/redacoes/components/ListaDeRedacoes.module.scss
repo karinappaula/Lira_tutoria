@@ -1,0 +1,63 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.titulo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  strong {
+    font-weight: 600;
+  }
+}
+
+.meta {
+  color: $cor-texto-suave;
+  font-size: 0.82rem;
+}
+
+.acao {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 500;
+  color: $cor-primaria;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+.espaco {
+  margin-bottom: $esp-4;
+}
+
+.tarefas {
+  margin-bottom: $esp-6;
+}
+
+.subtitulo {
+  margin-bottom: $esp-3;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.listaTarefas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: $esp-4;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @include celular {
+    grid-template-columns: 1fr;
+  }
+}
+
+.vazio {
+  background: $cor-superficie;
+  border-radius: $raio-lg;
+}

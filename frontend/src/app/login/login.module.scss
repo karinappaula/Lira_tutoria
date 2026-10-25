@@ -1,0 +1,96 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.cartao {
+  width: 100%;
+  max-width: 456px;
+  padding: 40px;
+  border-radius: $raio-xl;
+  background: linear-gradient(180deg, #93aba8 0%, $cor-auth-cartao 100%);
+  box-shadow: $sombra-auth;
+
+  @include com-movimento {
+    animation: aparecer 0.35s ease-out;
+  }
+
+  @include celular {
+    padding: 28px 20px;
+    border-radius: 24px;
+  }
+}
+
+.cabecalho {
+  margin-bottom: $esp-5;
+  text-align: center;
+}
+
+.titulo {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: $cor-texto;
+}
+
+.subtitulo {
+  margin-top: 6px;
+  font-size: 0.98rem;
+  font-weight: 500;
+  color: #1f3438;
+}
+
+.aviso {
+  margin-bottom: $esp-4;
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+}
+
+.entrar {
+  margin-top: $esp-2;
+  min-height: 54px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  box-shadow: 0 6px 14px -4px rgba(0, 70, 74, 0.55);
+}
+
+.apoio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: $esp-2 $esp-3;
+  margin-top: $esp-5;
+}
+
+.link {
+  padding: 4px 2px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: $cor-texto;
+  text-underline-offset: 3px;
+
+  &:hover {
+    color: #00383b;
+  }
+}
+
+.separador {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(23, 41, 45, 0.45);
+
+  @include celular {
+    display: none;
+  }
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}

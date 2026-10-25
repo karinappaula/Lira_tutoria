@@ -1,40 +1,77 @@
-.overlay {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  @include flex-center;
-  z-index: 1000;
-  padding: 1rem;
-}
+@use 'variables' as *;
+@use 'mixins' as *;
 
-.content {
-  background-color: $color-bg-white;
-  border-radius: $radius-lg;
-  width: 100%;
-  max-width: 500px;
-  box-shadow: $shadow-lg;
-  overflow: hidden;
-}
+.modal {
+  width: min(560px, calc(100% - 32px));
+  max-height: calc(100dvh - 48px);
+  padding: 0;
+  border: 0;
+  border-radius: $raio-lg;
+  background: $cor-superficie;
+  color: $cor-texto;
+  box-shadow: $sombra-modal;
 
-.header {
-  @include flex-between;
-  padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid $color-border-light;
-  background-color: $color-bg-light;
+  &::backdrop {
+    background: rgba(23, 41, 45, 0.55);
+  }
 
-  h2 {
-    font-size: 1.1rem;
-    color: $color-primary-teal;
+  &[open] {
+    @include com-movimento {
+      animation: entrar 0.18s ease-out;
+    }
   }
 }
 
-.closeButton {
-  color: $color-text-muted;
+.conteudo {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - 48px);
+}
+
+.cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-4;
+  padding: $esp-5 $esp-5 $esp-3;
+}
+
+.titulo {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.fechar {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+
   &:hover {
-    color: $color-text-main;
+    background: $cor-neutro-suave;
   }
 }
 
-.body {
-  padding: 1.5rem;
+.corpo {
+  padding: $esp-2 $esp-5 $esp-5;
+  overflow-y: auto;
+}
+
+.rodape {
+  display: flex;
+  justify-content: flex-end;
+  gap: $esp-3;
+  padding: $esp-4 $esp-5;
+  border-top: 1px solid $cor-borda;
+}
+
+@keyframes entrar {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
 }

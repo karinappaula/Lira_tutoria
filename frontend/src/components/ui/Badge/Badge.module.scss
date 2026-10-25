@@ -1,33 +1,29 @@
-﻿.badge {
-  display: inline-block;
-  padding: 0.25rem 0.65rem;
-  font-size: 0.75rem;
-  font-weight: 700;
-  border-radius: $radius-full;
-  text-align: center;
+@use 'variables' as *;
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
 }
 
-.success {
-  background-color: $color-success-bg;
-  color: $color-success;
+.neutro {
+  background: $cor-neutro-suave;
+  color: #55686b;
 }
-
-.warning {
-  background-color: $color-warning-bg;
-  color: $color-warning;
+.sucesso {
+  background: $cor-sucesso-suave;
+  color: $cor-sucesso-texto;
 }
-
-.error {
-  background-color: $color-error-bg;
-  color: $color-error;
+.alerta {
+  background: $cor-alerta-suave;
+  color: $cor-alerta-texto;
 }
-
-.info {
-  background-color: $color-info-bg;
-  color: $color-info;
-}
-
-.neutral {
-  background-color: #e0e0e0;
-  color: #424242;
+.perigo {
+  background: $cor-perigo-suave;
+  color: $cor-perigo-texto;
 }

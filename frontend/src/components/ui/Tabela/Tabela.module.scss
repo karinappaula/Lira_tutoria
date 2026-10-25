@@ -1,0 +1,122 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+/* ---------- Tabela (computador e tablet) ---------- */
+.rolagem {
+  width: 100%;
+  overflow-x: auto;
+  background: $cor-superficie;
+  border-radius: $raio-lg;
+
+  @include celular {
+    display: none;
+  }
+}
+
+.tabela {
+  width: 100%;
+  min-width: 640px;
+}
+
+.legenda {
+  @include visualmente-oculto;
+}
+
+.th {
+  padding: 18px 24px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: $cor-texto;
+  border-bottom: 1px solid $cor-borda;
+  white-space: nowrap;
+}
+
+.td {
+  padding: 18px 24px;
+  font-size: 0.95rem;
+  vertical-align: middle;
+}
+
+.linha + .linha .td {
+  border-top: 1px solid $cor-borda;
+}
+
+.linha:hover .td {
+  background: #fafcfb;
+}
+
+.esquerda {
+  text-align: left;
+}
+.centro {
+  text-align: center;
+}
+.direita {
+  text-align: right;
+}
+
+/* ---------- Cartões (celular) ---------- */
+.cartoes {
+  display: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @include celular {
+    display: flex;
+    flex-direction: column;
+    gap: $esp-3;
+  }
+}
+
+.cartao {
+  padding: $esp-4;
+  background: $cor-superficie;
+  border-radius: $raio-lg;
+  box-shadow: $sombra-cartao;
+}
+
+.cartaoTitulo {
+  margin-bottom: $esp-3;
+  font-size: 1.05rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.campos {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-2;
+  margin: 0;
+}
+
+.campo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-3;
+  font-size: 0.92rem;
+
+  dt {
+    color: $cor-texto-suave;
+    font-weight: 500;
+  }
+
+  dd {
+    margin: 0;
+    font-weight: 600;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+}
+
+.cartaoAcoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $esp-2 $esp-4;
+  margin-top: $esp-3;
+  padding-top: $esp-3;
+  border-top: 1px solid $cor-borda;
+}

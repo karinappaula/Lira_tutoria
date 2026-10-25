@@ -1,0 +1,188 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: $esp-5;
+  align-items: start;
+
+  @include tablet {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.principal {
+  min-width: 0;
+  padding: $esp-5;
+  background: $cor-superficie;
+  border-radius: $raio-lg;
+  box-shadow: $sombra-cartao;
+
+  @include celular {
+    padding: $esp-4;
+    /* espaço para a barra de ações fixa no rodapé do celular */
+    padding-bottom: 0;
+  }
+}
+
+.barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-3;
+  margin-bottom: $esp-4;
+}
+
+.indicador {
+  display: inline-flex;
+  align-items: center;
+  gap: $esp-2;
+  min-height: 32px;
+  color: $cor-texto-suave;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.ok {
+  color: $cor-primaria;
+}
+
+.erro {
+  color: $cor-perigo-texto;
+}
+
+.girando {
+  @include com-movimento {
+    animation: girar 0.9s linear infinite;
+  }
+}
+
+.atalhos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $esp-2;
+}
+
+.soCelular {
+  display: none;
+
+  @include tablet {
+    display: inline-flex;
+  }
+}
+
+.espaco {
+  margin-bottom: $esp-3;
+}
+
+.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: $cor-primaria;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.principal .texto {
+  min-height: 56vh;
+  padding: $esp-4 $esp-5;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  resize: vertical;
+
+  @include celular {
+    min-height: 50vh;
+    padding: $esp-3 $esp-4;
+    font-size: 1rem;
+  }
+}
+
+.rodape {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-3;
+  margin-top: $esp-4;
+
+  @include celular {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    margin-inline: -$esp-4;
+    padding: $esp-3 $esp-4 calc(#{$esp-3} + env(safe-area-inset-bottom));
+    background: $cor-superficie;
+    border-top: 1px solid $cor-borda;
+    box-shadow: 0 -6px 16px -10px rgba(23, 41, 45, 0.25);
+  }
+}
+
+.contagem {
+  color: $cor-texto-suave;
+  font-size: 0.88rem;
+}
+
+.botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $esp-3;
+
+  @include celular {
+    width: 100%;
+
+    > * {
+      flex: 1;
+      min-height: 48px;
+    }
+  }
+}
+
+.lateral {
+  position: sticky;
+  top: $esp-4;
+  padding: $esp-5;
+  background: $cor-superficie;
+  border-radius: $raio-lg;
+  box-shadow: $sombra-cartao;
+
+  @include tablet {
+    display: none;
+  }
+}
+
+.lateralTitulo {
+  margin-bottom: $esp-3;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $cor-texto-suave;
+}
+
+.versaoUm {
+  font-size: 1rem;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.confirmacao {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+}
+
+.resumoEnvio {
+  color: $cor-texto-suave;
+  font-size: 0.9rem;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,8 @@
+@use 'variables' as *;
+
+.linha {
+  display: flex;
+  align-items: center;
+  gap: $esp-3;
+  color: $cor-texto-suave;
+}

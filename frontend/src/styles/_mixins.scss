@@ -1,30 +1,57 @@
-﻿@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+@use 'variables' as *;
 
-@mixin flex-between {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-@mixin flex-column {
-  display: flex;
-  flex-direction: column;
-}
-
-@mixin card-base {
-  background-color: $color-bg-white;
-  border: 1px solid $color-border-light;
-  border-radius: $radius-md;
-  padding: 1.5rem;
-  box-shadow: $shadow-sm;
-}
-
-@mixin mobile {
-  @media (max-width: 768px) {
+@mixin celular {
+  @media (max-width: #{$bp-celular}) {
     @content;
   }
+}
+
+@mixin tablet {
+  @media (max-width: #{$bp-tablet}) {
+    @content;
+  }
+}
+
+@mixin anel-de-foco {
+  outline: none;
+  box-shadow: $anel-foco;
+}
+
+// Respeita quem pediu menos movimento no sistema
+@mixin com-movimento {
+  @media (prefers-reduced-motion: no-preference) {
+    @content;
+  }
+}
+
+@mixin container-pagina {
+  width: 100%;
+  max-width: $largura-conteudo;
+  margin-inline: auto;
+  padding-inline: $gutter-pagina;
+
+  @include tablet {
+    padding-inline: $esp-5;
+  }
+  @include celular {
+    padding-inline: $gutter-pagina-mobile;
+  }
+}
+
+@mixin truncar {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin visualmente-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }

@@ -1,0 +1,97 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+}
+
+.opcoes {
+  display: grid;
+  gap: $esp-3;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.legenda {
+  margin-bottom: $esp-2;
+  padding: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.opcao {
+  display: flex;
+  align-items: flex-start;
+  gap: $esp-3;
+  min-height: 56px;
+  padding: $esp-3 $esp-4;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-md;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+
+  input {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    accent-color: $cor-primaria;
+  }
+
+  span {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  small {
+    color: $cor-texto-suave;
+    font-size: 0.85rem;
+  }
+
+  &:hover {
+    border-color: $cor-borda-forte;
+  }
+
+  &:has(input:focus-visible) {
+    @include anel-de-foco;
+  }
+}
+
+.opcaoAtiva {
+  border-color: $cor-primaria;
+  background: $cor-primaria-suave;
+}
+
+.carregando {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  color: $cor-texto-suave;
+}
+
+.resumo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: $esp-3 $esp-4;
+  border-radius: $raio-md;
+  background: $cor-fundo;
+  font-size: 0.9rem;
+}
+
+.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: $cor-primaria;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}

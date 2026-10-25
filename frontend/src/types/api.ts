@@ -1,168 +1,37 @@
-﻿export type PapelUsuario = 'ADMINISTRADOR' | 'TUTOR' | 'ALUNO';
+/**
+ * Contratos da API do backend LIRA (fonte: docs/ROTAS.md e schema.prisma).
+ * Só entram aqui campos confirmados na documentação. Os tipos de cada módulo
+ * (redações, tarefas, simulados...) serão adicionados na fase que usar a rota.
+ */
 
-export interface Usuario {
+export type PapelUsuario = 'ADMINISTRADOR' | 'TUTOR' | 'ALUNO';
+
+export interface UsuarioBasico {
   id: number;
   nome: string;
   email: string;
-  status: 'ATIVO' | 'INATIVO';
-  criadoEm?: string;
 }
 
-export interface SessaoResposta {
-  tipo: 'sessao';
-  token: string;
+/** Resposta de GET /auth/me */
+export interface Sessao {
+  usuario: UsuarioBasico;
   papelAtivo: PapelUsuario;
-  usuario: Usuario;
-}
-
-export interface SelecaoPendenteResposta {
-  tipo: 'selecao_pendente';
-  token: string;
   papeisDisponiveis: PapelUsuario[];
-  usuario: Usuario;
 }
 
-export type LoginResposta = SessaoResposta | SelecaoPendenteResposta;
-
-export interface ErroDetalheAPI {
-  campo: string;
-  mensagem: string;
-}
-
-export interface ErroAPI {
+/** Erro padrão do backend: { erro, codigo, detalhes? } */
+export interface ApiErroCorpo {
   erro: string;
   codigo: string;
-  detalhes?: ErroDetalheAPI[];
+  detalhes?: Array<{ campo: string; mensagem: string }>;
 }
 
-export interface Turma {
-  id: number;
-  nome: string;
-  anoLetivo: number;
-  vestibularFoco: string;
-  status: 'ATIVA' | 'ARQUIVADA' | 'INATIVA';
-  criadoEm?: string;
-}
+/** O que o navegador recebe de /api/auth/login (o token NUNCA vai para o navegador). */
+export type LoginResultado =
+  | { tipo: 'sessao'; papelAtivo: PapelUsuario }
+  | { tipo: 'selecao_pendente'; papeisDisponiveis: PapelUsuario[] };
 
-export interface Tema {
-  id: number;
-  tituloTema: string;
-  textoMotivador?: string | null;
-  origem?: string | null;
-  idCriador?: number | null;
-}
-
-export interface Anexo {
-  id: number;
-  idTarefa: number;
-  nomeArquivo: string;
-  caminhoArquivo: string;
-  tipoArquivo: string;
-  criadoEm: string;
-}
-
-export interface Tarefa {
-  id: number;
-  idTutor?: number | null;
-  idAdm?: number | null;
-  idTurma?: number | null;
-  idTema?: number | null;
-  idTarefaOrigem?: number | null;
-  tituloTarefa: string;
-  descricao?: string | null;
-  prazoEntrega: string;
-  modalidade: 'AVALIATIVA' | 'GERAL';
-  criadoEm: string;
-  tema?: Tema;
-  anexos?: Anexo[];
-}
-
-export interface VersaoRedacao {
-  id: number;
-  idRedacao: number;
-  numeroVersao: number;
-  conteudoTexto: string;
-  statusVersao: 'RASCUNHO' | 'ENVIADA' | 'EM_CORRECAO' | 'CORRIGIDA' | 'AGUARDANDO_REESCRITA' | 'AJUSTE_SOLICITADO';
-  criadoEm: string;
-  dataEnvio?: string | null;
-}
-
-export interface Anotacao {
-  id?: number;
-  posicaoInicio: number;
-  posicaoFinal: number;
-  textoSelecionado: string;
-  tipoErro: string;
-  sugestaoComentario?: string | null;
-}
-
-export interface Correcao {
-  id: number;
-  idVersao: number;
-  idTutor: number;
-  idAdm?: number | null;
-  numeroAjuste: number;
-  notaComp1: number;
-  notaComp2: number;
-  notaComp3: number;
-  notaComp4: number;
-  notaComp5: number;
-  notaTotal: number;
-  comentarioComp1?: string;
-  comentarioComp2?: string;
-  comentarioComp3?: string;
-  comentarioComp4?: string;
-  comentarioComp5?: string;
-  parecerGeral?: string;
-  recadoAdmin?: string;
-  comentarioAjusteAdmin?: string;
-  statusAprovacao: 'PENDENTE_APROVACAO' | 'AJUSTE_SOLICITADO' | 'APROVADA';
-  dataCorrecao: string;
-  anotacoes?: Anotacao[];
-}
-
-export interface Redacao {
-  id: number;
-  idAluno: number;
-  idTarefa?: number | null;
-  idTema?: number | null;
-  tipoFluxo: 'TREINO' | 'AVALIATIVA';
-  criadoEm: string;
-  tema?: Tema;
-  tarefa?: Tarefa;
-  versoes?: VersaoRedacao[];
-}
-
-export interface Alternativa {
-  id?: number;
-  letraOpcao: string;
-  textoAlternativa: string;
-  alternativaCorreta: boolean;
-}
-
-export interface Assunto {
-  id: number;
-  nomeAssunto: string;
-}
-
-export interface Questao {
-  id: number;
-  enunciado: string;
-  imagemUrl?: string | null;
-  vestibular: string;
-  ano: number;
-  numeroQuestao?: number | null;
-  grauDificuldade: 'FACIL' | 'MEDIA' | 'DIFICIL';
-  explicacaoGabarito?: string | null;
-  status: 'ATIVA' | 'INATIVA';
-  alternativas: Alternativa[];
-  assuntos?: Assunto[];
-}
-
-export interface RespostaPaginadaQuestoes {
-  total: number;
-  pagina: number;
-  limite: number;
-  totalPaginas: number;
-  itens: Questao[];
-}
+/** Respostas brutas do backend (usadas só no servidor do Next). */
+export type LoginBackend =
+  | { tipo: 'sessao'; token: string; papelAtivo: PapelUsuario; usuario: UsuarioBasico }
+  | { tipo: 'selecao_pendente'; token: string; papeisDisponiveis: PapelUsuario[]; usuario: UsuarioBasico };

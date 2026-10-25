@@ -1,11 +1,9 @@
-﻿import React from 'react';
+import type { ReactNode } from 'react';
+import { cx } from '@/lib/cx';
 import styles from './Badge.module.scss';
 
-interface BadgeProps {
-  children: React.ReactNode;
-  variant?: 'success' | 'warning' | 'error' | 'info' | 'neutral';
-}
+export type TomDoBadge = 'neutro' | 'sucesso' | 'alerta' | 'perigo';
 
-export default function Badge({ children, variant = 'neutral' }: BadgeProps) {
-  return <span className={`${styles.badge} ${styles[variant]}`}>{children}</span>;
+export function Badge({ tom = 'neutro', children }: { tom?: TomDoBadge; children: ReactNode }) {
+  return <span className={cx(styles.badge, styles[tom])}>{children}</span>;
 }

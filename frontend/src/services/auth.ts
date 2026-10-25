@@ -1,60 +1,48 @@
-import { fetchClient } from '@/lib/api';
-import { LoginResposta, SessaoResposta, Usuario, PapelUsuario } from '@/types/api';
+import { ApiError } from '@/lib/erros';
+import { api } from '@/lib/http';
+import type { ApiErroCorpo, LoginResultado, PapelUsuario, Sessao } from '@/types/api';
 
-export async function loginApi(email: string, senha: string): Promise<LoginResposta> {
-  return fetchClient<LoginResposta>('/auth/login', {
-    method: 'POST',
-    body: JSON.stringify({ email, senha }),
-  });
+/** Chamadas aos manipuladores de autenticação do próprio Next.js (/api/auth/...). */
+async function chamar<T>(url: string, init?: RequestInit): Promise<T> {
+  let resposta: Response;
+  try {
+    resposta = await fetch(url, { credentials: 'same-origin', ...init });
+  } catch {
+    throw new ApiError(0, {
+      erro: 'Sem conexão com o servidor. Verifique sua internet e tente novamente.',
+      codigo: 'SEM_CONEXAO',
+    });
+  }
+  const dados: unknown = await resposta.json().catch(() => null);
+  if (!resposta.ok) throw new ApiError(resposta.status, (dados as Partial<ApiErroCorpo> | null) ?? {});
+  return dados as T;
 }
 
-export async function selecionarPapelApi(
-  tokenPendente: string,
-  papel: PapelUsuario
-): Promise<SessaoResposta> {
-  return fetchClient<SessaoResposta>('/auth/selecionar-papel', {
-    method: 'POST',
-    body: JSON.stringify({ tokenPendente, papel }),
-  });
-}
+const json = (corpo: unknown): RequestInit => ({
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(corpo),
+});
 
-export async function cadastrarApi(dados: {
+export interface DadosDeCadastro {
   codigo: string;
   nome: string;
   email: string;
   senha: string;
-}): Promise<SessaoResposta> {
-  return fetchClient<SessaoResposta>('/auth/cadastro', {
-    method: 'POST',
-    body: JSON.stringify(dados),
-  });
 }
 
-export async function meApi(): Promise<{
-  usuario: Usuario;
-  papelAtivo: PapelUsuario;
-  papeisDisponiveis: PapelUsuario[];
-}> {
-  return fetchClient<{
-    usuario: Usuario;
-    papelAtivo: PapelUsuario;
-    papeisDisponiveis: PapelUsuario[];
-  }>('/auth/me');
-}
+export const authService = {
+  login: (email: string, senha: string) => chamar<LoginResultado>('/api/auth/login', json({ email, senha })),
+  selecionarPapel: (papel: PapelUsuario) => chamar<LoginResultado>('/api/auth/selecionar-papel', json({ papel })),
+  logout: () => chamar<{ ok: true }>('/api/auth/logout', { method: 'POST' }),
+  sessao: () => chamar<Sessao>('/api/auth/sessao'),
 
-export async function esqueciSenhaApi(email: string): Promise<{ mensagem: string }> {
-  return fetchClient<{ mensagem: string }>('/auth/esqueci-senha', {
-    method: 'POST',
-    body: JSON.stringify({ email }),
-  });
-}
+  /** Cadastro por convite. Não entra automaticamente: o usuário vai para o login. */
+  cadastrar: (dados: DadosDeCadastro) => chamar<{ ok: true }>('/api/auth/cadastro', json(dados)),
 
-export async function redefinirSenhaApi(
-  token: string,
-  novaSenha: string
-): Promise<{ mensagem: string }> {
-  return fetchClient<{ mensagem: string }>('/auth/redefinir-senha', {
-    method: 'POST',
-    body: JSON.stringify({ token, novaSenha }),
-  });
-}
+  /** O backend sempre responde de forma genérica (não revela se o e-mail existe). */
+  esqueciSenha: (email: string) => api.post<unknown>('auth/esqueci-senha', { email }),
+
+  /** O token vem do link enviado por e-mail. Vale 1 hora e só pode ser usado uma vez. */
+  redefinirSenha: (token: string, novaSenha: string) => api.post<unknown>('auth/redefinir-senha', { token, novaSenha }),
+};

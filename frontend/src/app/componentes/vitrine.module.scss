@@ -1,0 +1,33 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.pagina {
+  @include container-pagina;
+  padding-block: $esp-6 $esp-8;
+}
+
+.grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: $esp-5;
+}
+
+.linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $esp-3;
+}
+
+.coluna {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+  margin-top: $esp-4;
+}
+
+.secao {
+  margin: $esp-6 0 $esp-4;
+  font-size: 1.3rem;
+  font-weight: 700;
+}

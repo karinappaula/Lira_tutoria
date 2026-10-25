@@ -1,29 +1,50 @@
-﻿import React from 'react';
+import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import { cx } from '@/lib/cx';
+import { Spinner } from '@/components/ui/Spinner/Spinner';
 import styles from './Button.module.scss';
-import Spinner from '../Spinner/Spinner';
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'danger';
-  isLoading?: boolean;
+type Variante = 'primario' | 'secundario' | 'escuro' | 'perigo' | 'texto';
+
+interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variante?: Variante;
+  tamanho?: 'sm' | 'md' | 'lg';
+  /** Formato de pílula (usado nas telas de entrada) */
+  pilula?: boolean;
+  larguraTotal?: boolean;
+  carregando?: boolean;
+  icone?: ReactNode;
 }
 
-export default function Button({
-  children,
-  variant = 'primary',
-  isLoading = false,
-  className = '',
+export function Button({
+  variante = 'primario',
+  tamanho = 'md',
+  pilula = false,
+  larguraTotal = false,
+  carregando = false,
+  icone,
   disabled,
+  className,
+  children,
   type = 'button',
-  ...props
-}: ButtonProps) {
+  ...resto
+}: Props) {
   return (
     <button
       type={type}
-      className={`${styles.button} ${styles[variant]} ${className}`}
-      disabled={disabled || isLoading}
-      {...props}
+      className={cx(
+        styles.botao,
+        styles[variante],
+        styles[tamanho],
+        pilula && styles.pilula,
+        larguraTotal && styles.total,
+        className,
+      )}
+      disabled={disabled || carregando}
+      aria-busy={carregando || undefined}
+      {...resto}
     >
-      {isLoading ? <Spinner size="small" /> : children}
+      {carregando ? <Spinner tamanho="sm" rotulo="Aguarde" className={styles.spinner} /> : icone}
+      <span>{children}</span>
     </button>
   );
 }
