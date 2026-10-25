@@ -1,5 +1,5 @@
 import { Router } from "express";
-import healthRoute from "./health.route";
+import saudeRoute from "./saude.route";
 import turmaRoute from "./turma.route";
 import authRoute from "./auth.route";
 import conviteRoute from "./convite.route";
@@ -13,9 +13,10 @@ import comunicadoRoute from "./comunicado.route";
 import indicadoresRoute from "./indicadores.route";
 import vinculoRoute from "./vinculo.route";
 
+
 const router = Router();
 
-router.use(healthRoute);
+router.use(saudeRoute);
 router.use(turmaRoute);
 router.use("/auth", authRoute);
 router.use(vinculoRoute);

@@ -9,5 +9,5 @@ app.listen(PORT, HOST, () => {
   console.log(`API rodando na porta ${PORT}`);
   console.log("Acesse localmente: http://localhost:" + PORT);
   console.log("Para acesso pela rede, use o IP local desta máquina.");
-  console.log(`Teste de conexão com o banco: http://localhost:${PORT}/health`);
+  console.log(`Teste de conexão com o banco: http://localhost:${PORT}/saude`);
 });
