@@ -3,9 +3,8 @@ import { prisma } from "../db/prisma";
 
 const router = Router();
 
-// GET /health — confirma que a API está de pé E que a conexão
-// com o MySQL via Prisma está funcionando (exigência da Sprint 2:
-// "conexão e integração com o banco de dados testada no código").
+// GET /saude — confirma que a API está de pé E que a conexão
+// com o MySQL via Prisma está funcionando 
 router.get("/saude", async (_req, res) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
