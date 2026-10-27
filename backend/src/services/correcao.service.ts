@@ -18,7 +18,7 @@ export const STATUS_VISIVEIS_AO_ALUNO: string[] = [
   STATUS_CORRECAO.LIBERADA,
 ];
 
-const TEXTO_MAXIMO = 5000;
+ const TEXTO_MAXIMO = 2000;
 
 export interface AnotacaoInput {
   posicaoInicio: number;
@@ -82,6 +82,8 @@ function validarTexto(valor: string | undefined, campo: string): string | undefi
   }
   return valor;
 }
+
+function exigirComentario(valor: string | undefined, campo: string): string {  const texto = validarTexto(valor?.trim(), campo);  if (!texto) {    throw new ErroNegocio(`${campo} é obrigatório.`, 400, "COMENTARIO_Obrigatorio");  }  return texto;}
 
 function validarAnotacoes(anotacoes: AnotacaoInput[] | undefined, texto: string) {
   for (const anotacao of anotacoes ?? []) {
@@ -153,11 +155,11 @@ export async function criarCorrecao(idUsuarioTutor: number, input: CriarCorrecao
   validarAnotacoes(input.anotacoes, versao.conteudoTexto);
 
   const comentarios = [
-    validarTexto(input.comentarioComp1, "comentarioComp1"),
-    validarTexto(input.comentarioComp2, "comentarioComp2"),
-    validarTexto(input.comentarioComp3, "comentarioComp3"),
-    validarTexto(input.comentarioComp4, "comentarioComp4"),
-    validarTexto(input.comentarioComp5, "comentarioComp5"),
+    exigirComentario(input.comentarioComp1, "comentarioComp1"),
+    exigirComentario(input.comentarioComp2, "comentarioComp2"),
+    exigirComentario(input.comentarioComp3, "comentarioComp3"),
+    exigirComentario(input.comentarioComp4, "comentarioComp4"),
+    exigirComentario(input.comentarioComp5, "comentarioComp5"),
   ];
   const parecerGeral = validarTexto(input.parecerGeral, "parecerGeral");
   const recadoAdmin = validarTexto(input.recadoAdmin, "recadoAdmin");
