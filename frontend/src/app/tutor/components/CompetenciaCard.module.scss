@@ -1,0 +1,142 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.cartao {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+  min-width: 0;
+  margin: 0;
+  padding: $esp-5;
+  background: $cor-superficie;
+  border: 0;
+  border-radius: $raio-lg;
+  box-shadow: $sombra-cartao;
+
+  @include celular {
+    padding: $esp-4;
+  }
+}
+
+.legenda {
+  float: left;
+  width: 100%;
+  padding: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.numero {
+  display: inline-grid;
+  place-items: center;
+  min-width: 34px;
+  padding: 2px 8px;
+  margin-right: 6px;
+  border-radius: $raio-sm;
+  background: $cor-primaria;
+  color: $cor-texto-invertido;
+  font-size: 0.9rem;
+}
+
+.pergunta {
+  clear: both;
+  color: $cor-texto-suave;
+  font-size: 0.92rem;
+}
+
+.niveis {
+  display: grid;
+  gap: $esp-2;
+}
+
+.nivel {
+  display: grid;
+  grid-template-columns: auto 52px 1fr;
+  align-items: start;
+  gap: $esp-3;
+  min-height: 48px;
+  padding: $esp-3;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-md;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+
+  input {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    accent-color: $cor-primaria;
+  }
+
+  &:hover {
+    border-color: $cor-borda-forte;
+  }
+
+  &:has(input:focus-visible) {
+    @include anel-de-foco;
+  }
+}
+
+.nivelAtivo {
+  border-color: $cor-primaria;
+  background: $cor-primaria-suave;
+}
+
+.nota {
+  font-weight: 700;
+  color: $cor-primaria;
+}
+
+.descricao {
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.evidencias {
+  display: flex;
+}
+
+.rotuloComentario {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.comentario {
+  width: 100%;
+  min-height: 88px;
+  padding: 10px 14px;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-md;
+  line-height: 1.5;
+  resize: vertical;
+
+  &:focus {
+    border-color: $cor-primaria;
+    @include anel-de-foco;
+  }
+}
+
+.invalido {
+  border-color: $cor-perigo;
+}
+
+.rodape {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $esp-3;
+}
+
+.contador {
+  color: $cor-texto-suave;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.erro {
+  color: $cor-perigo-texto;
+  font-size: 0.85rem;
+  font-weight: 500;
+}

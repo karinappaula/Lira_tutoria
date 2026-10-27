@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import { PaginaEmConstrucao } from '@/components/layout/PaginaEmConstrucao';
+import { HistoricoDoTutor } from '../components/HistoricoDoTutor';
 
 export const metadata: Metadata = { title: 'Histórico de correções' };
 
-export default function Pagina() {
-  return <PaginaEmConstrucao titulo="Histórico de correções" fase="Fase F3" />;
+export default function PaginaHistorico() {
+  return <HistoricoDoTutor />;
 }

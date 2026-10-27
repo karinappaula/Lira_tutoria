@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import { PaginaEmConstrucao } from '@/components/layout/PaginaEmConstrucao';
+import { FilaDeCorrecao } from '../components/FilaDeCorrecao';
 
 export const metadata: Metadata = { title: 'Fila de correção' };
 
-export default function Pagina() {
-  return <PaginaEmConstrucao titulo="Fila de correção" fase="Fase F3" />;
+export default function PaginaFila() {
+  return <FilaDeCorrecao />;
 }

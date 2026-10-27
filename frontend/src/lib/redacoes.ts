@@ -11,8 +11,7 @@ export function tituloDaRedacao(redacao: Redacao): string {
 
 /**
  * Texto do status que o ALUNO vê. O aluno nunca vê o ajuste pedido pela Administração:
- * AJUSTE_SOLICITADO aparece como "Em revisão final" (o backend já faz isso no detalhe,
- * mas na lista ele chega cru, por isso a conversão também é feita aqui).
+ * AJUSTE_SOLICITADO aparece como "Em revisão final" 
  */
 export function statusParaAluno(versao: VersaoRedacao | undefined): { rotulo: string; tom: TomDoBadge } {
   if (!versao) return { rotulo: 'Sem versão', tom: 'neutro' };
@@ -55,4 +54,17 @@ export function urlSegura(url: string): string | null {
 
 export function formatarHora(data: Date): string {
   return new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }).format(data);
+}
+/** Status como o Tutor e a Administração veem (mostram o ajuste pedido e a revisão da Administração). */
+export function statusParaGestao(versao: VersaoRedacao | undefined): { rotulo: string; tom: TomDoBadge } {
+  if (!versao) return { rotulo: 'Sem versão', tom: 'neutro' };
+  const tabela: Record<StatusVersao, { rotulo: string; tom: TomDoBadge }> = {
+    RASCUNHO: { rotulo: 'Rascunho do aluno', tom: 'neutro' },
+    ENVIADA: { rotulo: 'Aguardando correção', tom: 'alerta' },
+    EM_CORRECAO: { rotulo: 'Aguardando revisão do Admin', tom: 'alerta' },
+    AJUSTE_SOLICITADO: { rotulo: 'Ajuste solicitado', tom: 'perigo' },
+    CORRIGIDA: { rotulo: 'Corrigida', tom: 'sucesso' },
+    AGUARDANDO_REESCRITA: { rotulo: 'Reescrita solicitada', tom: 'alerta' },
+  };
+  return tabela[versao.statusVersao];
 }

@@ -1,0 +1,250 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.voltar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  margin-bottom: $esp-2;
+  color: $cor-primaria;
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+.espaco {
+  margin-top: $esp-4;
+}
+
+.avisos {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+  margin-bottom: $esp-5;
+  scroll-margin-top: $esp-5;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: $esp-5;
+  align-items: start;
+  padding-bottom: 96px;
+
+  @include tablet {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.textoColuna,
+.fichaColuna {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+  min-width: 0;
+}
+
+.textoColuna {
+  position: sticky;
+  top: $esp-4;
+  max-height: calc(100dvh - #{$esp-6});
+  overflow-y: auto;
+  padding-right: 4px;
+
+  @include tablet {
+    position: static;
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+  }
+}
+
+.instrucao {
+  margin-bottom: $esp-3;
+  color: $cor-texto-suave;
+  font-size: 0.9rem;
+}
+
+.painelMarca {
+  border: 2px solid $cor-primaria;
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+}
+
+.trecho {
+  margin: $esp-2 0;
+  font-style: italic;
+  overflow-wrap: anywhere;
+}
+
+.rotuloSugestao {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sugestao {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-md;
+  line-height: 1.5;
+  resize: vertical;
+
+  &:focus {
+    border-color: $cor-primaria;
+    @include anel-de-foco;
+  }
+}
+
+.botoesMarca {
+  display: flex;
+  justify-content: flex-end;
+  gap: $esp-3;
+
+  @include celular {
+    > * {
+      flex: 1;
+      min-height: 48px;
+    }
+  }
+}
+
+.erro {
+  color: $cor-perigo-texto;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.listaMarcas {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.itemMarca {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $esp-3;
+  padding-bottom: $esp-3;
+  border-bottom: 1px solid $cor-borda;
+
+  &:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+}
+
+.sugestaoTexto {
+  color: $cor-texto-suave;
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.remover {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: $cor-perigo-texto;
+  cursor: pointer;
+
+  &:hover {
+    background: $cor-perigo-suave;
+  }
+}
+
+.contador {
+  margin-top: $esp-1;
+  color: $cor-texto-suave;
+  font-size: 0.8rem;
+  text-align: right;
+}
+
+.barraFixa {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-4;
+  padding: $esp-3 $gutter-pagina calc(#{$esp-3} + env(safe-area-inset-bottom));
+  background: $cor-superficie;
+  border-top: 1px solid $cor-borda;
+  box-shadow: 0 -8px 20px -12px rgba(23, 41, 45, 0.3);
+
+  @include tablet {
+    padding-inline: $esp-5;
+  }
+  @include celular {
+    padding-inline: $esp-4;
+  }
+}
+
+.parcial {
+  font-size: 1rem;
+
+  strong {
+    font-size: 1.3rem;
+    color: $cor-primaria;
+  }
+
+  span {
+    color: $cor-texto-suave;
+    font-size: 0.88rem;
+  }
+
+  @include celular {
+    font-size: 0.9rem;
+
+    span {
+      display: none;
+    }
+  }
+}
+
+.resumo {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+}
+
+.notas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: $esp-2;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    padding: $esp-2 $esp-3;
+    border-radius: $raio-sm;
+    background: $cor-fundo;
+  }
+}
+
+.total {
+  font-size: 1.1rem;
+}

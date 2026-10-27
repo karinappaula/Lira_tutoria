@@ -1,0 +1,79 @@
+@use 'variables' as *;
+
+.texto {
+  max-width: 80ch;
+  font-size: 1.02rem;
+  line-height: 2;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.selecionavel {
+  cursor: text;
+  user-select: text;
+}
+
+/* Cada tipo tem cor E estilo de sublinhado, para não depender só da cor */
+.marca {
+  padding: 1px 2px;
+  border-radius: 3px;
+  cursor: pointer;
+  text-decoration-line: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+
+  &:focus-visible {
+    outline: 3px solid rgba(0, 107, 112, 0.5);
+  }
+}
+
+.ativa {
+  box-shadow: 0 0 0 2px $cor-texto;
+}
+
+.pendente {
+  background: #cfe8ff;
+  border-radius: 3px;
+  outline: 2px dashed #3b82c4;
+}
+
+.ortografia {
+  background: #fde2e4;
+  text-decoration-style: wavy;
+  text-decoration-color: #d63a44;
+}
+.gramatica {
+  background: #fff0c2;
+  text-decoration-style: solid;
+  text-decoration-color: #b57800;
+}
+.pontuacao {
+  background: #e6dcff;
+  text-decoration-style: dotted;
+  text-decoration-color: #6b46c1;
+}
+.coesao {
+  background: #d9f0ff;
+  text-decoration-style: dashed;
+  text-decoration-color: #1f78b4;
+}
+.argumento {
+  background: #dcf5e3;
+  text-decoration-style: double;
+  text-decoration-color: #2f855a;
+}
+.tema {
+  background: #ffe1cc;
+  text-decoration-style: wavy;
+  text-decoration-color: #c05621;
+}
+.proposta {
+  background: #e0f4f2;
+  text-decoration-style: dashed;
+  text-decoration-color: $cor-primaria;
+}
+.outro {
+  background: #e8eceb;
+  text-decoration-style: dotted;
+  text-decoration-color: #55686b;
+}

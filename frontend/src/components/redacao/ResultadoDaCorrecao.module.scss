@@ -1,0 +1,178 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.resultado {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+}
+
+.nota {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-4;
+  padding: $esp-5;
+  border-radius: $raio-lg;
+  background: $cor-primaria;
+  color: $cor-texto-invertido;
+}
+
+.notaRotulo {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.notaValor {
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1.1;
+
+  span {
+    font-size: 1.2rem;
+    font-weight: 500;
+    opacity: 0.85;
+  }
+}
+
+.notaMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: $esp-2;
+  font-size: 0.92rem;
+
+  @include celular {
+    align-items: flex-start;
+  }
+}
+
+.grade {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: $esp-4;
+  align-items: start;
+
+  @include tablet {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.coluna {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.cartaoTexto {
+  min-width: 0;
+}
+
+.legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $esp-2 $esp-4;
+  margin: 0 0 $esp-4;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+.amostra {
+  cursor: default;
+}
+
+.detalheMarca {
+  margin-top: $esp-4;
+  padding: $esp-4;
+  border-left: 4px solid $cor-primaria;
+  border-radius: $raio-md;
+  background: $cor-fundo;
+  display: flex;
+  flex-direction: column;
+  gap: $esp-2;
+}
+
+.detalheTipo {
+  font-weight: 700;
+
+  span {
+    color: $cor-texto-suave;
+    font-weight: 500;
+  }
+}
+
+.detalheTrecho {
+  font-style: italic;
+  overflow-wrap: anywhere;
+}
+
+.dica {
+  margin-top: $esp-3;
+  color: $cor-texto-suave;
+  font-size: 0.88rem;
+}
+
+.competencias {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+  min-width: 0;
+}
+
+.competencia {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-2;
+}
+
+.competenciaTopo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: $esp-3;
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  strong {
+    color: $cor-primaria;
+    white-space: nowrap;
+  }
+}
+
+.barra {
+  height: 8px;
+  border-radius: 999px;
+  background: $cor-neutro-suave;
+  overflow: hidden;
+
+  span {
+    display: block;
+    height: 100%;
+    background: $cor-primaria;
+    border-radius: 999px;
+  }
+}
+
+.nivel {
+  color: $cor-texto-suave;
+  font-size: 0.85rem;
+}
+
+.comentario {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

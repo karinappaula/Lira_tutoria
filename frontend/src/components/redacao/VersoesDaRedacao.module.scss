@@ -1,0 +1,77 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.versoes {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+}
+
+.abas {
+  display: flex;
+  gap: $esp-2;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.aba {
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-pilula;
+  background: $cor-superficie;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $cor-borda-forte;
+  }
+}
+
+.abaAtiva {
+  border-color: $cor-primaria;
+  background: $cor-primaria;
+  color: $cor-texto-invertido;
+}
+
+.painel {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+}
+
+.cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $esp-3;
+}
+
+.titulo {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.data {
+  color: $cor-texto-suave;
+  font-size: 0.9rem;
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $esp-3;
+}
+
+.texto {
+  max-width: 80ch;
+  font-size: 1.02rem;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

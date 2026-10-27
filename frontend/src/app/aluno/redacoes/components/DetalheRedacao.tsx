@@ -46,7 +46,7 @@ export function DetalheRedacao({ id }: { id: number }) {
     <>
       {voltar}
       <PageHeader titulo={tituloDaRedacao(dados)} descricao={descricao} />
-      {emEdicao ? <EditorRedacao key={`${dados.id}-${versao?.id}`} redacao={dados} /> : <LeituraRedacao redacao={dados} />}
+      {emEdicao ? <EditorRedacao key={`${dados.id}-${versao?.id}`} redacao={dados} /> : <LeituraRedacao redacao={dados} aoAtualizar={recarregar} />}
     </>
   );
 }

@@ -12,13 +12,15 @@ import { useAutosave } from '@/hooks/useAutosave';
 import { ApiError, mensagemDeErro } from '@/lib/erros';
 import { contarPalavras, formatarHora, podeExcluir, prazoEncerrado, ultimaVersao } from '@/lib/redacoes';
 import { redacoesService } from '@/services/redacoes';
-import type { Redacao } from '@/types/redacoes';
+import type { RedacaoDetalhada } from '@/types/correcoes';
+import { ultimaCorrecao } from '@/lib/correcoes';
+import { ResultadoDaCorrecao } from '@/components/redacao/ResultadoDaCorrecao';
 import { PainelDoTema } from './PainelDoTema';
 import styles from './EditorRedacao.module.scss';
 
 type Janela = 'tema' | 'enviar' | 'excluir' | 'versao1' | null;
 
-export function EditorRedacao({ redacao }: { redacao: Redacao }) {
+export function EditorRedacao({ redacao }: { redacao: RedacaoDetalhada }) {
   const router = useRouter();
   const toast = useToast();
   const versao = ultimaVersao(redacao);
@@ -190,8 +192,12 @@ export function EditorRedacao({ redacao }: { redacao: Redacao }) {
         <PainelDoTema redacao={redacao} />
       </Modal>
 
-      <Modal aberto={janela === 'versao1'} aoFechar={fechar} titulo="Sua versão 1">
-        <p className={styles.versaoUm}>{versaoUm?.conteudoTexto || 'Texto vazio.'}</p>
+      <Modal aberto={janela === 'versao1'} aoFechar={fechar} titulo="Sua versão 1 e a correção">
+        {versaoUm && ultimaCorrecao(versaoUm) ? (
+          <ResultadoDaCorrecao texto={versaoUm.conteudoTexto} correcao={ultimaCorrecao(versaoUm)!} coluna />
+        ) : (
+          <p className={styles.versaoUm}>{versaoUm?.conteudoTexto || 'Texto vazio.'}</p>
+        )}
       </Modal>
 
       <Modal
