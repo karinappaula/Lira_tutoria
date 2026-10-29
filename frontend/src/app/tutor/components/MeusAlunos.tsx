@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Copy, UserPlus } from 'lucide-react';
+import { Copy, RefreshCw, UserPlus } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Alerta } from '@/components/ui/Alerta/Alerta';
 import { Badge, type TomDoBadge } from '@/components/ui/Badge/Badge';
@@ -33,6 +33,7 @@ export function MeusAlunos() {
   const [conviteAberto, setConviteAberto] = useState(false);
   const [convidando, setConvidando] = useState(false);
   const [erroConvite, setErroConvite] = useState<string | null>(null);
+  const [confirmarRenovar, setConfirmarRenovar] = useState(false);
 
   // espera o usuário parar de digitar antes de buscar
   useEffect(() => {
@@ -43,11 +44,16 @@ export function MeusAlunos() {
   const { dados, carregando, erro, recarregar } = useBuscar((signal) => tutorService.tutorados(termo || undefined, signal), termo);
   const alunos = dados ?? [];
 
-  async function gerarConvite() {
+  async function obterOuGerarConvite(renovar = false) {
     setConvidando(true);
     setErroConvite(null);
     try {
-      setConvite(await tutorService.convidarAluno());
+      const conv = await tutorService.convidarAluno(renovar);
+      setConvite(conv);
+      if (renovar) {
+        toast.sucesso('Novo link do grupo gerado com sucesso!');
+        setConfirmarRenovar(false);
+      }
     } catch (e) {
       setErroConvite(mensagemDeErro(e));
     } finally {
@@ -55,12 +61,41 @@ export function MeusAlunos() {
     }
   }
 
+  // Executa a busca/geração do convite APENAS UMA VEZ na montagem do componente (matriz de dependências [])
+  useEffect(() => {
+    let ativo = true;
+
+    async function carregarConviteInicial() {
+      try {
+        const conv = await tutorService.convidarAluno(false);
+        if (ativo) {
+          setConvite(conv);
+        }
+      } catch {
+        // Silencioso se o tutor ainda não possui turma ativa ou atingiu o limite
+      }
+    }
+
+    void carregarConviteInicial();
+
+    return () => {
+      ativo = false;
+    };
+  }, [dados]);
+
+  function abrirModalConvite() {
+    setErroConvite(null);
+    setConfirmarRenovar(false);
+    setConviteAberto(true);
+    void obterOuGerarConvite(false);
+  }
+
   const link = convite && typeof window !== 'undefined' ? `${window.location.origin}/cadastro?codigo=${encodeURIComponent(convite.codigo)}` : '';
 
   async function copiar(texto: string) {
     try {
       await navigator.clipboard.writeText(texto);
-      toast.sucesso('Copiado!');
+      toast.sucesso('Link copiado para a área de transferência!');
     } catch {
       toast.erro('Não foi possível copiar. Selecione o texto e copie manualmente.');
     }
@@ -78,6 +113,11 @@ export function MeusAlunos() {
     },
   ];
 
+  const totalVagas = convite?.usosMaximos ?? 10;
+  const vagasOcupadas = convite?.usos !== undefined ? convite.usos : alunos.length;
+  const vagasRestantes = Math.max(0, totalVagas - vagasOcupadas);
+  const grupoLotado = vagasOcupadas >= totalVagas;
+
   return (
     <>
       <PageHeader
@@ -86,12 +126,7 @@ export function MeusAlunos() {
         acao={
           <Button
             icone={<UserPlus size={18} aria-hidden="true" />}
-            onClick={() => {
-              setConvite(null);
-              setErroConvite(null);
-              setConvidando(false);
-              setConviteAberto(true);
-            }}
+            onClick={abrirModalConvite}
           >
             Convidar aluno
           </Button>
@@ -101,16 +136,32 @@ export function MeusAlunos() {
         <div className={styles.filtro}>
           <Input rotulo="Buscar aluno" ocultarRotulo type="search" value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Buscar aluno..." />
         </div>
-        {!carregando && !erro && <p className={styles.contagem}>{alunos.length} {alunos.length === 1 ? 'aluno cadastrado' : 'alunos cadastrados'}</p>}
+        <div className={styles.contadores}>
+          {!carregando && !erro && (
+            <p className={styles.contagem}>
+              {alunos.length} {alunos.length === 1 ? 'aluno cadastrado' : 'alunos cadastrados'}
+            </p>
+          )}
+          <Badge tom={grupoLotado ? 'perigo' : 'sucesso'}>
+            Vagas: {vagasOcupadas}/{totalVagas}
+          </Badge>
+        </div>
       </div>
 
       {carregando ? (
         <CarregandoPagina rotulo="Carregando seus alunos" />
       ) : erro ? (
-        <ErrorState mensagem={erro.message} conexao={erro.ehErroDeConexao} aoTentarNovamente={recarregar} />
+        <ErrorState
+          mensagem={erro.message}
+          conexao={erro.ehErroDeConexao}
+          aoTentarNovamente={() => {
+            recarregar();
+            void obterOuGerarConvite(false);
+          }}
+        />
       ) : alunos.length === 0 ? (
         <div className={styles.vazio}>
-          <EmptyState titulo={termo ? 'Nenhum aluno encontrado' : 'Você ainda não tem alunos'} descricao={termo ? 'Tente outro nome.' : 'Use "Convidar aluno" para gerar um código de cadastro.'} />
+          <EmptyState titulo={termo ? 'Nenhum aluno encontrado' : 'Você ainda não tem alunos'} descricao={termo ? 'Tente outro nome.' : 'Use "Convidar aluno" para gerar um link de grupo para seus alunos.'} />
         </div>
       ) : (
         <Tabela colunas={colunas} linhas={alunos} chaveDaLinha={(a) => a.idAluno} descricao="Lista dos seus alunos" />
@@ -118,18 +169,33 @@ export function MeusAlunos() {
 
       <Modal
         aberto={conviteAberto}
-        aoFechar={() => setConviteAberto(false)}
-        titulo="Convidar aluno"
+        aoFechar={() => {
+          setConviteAberto(false);
+          setConfirmarRenovar(false);
+        }}
+        titulo="Link do Grupo Reutilizável"
         rodape={
-          convite ? (
-            <Button onClick={() => setConviteAberto(false)}>Concluir</Button>
+          confirmarRenovar ? (
+            <>
+              <Button variante="secundario" onClick={() => setConfirmarRenovar(false)} disabled={convidando}>
+                Voltar
+              </Button>
+              <Button variante="perigo" carregando={convidando} onClick={() => void obterOuGerarConvite(true)}>
+                Confirmar renovação
+              </Button>
+            </>
           ) : (
             <>
-              <Button variante="secundario" onClick={() => setConviteAberto(false)} disabled={convidando}>
-                Cancelar
+              <Button
+                variante="secundario"
+                icone={<RefreshCw size={16} aria-hidden="true" />}
+                onClick={() => setConfirmarRenovar(true)}
+                disabled={convidando}
+              >
+                Renovar link
               </Button>
-              <Button carregando={convidando} onClick={() => void gerarConvite()}>
-                Gerar convite
+              <Button onClick={() => setConviteAberto(false)}>
+                Concluir
               </Button>
             </>
           )
@@ -137,20 +203,52 @@ export function MeusAlunos() {
       >
         <div className={styles.formulario}>
           {erroConvite && <Alerta tom="erro">{erroConvite}</Alerta>}
-          {convite ? (
+
+          {confirmarRenovar ? (
+            <Alerta tom="alerta">
+              <strong>Tem certeza que deseja renovar o link?</strong>
+              <p>O link e código atuais serão desativados imediatamente. Novos alunos deverão utilizar o novo link gerado.</p>
+            </Alerta>
+          ) : convite ? (
             <>
+              <div className={styles.infoVagas}>
+                <span>Vagas no grupo: <strong>{vagasOcupadas}/{totalVagas}</strong></span>
+                <Badge tom={grupoLotado ? 'perigo' : 'sucesso'}>
+                  {grupoLotado ? 'Limite atingido (10/10)' : `${vagasRestantes} ${vagasRestantes === 1 ? 'vaga restante' : 'vagas restantes'}`}
+                </Badge>
+              </div>
+
               <div className={styles.codigo}>
                 <strong>{convite.codigo}</strong>
                 <span>Válido até {formatarDataHora(convite.expiraEm)}</span>
               </div>
-              <p>Envie o link abaixo para o aluno. Ele abre o cadastro já com o código preenchido.</p>
-              <p className={styles.linkConvite}>{link}</p>
-              <Button variante="secundario" icone={<Copy size={16} aria-hidden="true" />} onClick={() => void copiar(link)}>
-                Copiar link
-              </Button>
+
+              <p>Envie o link abaixo para seus alunos. Ele pode ser reutilizado por até {totalVagas} alunos para ingressar no seu grupo de tutoria.</p>
+              
+              <div className={styles.campoLink}>
+                <Input
+                  rotulo="Link de convite"
+                  ocultarRotulo
+                  readOnly
+                  value={link}
+                />
+              </div>
+
+              <div className={styles.acoesLink}>
+                <Button
+                  variante="primario"
+                  icone={<Copy size={16} aria-hidden="true" />}
+                  onClick={() => void copiar(link)}
+                  disabled={grupoLotado}
+                >
+                  Copiar link do grupo
+                </Button>
+              </div>
             </>
+          ) : convidando ? (
+            <CarregandoPagina rotulo="Carregando link de convite..." />
           ) : (
-            <p>Será gerado um código de uso único, válido por 30 dias, para o aluno criar a conta e ficar vinculado a você.</p>
+            <p>Carregando informações do link do grupo...</p>
           )}
         </div>
       </Modal>

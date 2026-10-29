@@ -1,8 +1,11 @@
 import type { Metadata } from 'next';
-import { PaginaEmConstrucao } from '@/components/layout/PaginaEmConstrucao';
+import { BancoQuestoesAdmin } from './BancoQuestoesAdmin';
 
-export const metadata: Metadata = { title: 'Banco de Questões' };
+export const metadata: Metadata = {
+  title: 'Banco de Questões - LIRA Administração',
+  description: 'Gerencie o acervo de questões de vestibulares, alternativas e taxonomia temática.',
+};
 
-export default function Pagina() {
-  return <PaginaEmConstrucao titulo="Banco de Questões" fase="Fase F5" />;
+export default function PaginaQuestoesAdmin() {
+  return <BancoQuestoesAdmin />;
 }

@@ -1,6 +1,6 @@
 import { api } from '@/lib/http';
 import type { RedacaoDetalhada } from '@/types/correcoes';
-import type { NovaRedacao, Redacao, Tema, TarefaDoAluno, VersaoRedacao } from '@/types/redacoes';
+import type { NovaRedacao, Redacao, TarefaDoAluno, VersaoRedacao } from '@/types/redacoes';
 
 export const redacoesService = {
   listar: (signal?: AbortSignal) => api.get<Redacao[]>('redacoes', undefined, signal),
@@ -17,9 +17,7 @@ export const redacoesService = {
   excluir: (id: number) => api.delete<void>(`redacoes/${id}`),
 };
 
-export const temasService = {
-  listar: (signal?: AbortSignal) => api.get<Tema[]>('temas', undefined, signal),
-};
+export { temasService, type DadosDeTema } from './temas';
 
 export const tarefasService = {
   /** Visão do aluno: tarefas avaliativas do seu Tutor, com o id da redação já iniciada (ou null). */

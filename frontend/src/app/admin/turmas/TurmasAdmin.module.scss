@@ -1,0 +1,628 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+/* ---------- Métricas Rápidas ---------- */
+.gradeMetricas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $esp-4;
+  margin-bottom: $esp-5;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include celular {
+    grid-template-columns: 1fr;
+    gap: $esp-3;
+  }
+}
+
+.cartaoMetrica {
+  display: flex;
+  align-items: center;
+  gap: $esp-4;
+  padding: $esp-4;
+  background: $cor-superficie;
+  border-radius: $raio-lg;
+  box-shadow: $sombra-cartao;
+  border: 1px solid $cor-borda;
+}
+
+.iconeMetrica {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: $raio-md;
+  background: $cor-primaria-suave;
+  color: $cor-primaria;
+  flex-shrink: 0;
+}
+
+.textosMetrica {
+  display: flex;
+  flex-direction: column;
+}
+
+.rotuloMetrica {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: $cor-texto-suave;
+}
+
+.valorMetrica {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: $cor-texto;
+  line-height: 1.2;
+}
+
+.subMetrica {
+  font-size: 0.78rem;
+  color: $cor-texto-suave;
+  margin-top: 2px;
+}
+
+/* ---------- Barra de Ferramentas e Filtros ---------- */
+.barraFerramentas {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-4;
+  margin-bottom: $esp-5;
+  flex-wrap: wrap;
+
+  @include celular {
+    flex-direction: column;
+    align-items: stretch;
+    gap: $esp-3;
+  }
+}
+
+.grupoFiltros {
+  display: flex;
+  align-items: center;
+  gap: $esp-3;
+  flex: 1;
+  flex-wrap: wrap;
+
+  @include celular {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+}
+
+.busca {
+  flex: 1;
+  min-width: 240px;
+  max-width: 360px;
+
+  @include celular {
+    max-width: 100%;
+    min-width: 100%;
+  }
+}
+
+.seletorFiltro {
+  min-width: 180px;
+
+  @include celular {
+    min-width: 100%;
+  }
+}
+
+.grupoControles {
+  display: flex;
+  align-items: center;
+  gap: $esp-4;
+
+  @include celular {
+    justify-content: space-between;
+  }
+}
+
+.contagem {
+  font-size: 0.88rem;
+  color: $cor-texto-suave;
+  white-space: nowrap;
+}
+
+.alternadorModo {
+  display: flex;
+  align-items: center;
+  background: $cor-superficie;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-md;
+  padding: 2px;
+}
+
+.modoBotao,
+.modoAtivo {
+  display: inline-flex;
+  align-items: center;
+  gap: $esp-2;
+  padding: $esp-2 $esp-3;
+  border: 0;
+  border-radius: $raio-sm;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  background: transparent;
+  color: $cor-texto-suave;
+  transition: all 0.15s ease-in-out;
+
+  &:hover {
+    color: $cor-texto;
+  }
+}
+
+.modoAtivo {
+  background: $cor-primaria-suave;
+  color: $cor-primaria;
+  font-weight: 600;
+}
+
+.rotuloModo {
+  @include celular {
+    display: none;
+  }
+}
+
+/* ---------- Grade de Cartões de Turmas ---------- */
+.gradeTurmas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $esp-5;
+
+  @media (min-width: 768px) and (max-width: 1023px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $esp-4;
+  }
+
+  @include celular {
+    grid-template-columns: 1fr;
+    gap: $esp-4;
+  }
+}
+
+.cardTurma {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  border: 1px solid $cor-borda;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    box-shadow: $sombra-auth;
+    transform: translateY(-2px);
+  }
+}
+
+.cabecalhoCardTurma {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $esp-3;
+  margin-bottom: $esp-4;
+}
+
+.tituloCardTurma {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: $cor-texto;
+  margin: 0;
+}
+
+.anoCardTurma {
+  display: block;
+  font-size: 0.82rem;
+  color: $cor-texto-suave;
+  margin-top: 2px;
+}
+
+.detalhesCardTurma {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+  flex: 1;
+}
+
+.tagVestibular {
+  display: flex;
+}
+
+.blocoCapacidade {
+  padding: $esp-3;
+  background: $cor-fundo;
+  border-radius: $raio-md;
+  display: flex;
+  flex-direction: column;
+  gap: $esp-2;
+}
+
+.linhaCapacidade {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.88rem;
+  color: $cor-texto;
+
+  strong {
+    color: $cor-primaria;
+    font-size: 0.95rem;
+  }
+}
+
+.barraProgresso {
+  width: 100%;
+  height: 6px;
+  background: $cor-borda;
+  border-radius: $raio-pilula;
+  overflow: hidden;
+}
+
+.preenchimentoProgresso {
+  height: 100%;
+  background: $cor-primaria;
+  border-radius: $raio-pilula;
+  transition: width 0.3s ease;
+}
+
+.avisoVagas {
+  font-size: 0.76rem;
+  color: $cor-texto-suave;
+}
+
+.blocoAlunos {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  font-size: 0.88rem;
+  color: $cor-texto;
+}
+
+.rodapeCardTurma {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  margin-top: $esp-5;
+  padding-top: $esp-4;
+  border-top: 1px solid $cor-borda;
+  flex-wrap: wrap;
+
+  @include celular {
+    flex-direction: column;
+    align-items: stretch;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+/* ---------- Tabela e Elementos Internos ---------- */
+.colunaTurma {
+  display: flex;
+  flex-direction: column;
+}
+
+.nomeTurmaLinha {
+  color: $cor-texto;
+  font-size: 0.95rem;
+}
+
+.subtextoLinha {
+  font-size: 0.8rem;
+  color: $cor-texto-suave;
+}
+
+.capacidadeLinha {
+  font-size: 0.92rem;
+
+  strong {
+    color: $cor-primaria;
+  }
+}
+
+.acoesLinha {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: $esp-2;
+  flex-wrap: wrap;
+
+  @include celular {
+    justify-content: flex-start;
+    width: 100%;
+    margin-top: $esp-2;
+  }
+}
+
+/* ---------- Modal e Formulários ---------- */
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+}
+
+.textoInstrucao {
+  font-size: 0.92rem;
+  color: $cor-texto;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.infoCapacidade {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-3;
+  padding: $esp-3 $esp-4;
+  background: $cor-fundo;
+  border-radius: $raio-md;
+  font-size: 0.88rem;
+  color: $cor-texto;
+  border: 1px solid $cor-borda;
+
+  @include celular {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.codigo {
+  padding: $esp-5;
+  border-radius: $raio-lg;
+  background: $cor-primaria-suave;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: $esp-2;
+
+  strong {
+    display: block;
+    font-size: 2rem;
+    letter-spacing: 0.1em;
+    color: $cor-primaria;
+  }
+
+  span {
+    color: $cor-texto-suave;
+    font-size: 0.85rem;
+  }
+}
+
+.linkConvite {
+  padding: $esp-3 $esp-4;
+  background: $cor-fundo;
+  border: 1px dashed $cor-primaria;
+  border-radius: $raio-md;
+  font-size: 0.85rem;
+  color: $cor-texto;
+  word-break: break-all;
+  user-select: all;
+  margin: 0;
+}
+
+/* ---------- Modal de Integrantes ---------- */
+.conteudoIntegrantes {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+}
+
+.cabecalhoTurmaInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: $esp-3;
+  border-bottom: 1px solid $cor-borda;
+  flex-wrap: wrap;
+  gap: $esp-2;
+}
+
+.turmaBadges {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  flex-wrap: wrap;
+}
+
+.anoTexto {
+  font-size: 0.85rem;
+  color: $cor-texto-suave;
+  font-weight: 500;
+}
+
+.listaTutores {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: $esp-1;
+}
+
+.cardTutor {
+  background: $cor-fundo;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-md;
+  padding: $esp-4;
+}
+
+.topoTutor {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-3;
+  flex-wrap: wrap;
+  margin-bottom: $esp-3;
+}
+
+.dadosTutor {
+  display: flex;
+  align-items: center;
+  gap: $esp-3;
+}
+
+.avatarTutor {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: $cor-primaria-suave;
+  color: $cor-primaria;
+  flex-shrink: 0;
+}
+
+.nomeTutor {
+  display: block;
+  font-size: 0.95rem;
+  color: $cor-texto;
+}
+
+.emailTutor {
+  display: block;
+  font-size: 0.8rem;
+  color: $cor-texto-suave;
+}
+
+.acoesTutor {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+}
+
+.secaoAlunos {
+  border-top: 1px dashed $cor-borda;
+  padding-top: $esp-3;
+  margin-top: $esp-2;
+}
+
+.tituloAlunos {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: $cor-texto-suave;
+  margin: 0 0 $esp-3 0;
+}
+
+.nenhumAluno {
+  font-size: 0.82rem;
+  color: $cor-texto-suave;
+  font-style: italic;
+  margin: 0;
+}
+
+.gradeAlunos {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $esp-2;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  @include celular {
+    grid-template-columns: 1fr;
+  }
+}
+
+.itemAluno {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-2;
+  padding: $esp-2 $esp-3;
+  background: $cor-superficie;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-sm;
+}
+
+.infoAluno {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  overflow: hidden;
+}
+
+.avatarAluno {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: $cor-fundo;
+  color: $cor-primaria;
+  flex-shrink: 0;
+}
+
+.textosAluno {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  strong {
+    font-size: 0.82rem;
+    color: $cor-texto;
+    @include truncar;
+  }
+
+  span {
+    font-size: 0.72rem;
+    color: $cor-texto-suave;
+    @include truncar;
+  }
+}
+
+.rodapeIntegrantes {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: $esp-3;
+
+  @include celular {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.resumoIntegrantes {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  font-size: 0.85rem;
+  color: $cor-texto-suave;
+  font-weight: 500;
+}
+
+.acoesRodape {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+
+  @include celular {
+    flex-direction: column;
+    width: 100%;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+.vazio {
+  padding: $esp-5;
+  background: $cor-superficie;
+  border-radius: $raio-lg;
+  box-shadow: $sombra-cartao;
+}

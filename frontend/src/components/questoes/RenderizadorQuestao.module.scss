@@ -1,0 +1,131 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.containerRenderizador {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+  width: 100%;
+}
+
+/* ---------- Card de Leitura - Texto Base Compartilhado (Estilo ENEM) ---------- */
+.cardTextoBase {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+  padding: $esp-4 $esp-5;
+  background: #fbfdfc;
+  border: 1px solid #c8ded9;
+  border-left: 4px solid $cor-primaria;
+  border-radius: $raio-md;
+  box-shadow: 0 1px 3px rgba(0, 107, 112, 0.05);
+
+  @include celular {
+    padding: $esp-3 $esp-4;
+  }
+}
+
+.cabecalhoTextoBase {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: $cor-primaria;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px dashed #d5e6e2;
+  padding-bottom: $esp-2;
+}
+
+.corpoTextoBase {
+  font-size: 0.98rem;
+  line-height: 1.7;
+  color: #213538;
+  font-style: normal;
+
+  p {
+    margin-bottom: $esp-3;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  @include celular {
+    font-size: 0.92rem;
+    line-height: 1.6;
+  }
+}
+
+/* ---------- Corpo Principal do Enunciado ---------- */
+.corpoEnunciado {
+  font-size: 1.02rem;
+  line-height: 1.65;
+  color: $cor-texto;
+  word-break: break-word;
+
+  p {
+    margin-bottom: $esp-3;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  strong {
+    color: #0c181a;
+    font-weight: 700;
+  }
+
+  em {
+    font-style: italic;
+  }
+
+  code {
+    background: $cor-neutro-suave;
+    padding: 2px 6px;
+    border-radius: $raio-sm;
+    font-size: 0.88em;
+  }
+
+  @include celular {
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+}
+
+/* ---------- Imagem In-line (Substituição de [IMAGEM]) ---------- */
+.blocoImagemInline {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: $esp-3 0;
+  padding: $esp-2;
+  background: $cor-fundo;
+  border-radius: $raio-md;
+  border: 1px solid $cor-borda;
+}
+
+.imagemInline {
+  max-width: 100%;
+  max-height: 380px;
+  object-fit: contain;
+  border-radius: $raio-sm;
+  box-shadow: 0 1px 4px rgba(23, 41, 45, 0.08);
+
+  @include celular {
+    max-height: 260px;
+  }
+}
+
+.blocoImagemFallback {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: $esp-3;
+  padding: $esp-2;
+  background: $cor-fundo;
+  border-radius: $raio-md;
+  border: 1px solid $cor-borda;
+}

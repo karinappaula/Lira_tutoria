@@ -1,8 +1,11 @@
 import type { Metadata } from 'next';
-import { PaginaEmConstrucao } from '@/components/layout/PaginaEmConstrucao';
+import { CadernoErrosAluno } from './CadernoErrosAluno';
 
-export const metadata: Metadata = { title: 'Caderno de erros' };
+export const metadata: Metadata = {
+  title: 'Caderno de Erros - LIRA Tutoria',
+  description: 'Revise suas questões erradas em simulados, pratique com novos simulados de revisão e consulte resoluções comentadas.',
+};
 
-export default function Pagina() {
-  return <PaginaEmConstrucao titulo="Caderno de erros" fase="Fase F5" />;
+export default function PaginaCadernoErrosAluno() {
+  return <CadernoErrosAluno />;
 }

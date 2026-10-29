@@ -79,10 +79,32 @@
   justify-content: space-between;
   gap: $esp-3;
   margin-bottom: $esp-4;
+
+  @include celular {
+    flex-direction: column;
+    align-items: stretch;
+    gap: $esp-3;
+  }
 }
 
 .filtro {
   width: min(380px, 100%);
+
+  @include celular {
+    width: 100%;
+  }
+}
+
+.contadores {
+  display: flex;
+  align-items: center;
+  gap: $esp-3;
+  flex-wrap: wrap;
+
+  @include celular {
+    width: 100%;
+    justify-content: space-between;
+  }
 }
 
 .contagem {
@@ -121,6 +143,15 @@
   overflow-wrap: anywhere;
 }
 
+.campoLink {
+  width: 100%;
+
+  input {
+    font-family: monospace;
+    font-size: 0.88rem;
+  }
+}
+
 .detalhes {
   display: flex;
   flex-direction: column;
@@ -142,6 +173,31 @@
   }
 }
 
+.grupoAcoes {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: $esp-2;
+  flex-wrap: wrap;
+
+  @include tablet {
+    gap: $esp-1;
+  }
+
+  @include celular {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: $esp-2;
+
+    > * {
+      flex: 1 1 calc(50% - #{$esp-1});
+      min-width: 90px;
+    }
+  }
+}
+
 .botoes {
   display: flex;
   justify-content: flex-end;
@@ -155,7 +211,179 @@
   }
 }
 
+.grupoBotoesHeader {
+  display: flex;
+  align-items: center;
+  gap: $esp-3;
+  flex-wrap: wrap;
+
+  @include celular {
+    width: 100%;
+
+    > * {
+      flex: 1;
+    }
+  }
+}
+
 .dica {
   margin-bottom: $esp-4;
+  color: $cor-texto-suave;
+}
+
+.infoVagas {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-3;
+  margin: $esp-2 0;
+  padding: $esp-2 $esp-3;
+  background: $cor-fundo;
+  border-radius: $raio-sm;
+  font-size: 0.88rem;
+  font-weight: 500;
+  flex-wrap: wrap;
+
+  @include celular {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $esp-2;
+  }
+}
+
+.acoesLink {
+  display: flex;
+  gap: $esp-2;
+  align-items: center;
+  margin-top: $esp-3;
+  flex-wrap: wrap;
+
+  @include celular {
+    width: 100%;
+
+    > * {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+/* ---------- Campo de Anexo com Upload Cloudinary ---------- */
+.campoAnexo {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-2;
+  margin: $esp-2 0;
+}
+
+.rotuloAnexo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: $cor-texto;
+}
+
+.dicaAnexo {
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: $cor-texto-suave;
+}
+
+.uploadContainer {
+  position: relative;
+  width: 100%;
+}
+
+.inputArquivoOculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.botaoUpload {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $esp-3;
+  width: 100%;
+  min-height: 52px;
+  padding: $esp-3 $esp-4;
+  background: $cor-fundo;
+  border: 2px dashed $cor-borda-forte;
+  border-radius: $raio-md;
+  color: $cor-primaria;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+
+  &:hover {
+    background: $cor-primaria-suave;
+    border-color: $cor-primaria;
+  }
+
+  &:focus-within {
+    @include anel-de-foco;
+  }
+
+  @include celular {
+    font-size: 0.88rem;
+    padding: $esp-2 $esp-3;
+    text-align: center;
+  }
+}
+
+.anexoCarregado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-3;
+  padding: $esp-3 $esp-4;
+  background: $cor-fundo;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-md;
+
+  @include celular {
+    flex-direction: column;
+    align-items: stretch;
+    gap: $esp-3;
+  }
+}
+
+.infoArquivo {
+  display: flex;
+  align-items: center;
+  gap: $esp-3;
+  min-width: 0;
+}
+
+.iconeArquivo {
+  flex-shrink: 0;
+  color: $cor-primaria;
+}
+
+.detalhesArquivo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.nomeArquivo {
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: $cor-texto;
+  @include truncar;
+}
+
+.tamanhoArquivo {
+  font-size: 0.8rem;
   color: $cor-texto-suave;
 }

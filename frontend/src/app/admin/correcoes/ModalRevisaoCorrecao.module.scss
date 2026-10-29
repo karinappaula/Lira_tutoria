@@ -1,0 +1,419 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.modalRevisao {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+}
+
+/* Header & Meta */
+.cabecalhoMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: $esp-3;
+  border-bottom: 1px solid $cor-borda;
+  flex-wrap: wrap;
+  gap: $esp-3;
+}
+
+.tagsMeta {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  flex-wrap: wrap;
+}
+
+.tutorMeta {
+  font-size: 0.88rem;
+  color: $cor-texto-suave;
+
+  strong {
+    color: $cor-texto;
+  }
+}
+
+/* Alternador de Abas (Visível apenas em Mobile) */
+.abasMobile {
+  display: none;
+  background: $cor-fundo;
+  border-radius: $raio-md;
+  padding: $esp-1;
+  gap: $esp-1;
+
+  @media (max-width: 1023px) {
+    display: flex;
+  }
+}
+
+.abaBotao,
+.abaAtiva {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $esp-2;
+  padding: $esp-2 $esp-3;
+  border: 0;
+  border-radius: $raio-sm;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  background: transparent;
+  color: $cor-texto-suave;
+  transition: all 0.15s ease;
+
+  &:hover {
+    color: $cor-texto;
+  }
+}
+
+.abaAtiva {
+  background: $cor-superficie;
+  color: $cor-primaria;
+  font-weight: 700;
+  box-shadow: $sombra-cartao;
+}
+
+/* Painel Duplo (Desktop 1024px+ e Tablet) */
+.gradePaineis {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: $esp-5;
+  min-height: 480px;
+
+  @media (max-width: 1023px) {
+    display: flex;
+    flex-direction: column;
+    min-height: auto;
+  }
+}
+
+.colunaTexto,
+.colunaNotas {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+  overflow-y: auto;
+  max-height: 68vh;
+  padding-right: $esp-2;
+
+  @media (max-width: 1023px) {
+    max-height: none;
+    overflow-y: visible;
+    padding-right: 0;
+
+    &.ocultoMobile {
+      display: none;
+    }
+  }
+}
+
+/* Painel Esquerdo: Texto e Marcações */
+.cardTexto {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+  padding: $esp-4;
+  background: $cor-superficie;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-md;
+}
+
+.tituloSecao {
+  font-size: 1rem;
+  font-weight: 700;
+  color: $cor-texto;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+}
+
+.temaRedacao {
+  font-size: 0.85rem;
+  color: $cor-primaria;
+  font-weight: 600;
+  margin: 0;
+}
+
+.legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $esp-2;
+  list-style: none;
+  padding: $esp-2;
+  margin: 0;
+  background: $cor-fundo;
+  border-radius: $raio-sm;
+  font-size: 0.78rem;
+  color: $cor-texto;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+.amostraCor {
+  display: inline-block;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.areaTextoMarcado {
+  background: $cor-superficie;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-sm;
+  padding: $esp-4;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: $cor-texto;
+}
+
+.detalheMarcacao {
+  padding: $esp-3 $esp-4;
+  background: $cor-primaria-suave;
+  border-left: 4px solid $cor-primaria;
+  border-radius: $raio-sm;
+  display: flex;
+  flex-direction: column;
+  gap: $esp-2;
+  animation: surgir 0.2s ease-out;
+}
+
+.tipoMarcacao {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: $cor-primaria;
+  margin: 0;
+}
+
+.trechoMarcado {
+  font-size: 0.88rem;
+  font-style: italic;
+  color: $cor-texto;
+  margin: 0;
+}
+
+.sugestaoMarcacao {
+  font-size: 0.85rem;
+  color: $cor-texto;
+  margin: 0;
+}
+
+.dicaClique {
+  font-size: 0.8rem;
+  color: $cor-texto-suave;
+  font-style: italic;
+  margin: 0;
+}
+
+/* Painel Direito: Avaliação, Notas e Parecer */
+.cardNotaGeral {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $esp-4;
+  background: $cor-primaria-suave;
+  border-radius: $raio-md;
+  border: 1px solid rgba(0, 107, 112, 0.2);
+}
+
+.rotuloNotaGeral {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: $cor-primaria;
+  margin: 0;
+}
+
+.valorNotaGeral {
+  font-size: 2rem;
+  font-weight: 800;
+  color: $cor-primaria;
+  margin: 0;
+
+  span {
+    font-size: 1rem;
+    font-weight: 500;
+    color: $cor-texto-suave;
+  }
+}
+
+.cardRecadoAdmin {
+  padding: $esp-3 $esp-4;
+  background: $cor-alerta-suave;
+  border: 1px solid $cor-alerta;
+  border-radius: $raio-md;
+  font-size: 0.88rem;
+  color: $cor-alerta-texto;
+
+  strong {
+    display: block;
+    margin-bottom: $esp-1;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.listaCompetencias {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+}
+
+.cardCompetencia {
+  padding: $esp-3 $esp-4;
+  background: $cor-superficie;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-md;
+  display: flex;
+  flex-direction: column;
+  gap: $esp-2;
+}
+
+.topoCompetencia {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-2;
+
+  h4 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: $cor-texto;
+    margin: 0;
+  }
+
+  strong {
+    font-size: 0.95rem;
+    color: $cor-primaria;
+  }
+}
+
+.barraNivel {
+  width: 100%;
+  height: 6px;
+  background: $cor-borda;
+  border-radius: $raio-pilula;
+  overflow: hidden;
+
+  span {
+    display: block;
+    height: 100%;
+    background: $cor-primaria;
+    border-radius: $raio-pilula;
+  }
+}
+
+.descNivel {
+  font-size: 0.78rem;
+  color: $cor-texto-suave;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.comentarioCompetencia {
+  font-size: 0.82rem;
+  color: $cor-texto;
+  background: $cor-fundo;
+  padding: $esp-2 $esp-3;
+  border-radius: $raio-sm;
+  margin: 0;
+  border-left: 2px solid $cor-borda-forte;
+}
+
+.cardParecerGeral {
+  padding: $esp-3 $esp-4;
+  background: $cor-superficie;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-md;
+  display: flex;
+  flex-direction: column;
+  gap: $esp-2;
+
+  h4 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: $cor-texto;
+    margin: 0;
+  }
+
+  p {
+    font-size: 0.88rem;
+    color: $cor-texto;
+    line-height: 1.5;
+    margin: 0;
+  }
+}
+
+/* Área de Solicitação de Ajuste */
+.caixaSolicitacaoAjuste {
+  padding: $esp-4;
+  background: $cor-perigo-suave;
+  border: 1px solid $cor-perigo;
+  border-radius: $raio-md;
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+  animation: surgir 0.2s ease-out;
+}
+
+.tituloAjuste {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: $cor-perigo-texto;
+  margin: 0;
+}
+
+.instrucaoAjuste {
+  font-size: 0.85rem;
+  color: $cor-texto;
+  margin: 0;
+}
+
+/* Rodapé do Modal */
+.rodapeModal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: $esp-3;
+
+  @include celular {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.acoesPrimarias {
+  display: flex;
+  align-items: center;
+  gap: $esp-3;
+
+  @include celular {
+    flex-direction: column;
+    width: 100%;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+@keyframes surgir {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

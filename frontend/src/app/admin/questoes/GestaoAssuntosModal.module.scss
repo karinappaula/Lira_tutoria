@@ -1,0 +1,93 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.formularioNovo {
+  display: flex;
+  gap: $esp-3;
+  align-items: flex-end;
+  margin-bottom: $esp-5;
+  padding-bottom: $esp-4;
+  border-bottom: 1px solid $cor-borda;
+
+  @include celular {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.campoTexto {
+  flex: 1;
+}
+
+.listaAssuntos {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-2;
+  max-height: 380px;
+  overflow-y: auto;
+  padding-right: $esp-2;
+}
+
+.itemAssunto {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $esp-3 $esp-4;
+  background: $cor-fundo;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-md;
+  gap: $esp-3;
+
+  @include celular {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.infoAssunto {
+  display: flex;
+  align-items: center;
+  gap: $esp-3;
+  flex: 1;
+  min-width: 0;
+}
+
+.nomeAssunto {
+  font-weight: 500;
+  color: $cor-texto;
+  @include truncar;
+}
+
+.contadorQuestoes {
+  font-size: 0.8rem;
+  color: $cor-texto-suave;
+  background: $cor-superficie;
+  padding: 2px $esp-2;
+  border-radius: $raio-pilula;
+  border: 1px solid $cor-borda;
+  white-space: nowrap;
+}
+
+.acoesAssunto {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  flex-shrink: 0;
+
+  @include celular {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+.edicaoAtiva {
+  display: flex;
+  gap: $esp-2;
+  align-items: center;
+  flex: 1;
+
+  @include celular {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

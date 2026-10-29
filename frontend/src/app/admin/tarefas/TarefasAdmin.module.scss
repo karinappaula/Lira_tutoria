@@ -1,0 +1,467 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+/* ---------- Métricas Rápidas ---------- */
+.gradeMetricas {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $esp-4;
+  margin-bottom: $esp-5;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include celular {
+    grid-template-columns: 1fr;
+    gap: $esp-3;
+  }
+}
+
+.cartaoMetrica {
+  display: flex;
+  align-items: center;
+  gap: $esp-4;
+  padding: $esp-4;
+  background: $cor-superficie;
+  border-radius: $raio-lg;
+  box-shadow: $sombra-cartao;
+  border: 1px solid $cor-borda;
+}
+
+.iconeMetrica {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: $raio-md;
+  background: $cor-primaria-suave;
+  color: $cor-primaria;
+  flex-shrink: 0;
+}
+
+.textosMetrica {
+  display: flex;
+  flex-direction: column;
+}
+
+.rotuloMetrica {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: $cor-texto-suave;
+}
+
+.valorMetrica {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: $cor-texto;
+  line-height: 1.2;
+}
+
+.subMetrica {
+  font-size: 0.78rem;
+  color: $cor-texto-suave;
+  margin-top: 2px;
+}
+
+/* ---------- Barra de Ferramentas e Filtros ---------- */
+.barraFerramentas {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-4;
+  margin-bottom: $esp-5;
+  flex-wrap: wrap;
+
+  @include celular {
+    flex-direction: column;
+    align-items: stretch;
+    gap: $esp-3;
+  }
+}
+
+.grupoFiltros {
+  display: flex;
+  align-items: center;
+  gap: $esp-3;
+  flex: 1;
+  flex-wrap: wrap;
+
+  @include celular {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+}
+
+.busca {
+  flex: 1;
+  min-width: 240px;
+
+  @include celular {
+    min-width: 100%;
+  }
+}
+
+.filtroModalidade {
+  min-width: 200px;
+
+  @include celular {
+    width: 100%;
+  }
+}
+
+.contadores {
+  display: flex;
+  align-items: center;
+  gap: $esp-3;
+
+  @include celular {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+.contagem {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: $cor-texto-suave;
+}
+
+/* ---------- Célula de Título da Tarefa ---------- */
+.celulaTitulo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  strong {
+    font-size: 0.95rem;
+    color: $cor-texto;
+  }
+}
+
+.tagsTitulo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.previaDescricao {
+  font-size: 0.82rem;
+  color: $cor-texto-suave;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 440px;
+}
+
+/* ---------- Célula de Anexos ---------- */
+.celulaAnexos {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ---------- Grupo de Ações da Tabela ---------- */
+.grupoAcoes {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: $esp-2;
+  flex-wrap: wrap;
+
+  @include tablet {
+    gap: $esp-1;
+  }
+
+  @include celular {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: $esp-2;
+
+    > * {
+      flex: 1 1 calc(50% - #{$esp-1});
+      min-width: 90px;
+    }
+  }
+}
+
+/* ---------- Formulários nos Modais ---------- */
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+}
+
+.linhaDupla {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $esp-3;
+
+  @include celular {
+    grid-template-columns: 1fr;
+  }
+}
+
+.botoesModal {
+  display: flex;
+  justify-content: flex-end;
+  gap: $esp-3;
+  margin-top: $esp-2;
+
+  @include celular {
+    flex-direction: column;
+
+    > * {
+      width: 100%;
+      min-height: 48px;
+    }
+  }
+}
+
+/* ---------- Campo de Upload Cloudinary ---------- */
+.campoAnexo {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-2;
+  padding: $esp-3;
+  background: $cor-fundo;
+  border: 1px dashed $cor-borda-forte;
+  border-radius: $raio-md;
+}
+
+.rotuloAnexo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: $cor-texto;
+}
+
+.dicaAnexo {
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: $cor-texto-suave;
+}
+
+.uploadContainer {
+  position: relative;
+  width: 100%;
+}
+
+.inputArquivoOculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.botaoUpload {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $esp-2;
+  padding: $esp-3;
+  background: $cor-superficie;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-sm;
+  color: $cor-primaria;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    background: $cor-primaria-suave;
+    border-color: $cor-primaria;
+  }
+}
+
+.anexoCarregado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-3;
+  padding: $esp-3;
+  background: $cor-superficie;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-sm;
+}
+
+.infoArquivo {
+  display: flex;
+  align-items: center;
+  gap: $esp-3;
+  overflow: hidden;
+}
+
+.iconeArquivo {
+  color: $cor-primaria;
+  flex-shrink: 0;
+}
+
+.detalhesArquivo {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.nomeArquivo {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: $cor-texto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tamanhoArquivo {
+  font-size: 0.78rem;
+  color: $cor-texto-suave;
+}
+
+/* ---------- Gestão de Anexos da Tarefa ---------- */
+.secaoAnexos {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+}
+
+.listaAnexos {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-2;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.itemAnexo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-3;
+  padding: $esp-3;
+  background: $cor-fundo;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-sm;
+
+  @include celular {
+    flex-direction: column;
+    align-items: stretch;
+    gap: $esp-2;
+  }
+}
+
+.linkArquivo {
+  display: inline-flex;
+  align-items: center;
+  gap: $esp-2;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: $cor-primaria;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.vazioAnexos {
+  padding: $esp-4;
+  text-align: center;
+  font-size: 0.88rem;
+  color: $cor-texto-suave;
+  background: $cor-fundo;
+  border-radius: $raio-sm;
+}
+
+/* ---------- Detalhes da Tarefa Geral ---------- */
+.detalhesTarefa {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+}
+
+.infoGeral {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-2;
+  padding-bottom: $esp-3;
+  border-bottom: 1px solid $cor-borda;
+}
+
+.itemInfo {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  font-size: 0.88rem;
+  color: $cor-texto-suave;
+
+  strong {
+    color: $cor-texto;
+  }
+}
+
+.blocoOrientacoes {
+  background: $cor-fundo;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-md;
+  padding: $esp-4;
+
+  h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: $esp-2;
+    color: $cor-texto;
+  }
+
+  p {
+    white-space: pre-wrap;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: $cor-texto;
+    margin: 0;
+  }
+}
+
+.blocoTema {
+  padding: $esp-4;
+  background: $cor-primaria-suave;
+  border-radius: $raio-md;
+
+  h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: $cor-primaria;
+    margin-bottom: $esp-1;
+  }
+
+  strong {
+    display: block;
+    font-size: 1rem;
+    color: $cor-texto;
+    margin-bottom: $esp-2;
+  }
+
+  p {
+    white-space: pre-wrap;
+    font-size: 0.88rem;
+    color: $cor-texto;
+    margin: 0;
+  }
+}

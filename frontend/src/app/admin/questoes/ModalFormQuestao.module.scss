@@ -1,0 +1,484 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-5;
+}
+
+/* ---------- Caixa Importação Inteligente (Colar Questão) ---------- */
+.caixaImportacaoInteligente {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+  padding: $esp-4;
+  background: #fdfdfd;
+  border: 2px dashed #92bfba;
+  border-radius: $raio-lg;
+  transition: all 0.2s ease;
+
+  &:focus-within {
+    border-color: $cor-primaria;
+    background: #fbfdfd;
+  }
+}
+
+.cabecalhoImportacao {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.tituloImportacao {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: $cor-primaria;
+}
+
+.subtituloImportacao {
+  font-size: 0.82rem;
+  color: $cor-texto-suave;
+}
+
+.acoesImportacao {
+  display: flex;
+  justify-content: flex-end;
+  gap: $esp-2;
+}
+
+.secao {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+  padding: $esp-4;
+  background: $cor-fundo;
+  border-radius: $raio-md;
+  border: 1px solid $cor-borda;
+}
+
+.secaoTitulo {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: $cor-texto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-2;
+}
+
+.linhaCampos {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $esp-4;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include celular {
+    grid-template-columns: 1fr;
+    gap: $esp-3;
+  }
+}
+
+/* ---------- Upload de Imagem ---------- */
+.uploadContainer {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+}
+
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $esp-2;
+  padding: $esp-5;
+  border: 2px dashed $cor-borda-forte;
+  border-radius: $raio-md;
+  background: $cor-superficie;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+
+  &:hover {
+    border-color: $cor-primaria;
+    background: $cor-primaria-suave;
+  }
+}
+
+.textoDropzone {
+  font-size: 0.88rem;
+  color: $cor-texto-suave;
+
+  strong {
+    color: $cor-primaria;
+  }
+}
+
+.previewContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: $cor-superficie;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-md;
+  padding: $esp-3;
+  max-width: 100%;
+}
+
+.imagemPreview {
+  max-width: 100%;
+  max-height: 280px;
+  object-fit: contain;
+  border-radius: $raio-sm;
+}
+
+.barraAcoesImagem {
+  display: flex;
+  gap: $esp-3;
+  align-items: center;
+  margin-top: $esp-3;
+  width: 100%;
+  justify-content: flex-end;
+}
+
+/* ---------- Alternativas ---------- */
+.listaAlternativas {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+}
+
+.itemAlternativa {
+  display: flex;
+  align-items: flex-start;
+  gap: $esp-3;
+  padding: $esp-3;
+  background: $cor-superficie;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-md;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+
+  &.correta {
+    border-color: $cor-primaria;
+    background: $cor-primaria-suave;
+  }
+
+  @include celular {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.radioCorretaWrapper {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  cursor: pointer;
+  padding-top: $esp-2;
+  user-select: none;
+}
+
+.letraBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: $raio-pilula;
+  background: $cor-neutro-suave;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: $cor-texto;
+  flex-shrink: 0;
+
+  &.ativa {
+    background: $cor-primaria;
+    color: $cor-texto-invertido;
+  }
+}
+
+.inputAlternativaWrapper {
+  flex: 1;
+}
+
+/* ---------- Assuntos / Tags ---------- */
+.gradeTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $esp-2;
+  max-height: 180px;
+  overflow-y: auto;
+  padding: $esp-1;
+}
+
+.tagAssunto {
+  display: inline-flex;
+  align-items: center;
+  gap: $esp-1;
+  padding: 6px $esp-3;
+  border-radius: $raio-pilula;
+  border: 1px solid $cor-borda;
+  background: $cor-superficie;
+  color: $cor-texto;
+  font-size: 0.84rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    border-color: $cor-primaria;
+  }
+
+  &.selecionada {
+    background: $cor-primaria;
+    border-color: $cor-primaria;
+    color: $cor-texto-invertido;
+    font-weight: 500;
+  }
+}
+
+/* ---------- Barra de Abas (Edição vs Visualizar Formatação) ---------- */
+.barraAbas {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  border-bottom: 2px solid $cor-borda;
+  margin-bottom: $esp-4;
+  padding-bottom: $esp-2;
+
+  @include celular {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.botaoAba {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $esp-2;
+  padding: $esp-2 $esp-4;
+  border-radius: $raio-md;
+  border: 1px solid transparent;
+  background: transparent;
+  color: $cor-texto-suave;
+  font-size: 0.92rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    color: $cor-primaria;
+    background: $cor-primaria-suave;
+  }
+
+  &.abaAtiva {
+    background: $cor-primaria;
+    color: $cor-texto-invertido;
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0, 107, 112, 0.2);
+  }
+
+  @include celular {
+    width: 100%;
+    padding: $esp-3;
+  }
+}
+
+.badgeLive {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: $raio-pilula;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ---------- Painel de Live Preview ---------- */
+.painelPreview {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+  animation: deslizarFade 0.18s ease;
+}
+
+@keyframes deslizarFade {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bannerAvisoPreview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-3;
+  padding: $esp-3 $esp-4;
+  background: #fdfaf3;
+  border: 1px solid #fae2b8;
+  border-radius: $raio-md;
+
+  @include celular {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.bannerAvisoTexto {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  font-size: 0.85rem;
+  color: #634300;
+  line-height: 1.45;
+}
+
+.cardSimuladoPreview {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+  padding: $esp-5;
+  background: $cor-superficie;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-lg;
+  box-shadow: $sombra-cartao;
+
+  @include celular {
+    padding: $esp-4;
+  }
+}
+
+.topoSimuladoPreview {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: $esp-3;
+  border-bottom: 1px solid $cor-borda;
+  padding-bottom: $esp-3;
+}
+
+.identificacaoPreview {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  flex-wrap: wrap;
+}
+
+.tagsPreview {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tagAssuntoItem {
+  font-size: 0.78rem;
+  background: #eaf0ef;
+  padding: 2px 8px;
+  border-radius: $raio-pilula;
+  color: #17292d;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.gradeAlternativasPreview {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-2;
+}
+
+.itemAlternativaPreview {
+  display: flex;
+  align-items: flex-start;
+  gap: $esp-3;
+  padding: $esp-3 $esp-4;
+  background: $cor-superficie;
+  border: 1.5px solid $cor-borda;
+  border-radius: $raio-md;
+  transition: all 0.15s ease;
+
+  &.alternativaGabarito {
+    border-color: $cor-primaria;
+    background: #f2faf8;
+  }
+}
+
+.letraCirculoPreview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: $raio-pilula;
+  background: $cor-neutro-suave;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: $cor-texto;
+  flex-shrink: 0;
+
+  .itemAlternativaPreview.alternativaGabarito & {
+    background: $cor-primaria;
+    color: $cor-texto-invertido;
+  }
+}
+
+.textoAlternativaPreview {
+  flex: 1;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: $cor-texto;
+  padding-top: 2px;
+}
+
+.blocoResolucaoPreview {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-2;
+  padding: $esp-4;
+  background: #fdfdfd;
+  border: 1px dashed $cor-primaria;
+  border-radius: $raio-md;
+
+  p {
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: #213538;
+    white-space: pre-wrap;
+  }
+}
+
+.cabecalhoResolucaoPreview {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: $cor-primaria;
+}
+
+.avisoCamposVazios {
+  text-align: center;
+  padding: $esp-5;
+  color: $cor-texto-suave;
+  font-size: 0.9rem;
+}

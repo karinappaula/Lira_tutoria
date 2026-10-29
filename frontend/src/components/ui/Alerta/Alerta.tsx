@@ -1,11 +1,11 @@
 import type { ReactNode } from 'react';
-import { AlertCircle, CheckCircle2, Info } from 'lucide-react';
+import { AlertCircle, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
 import { cx } from '@/lib/cx';
 import styles from './Alerta.module.scss';
 
-type Tom = 'erro' | 'sucesso' | 'info';
+type Tom = 'erro' | 'sucesso' | 'info' | 'alerta';
 
-const ICONES = { erro: AlertCircle, sucesso: CheckCircle2, info: Info };
+const ICONES = { erro: AlertCircle, sucesso: CheckCircle2, info: Info, alerta: AlertTriangle };
 
 /** Aviso dentro da página/formulário (diferente do Toast, que é temporário). */
 export function Alerta({ tom = 'info', children }: { tom?: Tom; children: ReactNode }) {

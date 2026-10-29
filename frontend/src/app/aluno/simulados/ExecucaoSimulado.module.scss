@@ -1,0 +1,320 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.execucaoWrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 80px);
+  gap: $esp-4;
+  padding-bottom: $esp-7;
+}
+
+/* ---------- Barra Superior Fixa ---------- */
+.barraSuperior {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $esp-3 $esp-5;
+  background: $cor-superficie;
+  border-bottom: 2px solid $cor-borda;
+  box-shadow: 0 4px 12px rgba(23, 41, 45, 0.06);
+  border-radius: $raio-lg;
+  gap: $esp-4;
+
+  @include tablet {
+    flex-wrap: wrap;
+    gap: $esp-3;
+    padding: $esp-3 $esp-4;
+  }
+
+  @include celular {
+    flex-direction: column;
+    align-items: stretch;
+    padding: $esp-3;
+  }
+}
+
+.blocoIdentificacao {
+  display: flex;
+  align-items: center;
+  gap: $esp-3;
+}
+
+.tituloSimulado {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: $cor-texto;
+}
+
+.blocoCronometro {
+  display: flex;
+  align-items: center;
+  gap: $esp-3;
+}
+
+.displayTempo {
+  display: inline-flex;
+  align-items: center;
+  gap: $esp-2;
+  font-family: monospace, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: $cor-primaria;
+  background: $cor-primaria-suave;
+  padding: 6px $esp-3;
+  border-radius: $raio-md;
+  border: 1px solid rgba(0, 107, 112, 0.2);
+
+  &.pausado {
+    color: $cor-alerta-texto;
+    background: $cor-alerta-suave;
+    border-color: rgba(246, 164, 0, 0.3);
+  }
+}
+
+.blocoProgresso {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-1;
+  min-width: 180px;
+
+  @include celular {
+    min-width: 100%;
+  }
+}
+
+.textoProgresso {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: $cor-texto;
+}
+
+.trilhoProgresso {
+  height: 6px;
+  background: $cor-neutro-suave;
+  border-radius: $raio-pilula;
+  overflow: hidden;
+}
+
+.barraProgresso {
+  height: 100%;
+  background: $cor-primaria;
+  border-radius: $raio-pilula;
+  transition: width 0.25s ease;
+}
+
+.acoesBarraSuperior {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+
+  @include celular {
+    justify-content: space-between;
+  }
+}
+
+/* ---------- Navegador de Questões (Pills) ---------- */
+.navegadorPills {
+  display: flex;
+  gap: $esp-2;
+  overflow-x: auto;
+  padding: $esp-2 0;
+  scrollbar-width: thin;
+}
+
+.pillQuestao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: $raio-md;
+  background: $cor-superficie;
+  border: 1px solid $cor-borda;
+  color: $cor-texto;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+
+  &:hover {
+    border-color: $cor-primaria;
+  }
+
+  &.respondida {
+    background: $cor-primaria-suave;
+    border-color: $cor-primaria;
+    color: $cor-primaria;
+  }
+
+  &.atual {
+    background: $cor-primaria;
+    border-color: $cor-primaria;
+    color: $cor-texto-invertido;
+    box-shadow: 0 0 0 2px rgba(0, 107, 112, 0.35);
+  }
+}
+
+/* ---------- Cartão Central da Questão ---------- */
+.cartaoQuestao {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+  padding: $esp-6;
+  background: $cor-superficie;
+  border-radius: $raio-lg;
+  border: 1px solid $cor-borda;
+  box-shadow: $sombra-cartao;
+
+  @include tablet {
+    padding: $esp-4;
+  }
+
+  @include celular {
+    padding: $esp-3;
+  }
+}
+
+.cabecalhoQuestao {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: $esp-2;
+  padding-bottom: $esp-3;
+  border-bottom: 1px solid $cor-borda;
+}
+
+.metadadosQuestao {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  flex-wrap: wrap;
+}
+
+.statusSalvando {
+  font-size: 0.8rem;
+  color: $cor-texto-suave;
+  display: flex;
+  align-items: center;
+  gap: $esp-1;
+}
+
+.enunciado {
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: $cor-texto;
+  white-space: pre-wrap;
+  word-break: break-word;
+
+  @include celular {
+    font-size: 0.96rem;
+  }
+}
+
+.imagemApoioContainer {
+  display: flex;
+  justify-content: center;
+  background: $cor-fundo;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-md;
+  padding: $esp-3;
+}
+
+.imagemApoio {
+  max-width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  border-radius: $raio-sm;
+}
+
+/* ---------- Alternativas ---------- */
+.gradeAlternativas {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+  margin-top: $esp-2;
+}
+
+.botaoAlternativa {
+  display: flex;
+  align-items: flex-start;
+  gap: $esp-4;
+  padding: $esp-4;
+  background: $cor-fundo;
+  border: 2px solid $cor-borda;
+  border-radius: $raio-md;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+  user-select: none;
+
+  &:hover {
+    border-color: $cor-borda-forte;
+    background: #eef5f4;
+  }
+
+  &.selecionada {
+    border-color: $cor-primaria;
+    background: $cor-primaria-suave;
+  }
+
+  @include celular {
+    gap: $esp-3;
+    padding: $esp-3;
+  }
+}
+
+.letraCirculo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: $raio-pilula;
+  background: $cor-superficie;
+  border: 1px solid $cor-borda-forte;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: $cor-texto;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+
+  .botaoAlternativa.selecionada & {
+    background: $cor-primaria;
+    border-color: $cor-primaria;
+    color: $cor-texto-invertido;
+  }
+}
+
+.textoAlternativa {
+  font-size: 0.98rem;
+  line-height: 1.5;
+  color: $cor-texto;
+  flex: 1;
+  padding-top: 4px;
+
+  @include celular {
+    font-size: 0.92rem;
+  }
+}
+
+/* ---------- Barra Inferior de Navegação ---------- */
+.barraInferiorNavegacao {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $esp-3;
+  padding: $esp-3 0;
+
+  @include celular {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+}

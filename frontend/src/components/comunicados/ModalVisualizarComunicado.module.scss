@@ -1,0 +1,86 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+}
+
+.cabecalhoDetalhes {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: $esp-3;
+  padding-bottom: $esp-3;
+  border-bottom: 1px solid $cor-borda;
+
+  @include celular {
+    flex-direction: column;
+  }
+}
+
+.identificacao {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.remetente {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: $cor-texto;
+}
+
+.data {
+  font-size: 0.82rem;
+  color: $cor-texto-suave;
+}
+
+.iconeBadge {
+  margin-right: $esp-1;
+  vertical-align: text-bottom;
+}
+
+.blocoLeituras {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-2;
+  padding: $esp-3 $esp-4;
+  background: $cor-primaria-suave;
+  border-radius: $raio-md;
+}
+
+.topoLeituras {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: $cor-primaria;
+}
+
+.trilhaLeitura {
+  width: 100%;
+  height: 8px;
+  background: #c2dcd6;
+  border-radius: $raio-pilula;
+  overflow: hidden;
+}
+
+.preenchimentoLeitura {
+  height: 100%;
+  width: var(--largura, 0%);
+  background: $cor-primaria;
+  border-radius: $raio-pilula;
+  transition: width 0.3s ease;
+}
+
+.corpoMensagem {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #17292d;
+  white-space: pre-wrap;
+  margin: 0;
+  padding: $esp-2 0;
+}

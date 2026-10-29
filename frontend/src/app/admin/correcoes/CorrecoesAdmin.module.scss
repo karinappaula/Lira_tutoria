@@ -1,0 +1,207 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+/* ---------- Métricas da Fila ---------- */
+.gradeMetricas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $esp-4;
+  margin-bottom: $esp-5;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include celular {
+    grid-template-columns: 1fr;
+    gap: $esp-3;
+  }
+}
+
+.cartaoMetrica {
+  display: flex;
+  align-items: center;
+  gap: $esp-4;
+  padding: $esp-4;
+  background: $cor-superficie;
+  border-radius: $raio-lg;
+  box-shadow: $sombra-cartao;
+  border: 1px solid $cor-borda;
+}
+
+.iconeMetricaAlerta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: $raio-md;
+  background: $cor-alerta-suave;
+  color: $cor-alerta-texto;
+  flex-shrink: 0;
+}
+
+.iconeMetricaPrimaria {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: $raio-md;
+  background: $cor-primaria-suave;
+  color: $cor-primaria;
+  flex-shrink: 0;
+}
+
+.textosMetrica {
+  display: flex;
+  flex-direction: column;
+}
+
+.rotuloMetrica {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: $cor-texto-suave;
+}
+
+.valorMetrica {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: $cor-texto;
+  line-height: 1.2;
+}
+
+.subMetrica {
+  font-size: 0.78rem;
+  color: $cor-texto-suave;
+  margin-top: 2px;
+}
+
+/* ---------- Barra de Ferramentas e Filtros ---------- */
+.barraFerramentas {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-4;
+  margin-bottom: $esp-5;
+  flex-wrap: wrap;
+
+  @include celular {
+    flex-direction: column;
+    align-items: stretch;
+    gap: $esp-3;
+  }
+}
+
+.grupoFiltros {
+  display: flex;
+  align-items: center;
+  gap: $esp-3;
+  flex: 1;
+  flex-wrap: wrap;
+
+  @include celular {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+}
+
+.busca {
+  flex: 1;
+  min-width: 240px;
+  max-width: 380px;
+
+  @include celular {
+    max-width: 100%;
+    min-width: 100%;
+  }
+}
+
+.seletorFiltro {
+  min-width: 200px;
+
+  @include celular {
+    min-width: 100%;
+  }
+}
+
+.contagem {
+  font-size: 0.88rem;
+  color: $cor-texto-suave;
+  white-space: nowrap;
+}
+
+/* ---------- Células da Tabela ---------- */
+.colunaAluno {
+  display: flex;
+  flex-direction: column;
+}
+
+.nomeAluno {
+  color: $cor-texto;
+  font-size: 0.95rem;
+}
+
+.emailAluno {
+  font-size: 0.78rem;
+  color: $cor-texto-suave;
+}
+
+.colunaTema {
+  display: flex;
+  flex-direction: column;
+  max-width: 280px;
+}
+
+.tituloTema {
+  color: $cor-texto;
+  font-size: 0.9rem;
+  @include truncar;
+}
+
+.versaoTema {
+  font-size: 0.78rem;
+  color: $cor-texto-suave;
+}
+
+.notaLinha {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: $cor-primaria;
+
+  span {
+    font-size: 0.8rem;
+    color: $cor-texto-suave;
+    font-weight: normal;
+  }
+}
+
+.dataLinha {
+  font-size: 0.88rem;
+  color: $cor-texto-suave;
+  white-space: nowrap;
+}
+
+.acoesLinha {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  @include celular {
+    justify-content: flex-start;
+    width: 100%;
+    margin-top: $esp-2;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+.vazio {
+  padding: $esp-5;
+  background: $cor-superficie;
+  border-radius: $raio-lg;
+  box-shadow: $sombra-cartao;
+}

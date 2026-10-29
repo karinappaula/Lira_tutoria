@@ -62,6 +62,7 @@
 .atalhos {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: $esp-2;
 }
 
@@ -70,6 +71,75 @@
 
   @include tablet {
     display: inline-flex;
+  }
+}
+
+.atalhoAnexo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 4px 10px;
+  background: $cor-fundo;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-sm;
+  color: $cor-primaria;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+
+  &:hover {
+    background: $cor-primaria-suave;
+    border-color: $cor-primaria;
+  }
+
+  &:focus-visible {
+    @include anel-de-foco;
+  }
+}
+
+.barraAnexoMobile {
+  display: none;
+  margin-bottom: $esp-3;
+
+  @include tablet {
+    display: block;
+  }
+}
+
+.botaoVisualizarAnexoTopo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $esp-2;
+  width: 100%;
+  min-height: 44px;
+  padding: $esp-2 $esp-3;
+  background: $cor-primaria-suave;
+  color: $cor-primaria;
+  border: 1px solid $cor-borda-forte;
+  border-radius: $raio-sm;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+
+  &:hover {
+    background: $cor-primaria;
+    color: $cor-texto-invertido;
+    border-color: $cor-primaria;
+  }
+
+  &:focus-visible {
+    @include anel-de-foco;
+  }
+
+  @include celular {
+    font-size: 0.84rem;
+    padding: $esp-2;
   }
 }
 

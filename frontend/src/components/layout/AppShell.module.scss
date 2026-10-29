@@ -75,6 +75,50 @@
   flex-shrink: 0;
 }
 
+.botaoSino {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: $raio-md;
+  background: $cor-superficie;
+  border: 1px solid $cor-borda;
+  color: $cor-texto;
+  text-decoration: none;
+  transition: all 0.15s ease;
+
+  &:hover {
+    border-color: $cor-primaria;
+    color: $cor-primaria;
+    background: $cor-primaria-suave;
+  }
+
+  &:focus-visible {
+    @include anel-de-foco;
+  }
+}
+
+.badgeSino {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding-inline: 4px;
+  border-radius: $raio-pilula;
+  background: $cor-perigo;
+  color: $cor-texto-invertido;
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  box-shadow: 0 0 0 2px $cor-superficie;
+}
+
 /* ---------- Navegação ---------- */
 .nav {
   position: relative;
@@ -123,44 +167,40 @@
     display: none;
   }
 }
+
 .aba {
   display: inline-flex;
   align-items: center;
   gap: $esp-2;
-  padding: 10px 16px;
-  border-radius: $raio-sm;
+  padding: $esp-2 $esp-4;
+  border-radius: $raio-md;
   color: $cor-texto;
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 500;
   text-decoration: none;
   white-space: nowrap;
-  transition: background-color 0.15s, color 0.15s;
+  transition: all 0.15s ease;
 
   &:hover {
     background: $cor-primaria-suave;
+    color: $cor-primaria;
   }
+
+  @include anel-de-foco;
 }
 
-.navAdmin .aba {
-  background: $cor-superficie;
-
-  &:hover {
-    background: $cor-primaria-suave;
-  }
-}
-
-.abaAtiva,
-.navAdmin .abaAtiva {
-  background: $cor-primaria;
-  color: $cor-texto-invertido;
-
-  &:hover {
-    background: $cor-primaria-hover;
-  }
+.abaAtiva {
+  background: $cor-primaria-suave;
+  color: $cor-primaria;
+  font-weight: 600;
 }
 
 /* ---------- Conteúdo ---------- */
 .principal {
   @include container-pagina;
-  padding-block: $esp-6 $esp-8;
+  padding-block: $esp-6;
+
+  @include celular {
+    padding-block: $esp-4;
+  }
 }

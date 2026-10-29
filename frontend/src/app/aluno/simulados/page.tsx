@@ -1,8 +1,11 @@
 import type { Metadata } from 'next';
-import { PaginaEmConstrucao } from '@/components/layout/PaginaEmConstrucao';
+import { SimuladosAluno } from './SimuladosAluno';
 
-export const metadata: Metadata = { title: 'Simulados' };
+export const metadata: Metadata = {
+  title: 'Simulados - LIRA Tutoria',
+  description: 'Gere simulados cronometrados, pratique com questões de vestibulares e veja seus gabaritos comentados.',
+};
 
-export default function Pagina() {
-  return <PaginaEmConstrucao titulo="Simulados" fase="Fase F5" />;
+export default function PaginaSimuladosAluno() {
+  return <SimuladosAluno />;
 }

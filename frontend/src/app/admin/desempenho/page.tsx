@@ -1,8 +1,11 @@
 import type { Metadata } from 'next';
-import { PaginaEmConstrucao } from '@/components/layout/PaginaEmConstrucao';
+import { DesempenhoAdmin } from './DesempenhoAdmin';
 
-export const metadata: Metadata = { title: 'Desempenho por Turma' };
+export const metadata: Metadata = {
+  title: 'Desempenho por Turma e Tutor - LIRA Tutoria',
+  description: 'Painel analítico e indicadores consolidados de turmas, competências e tutores.',
+};
 
-export default function Pagina() {
-  return <PaginaEmConstrucao titulo="Desempenho por Turma" fase="Fase F6" />;
+export default function PaginaDesempenhoAdmin() {
+  return <DesempenhoAdmin />;
 }

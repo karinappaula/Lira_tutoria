@@ -1,0 +1,474 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.gradeMetricas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $esp-4;
+  margin-bottom: $esp-5;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include celular {
+    grid-template-columns: 1fr;
+    gap: $esp-3;
+  }
+}
+
+.cartaoMetrica {
+  display: flex;
+  align-items: center;
+  gap: $esp-4;
+  padding: $esp-4;
+  background: $cor-superficie;
+  border-radius: $raio-lg;
+  box-shadow: $sombra-cartao;
+  border: 1px solid $cor-borda;
+}
+
+.iconeMetrica {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: $raio-md;
+  background: $cor-perigo-suave;
+  color: $cor-perigo-texto;
+  flex-shrink: 0;
+
+  &.alerta {
+    background: #fff3c9;
+    color: #8a5a00;
+  }
+
+  &.primaria {
+    background: #e5f3f1;
+    color: #006b70;
+  }
+}
+
+.textosMetrica {
+  display: flex;
+  flex-direction: column;
+}
+
+.rotuloMetrica {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: $cor-texto-suave;
+}
+
+.valorMetrica {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: $cor-texto;
+  line-height: 1.2;
+}
+
+/* ---------- Banner Pedagógico ---------- */
+.bannerPedagogico {
+  display: flex;
+  align-items: flex-start;
+  gap: $esp-3;
+  padding: $esp-4;
+  background: #fdfaf3;
+  border: 1px solid #fae2b8;
+  border-radius: $raio-lg;
+  margin-bottom: $esp-5;
+
+  svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: #f6a400;
+  }
+
+  p {
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: #634300;
+    margin: 0;
+  }
+}
+
+/* ---------- Barra de Ferramentas / Filtros ---------- */
+.barraFiltros {
+  display: flex;
+  gap: $esp-3;
+  align-items: center;
+  padding: $esp-4;
+  background: $cor-superficie;
+  border-radius: $raio-lg;
+  border: 1px solid $cor-borda;
+  box-shadow: $sombra-cartao;
+  margin-bottom: $esp-5;
+
+  @include celular {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.buscaTexto {
+  flex: 1;
+}
+
+.filtroAssunto {
+  min-width: 240px;
+
+  @include celular {
+    min-width: 100%;
+  }
+}
+
+/* ---------- Barra de Ações em Massa ---------- */
+.barraMassa {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $esp-3 $esp-4;
+  background: $cor-superficie;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-md;
+  margin-bottom: $esp-4;
+  gap: $esp-3;
+
+  @include celular {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.contadorSelecao {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: $cor-texto;
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+
+  label {
+    cursor: pointer;
+  }
+}
+
+.botoesMassa {
+  display: flex;
+  gap: $esp-2;
+  align-items: center;
+
+  @include celular {
+    flex-direction: column;
+  }
+}
+
+/* ---------- Lista de Itens do Caderno de Erros ---------- */
+.listaErros {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-5;
+}
+
+.cardErro {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+  padding: $esp-5;
+  background: $cor-superficie;
+  border: 1px solid $cor-borda;
+  border-left: 5px solid $cor-perigo;
+  border-radius: $raio-lg;
+  box-shadow: $sombra-cartao;
+  transition: all 0.15s ease;
+
+  &.selecionado {
+    border-color: $cor-primaria;
+    border-left-color: $cor-primaria;
+    background: #fbfdfd;
+  }
+
+  @include celular {
+    padding: $esp-4;
+  }
+}
+
+.topoCardErro {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: $esp-3;
+
+  @include celular {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.identificacaoQuestao {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  flex-wrap: wrap;
+}
+
+.listaAssuntosTag {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tagAssunto {
+  font-size: 0.78rem;
+  background: #eaf0ef;
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: #17292d;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.checkboxSelecao {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: $cor-primaria;
+}
+
+/* ---------- Seção de Refazer Questão Diretamente no Caderno ---------- */
+.secaoRefazerPratica {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+  padding: $esp-4;
+  background: $cor-fundo;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-md;
+}
+
+.tituloRefazer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-2;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: $cor-texto;
+}
+
+.gradeAlternativasPratica {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-2;
+}
+
+.itemOpcaoPratica {
+  display: flex;
+  align-items: flex-start;
+  gap: $esp-3;
+  padding: $esp-3;
+  background: $cor-superficie;
+  border: 2px solid $cor-borda;
+  border-radius: $raio-md;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+
+  &:hover:not(:disabled) {
+    border-color: $cor-primaria;
+    background: $cor-primaria-suave;
+  }
+
+  &.selecionada {
+    border-color: $cor-primaria;
+    background: $cor-primaria-suave;
+  }
+
+  &.corretaConfirmada {
+    border-color: $cor-primaria;
+    background: #e5f3f1;
+    color: #005a5e;
+  }
+
+  &.incorretaConfirmada {
+    border-color: $cor-perigo;
+    background: $cor-perigo-suave;
+    color: $cor-perigo-texto;
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+.letraCirculoPratica {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: $raio-pilula;
+  background: $cor-neutro-suave;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: $cor-texto;
+  flex-shrink: 0;
+
+  .itemOpcaoPratica.selecionada & {
+    background: $cor-primaria;
+    color: $cor-texto-invertido;
+  }
+
+  .itemOpcaoPratica.corretaConfirmada & {
+    background: $cor-primaria;
+    color: $cor-texto-invertido;
+  }
+
+  .itemOpcaoPratica.incorretaConfirmada & {
+    background: $cor-perigo;
+    color: $cor-texto-invertido;
+  }
+}
+
+.textoOpcaoPratica {
+  flex: 1;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  padding-top: 3px;
+}
+
+.barraConfirmacaoPratica {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-3;
+  margin-top: $esp-2;
+  flex-wrap: wrap;
+}
+
+.bannerResultadoPratica {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  padding: $esp-2 $esp-3;
+  border-radius: $raio-sm;
+  font-size: 0.88rem;
+  font-weight: 600;
+
+  &.acertou {
+    background: $cor-primaria-suave;
+    color: $cor-primaria;
+  }
+
+  &.errou {
+    background: $cor-perigo-suave;
+    color: $cor-perigo-texto;
+  }
+}
+
+/* ---------- Painel Retrátil (Accordion) de Gabarito e Resolução ---------- */
+.painelAccordionGabarito {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+  border-top: 1px dashed $cor-borda-forte;
+  padding-top: $esp-3;
+}
+
+.corpoAccordion {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+  padding: $esp-4;
+  background: #fbfdfc;
+  border: 1px solid #c2dcd6;
+  border-radius: $raio-md;
+  animation: deslizarAbaixo 0.2s ease;
+}
+
+@keyframes deslizarAbaixo {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.blocoGabaritoOficial {
+  display: flex;
+  align-items: center;
+  gap: $esp-3;
+  padding-bottom: $esp-3;
+  border-bottom: 1px solid $cor-borda;
+}
+
+.rotuloGabaritoOficial {
+  font-size: 0.94rem;
+  color: #17292d;
+}
+
+.iconeGabaritoOficial {
+  margin-right: 4px;
+  vertical-align: text-bottom;
+}
+
+.blocoExplicacaoComentada {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-2;
+
+  strong {
+    font-size: 0.9rem;
+    color: $cor-primaria;
+  }
+
+  p {
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: #17292d;
+    white-space: pre-wrap;
+    margin: 0;
+  }
+}
+
+.textoSemExplicacao {
+  font-size: 0.86rem;
+  color: $cor-texto-suave;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ---------- Rodapé do Card ---------- */
+.rodapeCardErro {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid $cor-borda;
+  padding-top: $esp-3;
+  gap: $esp-3;
+
+  @include celular {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.infoDataErro {
+  font-size: 0.82rem;
+  color: $cor-texto-suave;
+}
+
+.acoesCardErro {
+  display: flex;
+  gap: $esp-2;
+  align-items: center;
+
+  @include celular {
+    justify-content: flex-end;
+  }
+}

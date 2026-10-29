@@ -1,0 +1,240 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-5;
+}
+
+/* ---------- Grade de Estatísticas ---------- */
+.gradeStats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $esp-3;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include celular {
+    grid-template-columns: 1fr;
+    gap: $esp-2;
+  }
+}
+
+.cartaoStat {
+  display: flex;
+  flex-direction: column;
+  padding: $esp-4;
+  border-radius: $raio-md;
+  background: $cor-fundo;
+  border: 1px solid $cor-borda;
+  text-align: center;
+  gap: $esp-1;
+
+  &.sucesso {
+    background: $cor-primaria-suave;
+    border-color: $cor-primaria;
+  }
+
+  &.alerta {
+    background: $cor-alerta-suave;
+    border-color: $cor-alerta;
+  }
+
+  &.perigo {
+    background: $cor-perigo-suave;
+    border-color: $cor-perigo;
+  }
+}
+
+.valorStat {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: $cor-texto;
+  line-height: 1.1;
+}
+
+.rotuloStat {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: $cor-texto-suave;
+}
+
+/* ---------- Desempenho por Assunto ---------- */
+.secao {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+  padding: $esp-4;
+  background: $cor-superficie;
+  border-radius: $raio-md;
+  border: 1px solid $cor-borda;
+}
+
+.secaoTitulo {
+  font-size: 1rem;
+  font-weight: 600;
+  color: $cor-texto;
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+}
+
+.gradeAssuntos {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-2;
+}
+
+.itemAssunto {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-1;
+  padding: $esp-2 $esp-3;
+  background: $cor-fundo;
+  border-radius: $raio-sm;
+}
+
+.linhaTopoAssunto {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: $cor-texto;
+}
+
+.barraTrilho {
+  height: 8px;
+  background: $cor-borda;
+  border-radius: $raio-pilula;
+  overflow: hidden;
+}
+
+.barraPreenchimento {
+  height: 100%;
+  background: $cor-primaria;
+  border-radius: $raio-pilula;
+  transition: width 0.3s ease;
+
+  &.baixo {
+    background: $cor-perigo;
+  }
+  &.medio {
+    background: $cor-alerta;
+  }
+}
+
+/* ---------- Gabarito Questão por Questão ---------- */
+.listaQuestoesGabarito {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+  max-height: 480px;
+  overflow-y: auto;
+  padding-right: $esp-2;
+}
+
+.cardQuestaoGabarito {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+  padding: $esp-4;
+  border-radius: $raio-md;
+  background: $cor-fundo;
+  border: 1px solid $cor-borda;
+
+  &.acertou {
+    border-left: 4px solid $cor-primaria;
+  }
+
+  &.errou {
+    border-left: 4px solid $cor-perigo;
+  }
+
+  &.emBranco {
+    border-left: 4px solid $cor-texto-suave;
+  }
+}
+
+.topoQuestaoGabarito {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: $esp-2;
+}
+
+.enunciado {
+  font-size: 0.94rem;
+  line-height: 1.5;
+  color: $cor-texto;
+  white-space: pre-wrap;
+}
+
+.imagemQuestao {
+  max-width: 100%;
+  max-height: 250px;
+  object-fit: contain;
+  border-radius: $raio-sm;
+}
+
+.listaAlternativasGabarito {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-2;
+}
+
+.itemAltGabarito {
+  display: flex;
+  align-items: flex-start;
+  gap: $esp-3;
+  padding: $esp-2 $esp-3;
+  border-radius: $raio-sm;
+  background: $cor-superficie;
+  border: 1px solid $cor-borda;
+  font-size: 0.88rem;
+
+  &.correta {
+    border-color: $cor-primaria;
+    background: $cor-primaria-suave;
+    color: $cor-primaria;
+    font-weight: 500;
+  }
+
+  &.marcadaIncorreta {
+    border-color: $cor-perigo;
+    background: $cor-perigo-suave;
+    color: $cor-perigo-texto;
+  }
+}
+
+.letraAlt {
+  font-weight: 700;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $raio-pilula;
+  background: $cor-neutro-suave;
+  flex-shrink: 0;
+}
+
+.caixaExplicacao {
+  margin-top: $esp-2;
+  padding: $esp-3;
+  background: $cor-superficie;
+  border-radius: $raio-sm;
+  border: 1px dashed $cor-borda-forte;
+  font-size: 0.88rem;
+  line-height: 1.5;
+
+  strong {
+    color: $cor-primaria;
+    display: block;
+    margin-bottom: $esp-1;
+  }
+}

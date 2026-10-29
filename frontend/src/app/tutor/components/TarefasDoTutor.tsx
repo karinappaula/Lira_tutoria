@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Paperclip, Plus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { BookOpen, Calendar, Eye, Paperclip, Plus, Trash2 } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Badge } from '@/components/ui/Badge/Badge';
 import { Button } from '@/components/ui/Button/Button';
@@ -22,6 +23,7 @@ import styles from './Tutor.module.scss';
 type Janela = { tipo: 'nova' } | { tipo: 'detalhes' | 'prazo' | 'remover' | 'aplicar'; tarefa: TarefaDoTutor } | null;
 
 export function TarefasDoTutor() {
+  const router = useRouter();
   const toast = useToast();
   const { dados, carregando, erro, recarregar } = useBuscar((signal) => tutorService.tarefas(signal));
   const [janela, setJanela] = useState<Janela>(null);
@@ -80,16 +82,31 @@ export function TarefasDoTutor() {
       alinhamento: 'direita',
       noCartao: 'acoes',
       celula: (t) => (
-        <div>
-          <button type="button" className={styles.acaoLink} onClick={() => setJanela({ tipo: 'detalhes', tarefa: t })}>
+        <div className={styles.grupoAcoes}>
+          <Button
+            variante="secundario"
+            tamanho="sm"
+            icone={<Eye size={15} aria-hidden="true" />}
+            onClick={() => setJanela({ tipo: 'detalhes', tarefa: t })}
+          >
             Detalhes
-          </button>
-          <button type="button" className={styles.acaoNeutra} onClick={() => setJanela({ tipo: 'prazo', tarefa: t })}>
+          </Button>
+          <Button
+            variante="secundario"
+            tamanho="sm"
+            icone={<Calendar size={15} aria-hidden="true" />}
+            onClick={() => setJanela({ tipo: 'prazo', tarefa: t })}
+          >
             Editar prazo
-          </button>
-          <button type="button" className={styles.acaoPerigo} onClick={() => setJanela({ tipo: 'remover', tarefa: t })}>
+          </Button>
+          <Button
+            variante="perigo"
+            tamanho="sm"
+            icone={<Trash2 size={15} aria-hidden="true" />}
+            onClick={() => setJanela({ tipo: 'remover', tarefa: t })}
+          >
             Remover
-          </button>
+          </Button>
         </div>
       ),
     },
@@ -117,9 +134,18 @@ export function TarefasDoTutor() {
         titulo="Tarefas"
         descricao="Gerencie as tarefas de redação e acompanhe as entregas."
         acao={
-          <Button icone={<Plus size={18} aria-hidden="true" />} onClick={() => setJanela({ tipo: 'nova' })}>
-            Nova tarefa
-          </Button>
+          <div className={styles.grupoBotoesHeader}>
+            <Button
+              variante="secundario"
+              icone={<BookOpen size={18} aria-hidden="true" />}
+              onClick={() => router.push('/tutor/temas')}
+            >
+              Banco de temas
+            </Button>
+            <Button icone={<Plus size={18} aria-hidden="true" />} onClick={() => setJanela({ tipo: 'nova' })}>
+              Nova tarefa
+            </Button>
+          </div>
         }
       />
 

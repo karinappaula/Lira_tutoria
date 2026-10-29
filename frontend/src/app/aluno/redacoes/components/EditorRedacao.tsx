@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import { BookOpen, Check, CloudOff, History, Loader2, Send, Trash2 } from 'lucide-react';
+import { BookOpen, Check, CloudOff, ExternalLink, FileText, History, Loader2, Paperclip, Send, Trash2 } from 'lucide-react';
 import { Alerta } from '@/components/ui/Alerta/Alerta';
 import { Button } from '@/components/ui/Button/Button';
 import { Textarea } from '@/components/ui/Campos/Campos';
@@ -10,7 +10,7 @@ import { Modal } from '@/components/ui/Modal/Modal';
 import { useToast } from '@/components/ui/Toast/Toast';
 import { useAutosave } from '@/hooks/useAutosave';
 import { ApiError, mensagemDeErro } from '@/lib/erros';
-import { contarPalavras, formatarHora, podeExcluir, prazoEncerrado, ultimaVersao } from '@/lib/redacoes';
+import { contarPalavras, formatarHora, podeExcluir, prazoEncerrado, ultimaVersao, urlSegura } from '@/lib/redacoes';
 import { redacoesService } from '@/services/redacoes';
 import type { RedacaoDetalhada } from '@/types/correcoes';
 import { ultimaCorrecao } from '@/lib/correcoes';
@@ -36,6 +36,13 @@ export function EditorRedacao({ redacao }: { redacao: RedacaoDetalhada }) {
   const prazoVencido = !ehReescrita && redacao.tarefa ? prazoEncerrado(redacao.tarefa.prazoEntrega) : false;
   const palavras = useMemo(() => contarPalavras(texto), [texto]);
   const vazio = texto.trim() === '';
+
+  const urlBruta =
+    redacao.tarefa?.anexoUrl ||
+    redacao.tarefa?.arquivoUrl ||
+    redacao.tarefa?.anexos?.[0]?.caminhoArquivo ||
+    null;
+  const urlAnexo = urlBruta ? urlSegura(urlBruta) : null;
 
   // Avisa antes de fechar a aba se há texto ainda não salvo no servidor
   useEffect(() => {
@@ -127,6 +134,19 @@ export function EditorRedacao({ redacao }: { redacao: RedacaoDetalhada }) {
               <Button variante="secundario" tamanho="sm" icone={<BookOpen size={16} aria-hidden="true" />} className={styles.soCelular} onClick={() => setJanela('tema')}>
                 Ver tema
               </Button>
+              {urlAnexo && (
+                <a
+                  href={urlAnexo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.atalhoAnexo}
+                  title="Abrir anexo da tarefa em nova aba"
+                >
+                  <Paperclip size={15} aria-hidden="true" />
+                  <span>Anexo</span>
+                  <ExternalLink size={13} aria-hidden="true" />
+                </a>
+              )}
               {ehReescrita && versaoUm && (
                 <Button variante="secundario" tamanho="sm" icone={<History size={16} aria-hidden="true" />} onClick={() => setJanela('versao1')}>
                   Ver versão 1
@@ -150,6 +170,22 @@ export function EditorRedacao({ redacao }: { redacao: RedacaoDetalhada }) {
           {ehReescrita && (
             <div className={styles.espaco}>
               <Alerta tom="info">Esta é a sua reescrita. Depois de enviada, ela será a versão final e não haverá nova tentativa.</Alerta>
+            </div>
+          )}
+
+          {/* Bloco de Anexo visível durante a escrita no Mobile e Tablet */}
+          {urlAnexo && (
+            <div className={styles.barraAnexoMobile}>
+              <a
+                href={urlAnexo}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.botaoVisualizarAnexoTopo}
+              >
+                <FileText size={16} aria-hidden="true" />
+                <span>Visualizar Anexo da Tarefa (PDF/Imagem)</span>
+                <ExternalLink size={14} aria-hidden="true" />
+              </a>
             </div>
           )}
 
@@ -183,7 +219,7 @@ export function EditorRedacao({ redacao }: { redacao: RedacaoDetalhada }) {
         </section>
 
         <aside className={styles.lateral} aria-label="Tema da redação">
-          <h2 className={styles.lateralTitulo}>Tema</h2>
+          <h2 className={styles.lateralTitulo}>Tema e Apoio</h2>
           <PainelDoTema redacao={redacao} />
         </aside>
       </div>
@@ -207,10 +243,10 @@ export function EditorRedacao({ redacao }: { redacao: RedacaoDetalhada }) {
         rodape={
           <>
             <Button variante="secundario" onClick={fechar} disabled={processando}>
-              Voltar e revisar
+              Continuar escrevendo
             </Button>
-            <Button onClick={() => void enviar()} carregando={processando}>
-              Enviar agora
+            <Button icone={<Send size={16} aria-hidden="true" />} carregando={processando} onClick={() => void enviar()}>
+              Confirmar envio
             </Button>
           </>
         }
@@ -218,11 +254,12 @@ export function EditorRedacao({ redacao }: { redacao: RedacaoDetalhada }) {
         <div className={styles.confirmacao}>
           {erroDaJanela && <Alerta tom="erro">{erroDaJanela}</Alerta>}
           <p>
-            Depois de enviar, <strong>você não poderá mais editar</strong> este texto.
-            {ehReescrita ? ' Esta reescrita será a versão final.' : ''}
+            Seu texto tem <strong>{palavras} palavras</strong>.
           </p>
           <p className={styles.resumoEnvio}>
-            {palavras} {palavras === 1 ? 'palavra' : 'palavras'} · {texto.length.toLocaleString('pt-BR')} caracteres
+            {ehReescrita
+              ? 'Esta reescrita será enviada para o seu tutor. Não será possível fazer novas alterações depois.'
+              : 'Depois do envio, o texto entra na fila do seu tutor e você não poderá editá-lo enquanto aguarda a correção.'}
           </p>
         </div>
       </Modal>
@@ -236,15 +273,15 @@ export function EditorRedacao({ redacao }: { redacao: RedacaoDetalhada }) {
             <Button variante="secundario" onClick={fechar} disabled={processando}>
               Cancelar
             </Button>
-            <Button variante="perigo" onClick={() => void excluir()} carregando={processando}>
-              Excluir rascunho
+            <Button variante="perigo" carregando={processando} onClick={() => void excluir()}>
+              Excluir
             </Button>
           </>
         }
       >
         <div className={styles.confirmacao}>
           {erroDaJanela && <Alerta tom="erro">{erroDaJanela}</Alerta>}
-          <p>O texto escrito será apagado e não poderá ser recuperado.</p>
+          <p>Esta ação não pode ser desfeita. Todo o texto escrito neste rascunho será perdido.</p>
         </div>
       </Modal>
     </>

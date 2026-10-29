@@ -24,6 +24,10 @@ export interface TemaResumo {
 export interface Tema extends TemaResumo {
   origem: string | null;
   idCriador: number | null;
+  _count?: {
+    tarefas: number;
+    redacoes: number;
+  };
 }
 
 export interface VersaoRedacao {
@@ -61,6 +65,9 @@ export interface TarefaDaRedacao {
   idTema: number | null;
   tema: TemaResumo | null;
   turma: TurmaResumo | null;
+  anexos?: AnexoDeTarefa[];
+  anexoUrl?: string | null;
+  arquivoUrl?: string | null;
 }
 
 /** Itens de GET /redacoes e GET /redacoes/:id (visão do aluno) */
@@ -88,6 +95,8 @@ export interface TarefaDoAluno {
   tema: TemaResumo | null;
   tutor: { idUsuario: number; usuario: { nome: string } } | null;
   anexos: AnexoDeTarefa[];
+  anexoUrl?: string | null;
+  arquivoUrl?: string | null;
   /** Id da redação já criada para esta tarefa, ou null se o aluno ainda não começou. */
   idRedacao: number | null;
 }

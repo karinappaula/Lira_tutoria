@@ -1,15 +1,33 @@
 @use 'variables' as *;
+@use 'mixins' as *;
 
 .painel {
   display: flex;
   flex-direction: column;
-  gap: $esp-3;
+  gap: $esp-4;
+}
+
+.secao {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-1;
+}
+
+.subtituloSecao {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $cor-texto-suave;
+  margin: 0;
 }
 
 .titulo {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 700;
+  color: $cor-texto;
   overflow-wrap: anywhere;
+  margin: 0;
 }
 
 .motivador {
@@ -18,11 +36,105 @@
   line-height: 1.6;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+  margin: 0;
 }
 
 .vazio {
   color: $cor-texto-suave;
   font-size: 0.92rem;
+  margin: 0;
+}
+
+.blocoAnexo {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-2;
+  padding-top: $esp-3;
+  border-top: 1px solid $cor-borda;
+}
+
+.cardAnexo {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+  padding: $esp-3;
+  background: $cor-fundo;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-md;
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &:hover {
+    border-color: $cor-borda-forte;
+  }
+}
+
+.cardAnexoInfo {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  min-width: 0;
+}
+
+.iconeClipe {
+  flex-shrink: 0;
+  color: $cor-primaria;
+}
+
+.nomeAnexo {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: $cor-texto;
+  @include truncar;
+}
+
+.botaoVisualizarAnexo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $esp-2;
+  width: 100%;
+  min-height: 44px;
+  padding: $esp-2 $esp-3;
+  background: $cor-primaria;
+  color: $cor-texto-invertido;
+  border: 1px solid transparent;
+  border-radius: $raio-sm;
+  font-weight: 600;
+  font-size: 0.88rem;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s, transform 0.1s;
+
+  &:hover {
+    background: $cor-primaria-hover;
+    color: $cor-texto-invertido;
+    text-decoration: none;
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  &:focus-visible {
+    @include anel-de-foco;
+  }
+
+  @include celular {
+    font-size: 0.82rem;
+    padding: $esp-2;
+  }
+}
+
+.cardAnexoVazio {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  padding: $esp-2 $esp-3;
+  background: $cor-fundo;
+  border-radius: $raio-sm;
+  font-size: 0.85rem;
+  color: $cor-texto-suave;
 }
 
 .prazo {

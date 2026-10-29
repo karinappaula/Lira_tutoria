@@ -1,0 +1,195 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+/* ---------- Métricas Globais ---------- */
+.gradeMetricas {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $esp-4;
+  margin-bottom: $esp-5;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include celular {
+    grid-template-columns: 1fr;
+    gap: $esp-3;
+  }
+}
+
+.cartaoMetrica {
+  display: flex;
+  align-items: center;
+  gap: $esp-3;
+  padding: $esp-4;
+  background: $cor-superficie;
+  border-radius: $raio-lg;
+  box-shadow: $sombra-cartao;
+  border: 1px solid $cor-borda;
+}
+
+.iconeMetrica {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: $raio-md;
+  background: $cor-primaria-suave;
+  color: $cor-primaria;
+  flex-shrink: 0;
+}
+
+.textosMetrica {
+  display: flex;
+  flex-direction: column;
+}
+
+.rotuloMetrica {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: $cor-texto-suave;
+}
+
+.valorMetrica {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: $cor-texto;
+  line-height: 1.2;
+}
+
+.subMetrica {
+  font-size: 0.76rem;
+  color: $cor-texto-suave;
+  margin-top: 2px;
+}
+
+/* ---------- Painel de Filtros Avançados ---------- */
+.cardFiltros {
+  background: $cor-superficie;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-lg;
+  padding: $esp-4;
+  margin-bottom: $esp-5;
+}
+
+.topoFiltros {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-3;
+  margin-bottom: $esp-4;
+  padding-bottom: $esp-3;
+  border-bottom: 1px solid $cor-borda;
+}
+
+.tituloFiltros {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: $cor-texto;
+  margin: 0;
+}
+
+.gradeFiltros {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $esp-4;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $esp-3;
+  }
+
+  @include celular {
+    grid-template-columns: 1fr;
+    gap: $esp-3;
+  }
+}
+
+.barraStatusFiltros {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-3;
+  margin-bottom: $esp-4;
+  flex-wrap: wrap;
+
+  @include celular {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.contagem {
+  font-size: 0.88rem;
+  color: $cor-texto-suave;
+}
+
+/* ---------- Células da Tabela ---------- */
+.alunoLinha {
+  display: flex;
+  flex-direction: column;
+
+  strong {
+    color: $cor-texto;
+    font-size: 0.95rem;
+  }
+}
+
+.notaLinha {
+  font-size: 1rem;
+  font-weight: 700;
+  color: $cor-primaria;
+
+  span {
+    font-size: 0.8rem;
+    color: $cor-texto-suave;
+    font-weight: normal;
+  }
+}
+
+.dataLinha {
+  font-size: 0.88rem;
+  color: $cor-texto-suave;
+  white-space: nowrap;
+}
+
+.versaoLinha {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $cor-texto;
+}
+
+.acoesLinha {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  @include celular {
+    justify-content: flex-start;
+    width: 100%;
+    margin-top: $esp-2;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+/* ---------- Modal de Detalhes da Correção ---------- */
+.corpoDetalhesModal {
+  max-height: 72vh;
+  overflow-y: auto;
+  padding-right: $esp-1;
+}
+
+.vazio {
+  padding: $esp-5;
+  background: $cor-superficie;
+  border-radius: $raio-lg;
+  box-shadow: $sombra-cartao;
+}

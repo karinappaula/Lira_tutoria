@@ -10,6 +10,21 @@ export interface DadosDeTarefa {
   novoTema?: { tituloTema: string; textoMotivador?: string };
 }
 
+export interface DadosDeAnexo {
+  nomeArquivo: string;
+  url: string;
+  tipoArquivo: string;
+}
+
+export interface AnexoCriado {
+  id: number;
+  idTarefa: number;
+  nomeArquivo: string;
+  caminhoArquivo: string;
+  tipoArquivo: string;
+  criadoEm: string;
+}
+
 export const tutorService = {
   fila: (signal?: AbortSignal) => api.get<ItemDaFila[]>('redacoes/aguardando-correcao', undefined, signal),
   corrigir: (dados: NovaCorrecao) => api.post<CorrecaoDaVersao>('redacoes/correcoes', dados),
@@ -17,11 +32,14 @@ export const tutorService = {
 
   tutorados: (busca?: string, signal?: AbortSignal) => api.get<Tutorado[]>('indicadores/tutor/alunos', { busca }, signal),
   historico: (mes?: string, signal?: AbortSignal) => api.get<ItemDoHistorico[]>('indicadores/historico-correcoes', { mes }, signal),
-  convidarAluno: () => api.post<ConviteCriado>('tutor/convites/aluno'),
+  convidarAluno: (renovar?: boolean) => api.post<ConviteCriado>('tutor/convites/aluno', renovar ? { renovar: true } : {}),
 
   tarefas: (signal?: AbortSignal) => api.get<TarefaDoTutor[]>('tarefas', undefined, signal),
   criarTarefa: (dados: DadosDeTarefa) => api.post<TarefaDoTutor>('tarefas', dados),
+  adicionarAnexo: (idTarefa: number, dados: DadosDeAnexo) => api.post<AnexoCriado>(`tarefas/${idTarefa}/anexos`, dados),
+  removerAnexo: (idTarefa: number, idAnexo: number) => api.delete<void>(`tarefas/${idTarefa}/anexos/${idAnexo}`),
   alterarPrazo: (id: number, prazoEntrega: string) => api.patch<TarefaDoTutor>(`tarefas/${id}`, { prazoEntrega }),
+  atualizarTarefa: (id: number, dados: Partial<DadosDeTarefa>) => api.patch<TarefaDoTutor>(`tarefas/${id}`, dados),
   excluirTarefa: (id: number) => api.delete<void>(`tarefas/${id}`),
   aplicarAtividadeGeral: (id: number, prazoEntrega: string) => api.post<TarefaDoTutor>(`tarefas/${id}/replicar`, { prazoEntrega }),
 };

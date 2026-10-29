@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LogOut, type LucideIcon } from 'lucide-react';
-import { useState, type ReactNode } from 'react';
+import { Bell, LogOut, type LucideIcon } from 'lucide-react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Button } from '@/components/ui/Button/Button';
 import { ErrorState } from '@/components/ui/Estados/Estados';
 import { CarregandoPagina } from '@/components/ui/Spinner/Spinner';
@@ -12,6 +12,7 @@ import { cx } from '@/lib/cx';
 import { primeiroNome } from '@/lib/formatar';
 import { ROTULO_PAPEL } from '@/lib/papeis';
 import { authService } from '@/services/auth';
+import { comunicadosService, EVENTO_COMUNICADOS_MUDOU } from '@/services/comunicados';
 import { SessaoProvider, useSessao } from './SessaoProvider';
 import styles from './AppShell.module.scss';
 import { limparBackupsDeRascunho } from '@/lib/autosave';
@@ -28,6 +29,54 @@ interface Props {
   variante: 'padrao' | 'admin';
   menu: ItemDeMenu[];
   children: ReactNode;
+}
+
+function SinoComunicados() {
+  const { estado } = useSessao();
+  const [naoLidos, setNaoLidos] = useState(0);
+
+  const papel = estado.situacao === 'ok' ? estado.sessao.papelAtivo : null;
+  const link =
+    papel === 'ADMINISTRADOR'
+      ? '/admin/comunicados'
+      : papel === 'TUTOR'
+        ? '/tutor/comunicados'
+        : '/aluno/comunicados';
+
+  useEffect(() => {
+    if (!papel || papel === 'ADMINISTRADOR') return;
+
+    let ativo = true;
+    function carregar() {
+      comunicadosService
+        .contarNaoLidos()
+        .then((res) => {
+          if (ativo) setNaoLidos(res.naoLidos);
+        })
+        .catch(() => {});
+    }
+
+    carregar();
+    window.addEventListener(EVENTO_COMUNICADOS_MUDOU, carregar);
+    return () => {
+      ativo = false;
+      window.removeEventListener(EVENTO_COMUNICADOS_MUDOU, carregar);
+    };
+  }, [papel]);
+
+  if (!papel) return null;
+
+  return (
+    <Link
+      href={link}
+      className={styles.botaoSino}
+      aria-label={naoLidos > 0 ? `${naoLidos} comunicados não lidos` : 'Ver comunicados'}
+      title="Comunicados"
+    >
+      <Bell size={18} aria-hidden="true" />
+      {naoLidos > 0 && <span className={styles.badgeSino}>{naoLidos > 99 ? '99+' : naoLidos}</span>}
+    </Link>
+  );
 }
 
 function Cabecalho({ variante }: { variante: 'padrao' | 'admin' }) {
@@ -72,6 +121,7 @@ function Cabecalho({ variante }: { variante: 'padrao' | 'admin' }) {
         </div>
 
         <div className={styles.acoes}>
+          <SinoComunicados />
           <Button variante="secundario" icone={<LogOut size={16} aria-hidden="true" />} onClick={sair} carregando={saindo}>
             Sair
           </Button>

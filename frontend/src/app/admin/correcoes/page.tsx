@@ -1,8 +1,11 @@
 import type { Metadata } from 'next';
-import { PaginaEmConstrucao } from '@/components/layout/PaginaEmConstrucao';
+import { CorrecoesAdmin } from './CorrecoesAdmin';
 
-export const metadata: Metadata = { title: 'Correções pendentes de revisão' };
+export const metadata: Metadata = {
+  title: 'Revisão de Correções · LIRA',
+  description: 'Fila de revisão e controle de qualidade pedagógica das correções de redações avaliativas.',
+};
 
-export default function Pagina() {
-  return <PaginaEmConstrucao titulo="Correções pendentes de revisão" fase="Fase F4" />;
+export default function PaginaCorrecoesAdmin() {
+  return <CorrecoesAdmin />;
 }

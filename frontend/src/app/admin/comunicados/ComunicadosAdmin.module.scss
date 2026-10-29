@@ -1,0 +1,41 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-5;
+}
+
+.tabelaContainer {
+  background: $cor-superficie;
+  border-radius: $raio-lg;
+  border: 1px solid $cor-borda;
+  box-shadow: $sombra-cartao;
+  overflow: hidden;
+}
+
+.tituloTabela {
+  color: $cor-texto;
+  display: block;
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+.resumoMensagem {
+  display: block;
+  font-size: 0.82rem;
+  color: $cor-texto-suave;
+  max-width: 380px;
+  @include truncar;
+
+  @include celular {
+    max-width: 240px;
+  }
+}
+
+.grupoAcoes {
+  display: flex;
+  gap: $esp-2;
+  justify-content: flex-end;
+}

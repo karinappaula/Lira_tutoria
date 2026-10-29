@@ -1,8 +1,11 @@
 import type { Metadata } from 'next';
-import { PaginaEmConstrucao } from '@/components/layout/PaginaEmConstrucao';
+import { HistoricoAdmin } from './HistoricoAdmin';
 
-export const metadata: Metadata = { title: 'Histórico geral de correções' };
+export const metadata: Metadata = {
+  title: 'Histórico Geral de Correções · LIRA',
+  description: 'Auditoria e consulta geral de todas as redações corrigidas no sistema.',
+};
 
-export default function Pagina() {
-  return <PaginaEmConstrucao titulo="Histórico geral de correções" fase="Fase F4" />;
+export default function PaginaHistoricoAdmin() {
+  return <HistoricoAdmin />;
 }

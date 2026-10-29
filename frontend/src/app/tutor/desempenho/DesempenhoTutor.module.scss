@@ -1,0 +1,337 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-5;
+}
+
+/* ---------- Grade de KPIs ---------- */
+.gradeKpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $esp-4;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include celular {
+    grid-template-columns: 1fr;
+    gap: $esp-3;
+  }
+}
+
+.cartaoKpi {
+  display: flex;
+  align-items: center;
+  gap: $esp-4;
+  padding: $esp-4;
+  background: $cor-superficie;
+  border-radius: $raio-lg;
+  border: 1px solid $cor-borda;
+  box-shadow: $sombra-cartao;
+}
+
+.iconeKpi {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: $raio-md;
+  background: $cor-primaria-suave;
+  color: $cor-primaria;
+  flex-shrink: 0;
+
+  &.alerta {
+    background: $cor-alerta-suave;
+    color: $cor-alerta-texto;
+  }
+
+  &.sucesso {
+    background: #e5f3f1;
+    color: #005a5e;
+  }
+
+  &.neutro {
+    background: $cor-neutro-suave;
+    color: $cor-texto;
+  }
+}
+
+.textosKpi {
+  display: flex;
+  flex-direction: column;
+}
+
+.rotuloKpi {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: $cor-texto-suave;
+}
+
+.valorKpi {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: $cor-texto;
+  line-height: 1.2;
+}
+
+/* ---------- Barra de Abas ---------- */
+.barraAbas {
+  display: flex;
+  gap: $esp-2;
+  padding: $esp-3 $esp-4;
+  background: $cor-superficie;
+  border-radius: $raio-lg;
+  border: 1px solid $cor-borda;
+  box-shadow: $sombra-cartao;
+
+  @include celular {
+    flex-direction: column;
+  }
+}
+
+.abaBotao {
+  display: inline-flex;
+  align-items: center;
+  gap: $esp-2;
+  padding: $esp-2 $esp-4;
+  background: transparent;
+  border: none;
+  border-radius: $raio-md;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: $cor-texto-suave;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    color: $cor-primaria;
+    background: $cor-primaria-suave;
+  }
+
+  &.ativa {
+    color: $cor-primaria;
+    background: $cor-primaria-suave;
+  }
+
+  @include celular {
+    justify-content: center;
+  }
+}
+
+/* ---------- Painéis e Gráficos ---------- */
+.painelConteudo {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-5;
+}
+
+.cartaoSecao {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+  padding: $esp-5;
+  background: $cor-superficie;
+  border-radius: $raio-lg;
+  border: 1px solid $cor-borda;
+  box-shadow: $sombra-cartao;
+
+  @include celular {
+    padding: $esp-4;
+  }
+}
+
+.cabecalhoSecao {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $esp-3;
+  flex-wrap: wrap;
+
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: $cor-texto;
+    margin: 0;
+  }
+
+  p {
+    font-size: 0.85rem;
+    color: $cor-texto-suave;
+    margin: 0;
+  }
+}
+
+.gradeBarras {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+}
+
+.itemBarra {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-1;
+}
+
+.topoItemBarra {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.88rem;
+}
+
+.nomeBarra {
+  font-weight: 600;
+  color: $cor-texto;
+}
+
+.valorBarra {
+  font-weight: 700;
+  color: $cor-primaria;
+  font-size: 0.92rem;
+}
+
+.trilhaBarra {
+  width: 100%;
+  height: 12px;
+  background: $cor-neutro-suave;
+  border-radius: $raio-pilula;
+  overflow: hidden;
+}
+
+.preenchimentoBarra {
+  height: 100%;
+  width: var(--largura, 0%);
+  background: $cor-primaria;
+  border-radius: $raio-pilula;
+  transition: width 0.4s ease;
+
+  &.alerta {
+    background: $cor-alerta;
+  }
+
+  &.perigo {
+    background: $cor-perigo;
+  }
+}
+
+.aprovadasDestaque {
+  font-weight: 600;
+  color: $cor-primaria;
+}
+
+.notaDestaque {
+  color: $cor-primaria;
+  font-weight: 700;
+}
+
+.textoSuave {
+  color: $cor-texto-suave;
+}
+
+.aproveitamentoAlto {
+  color: $cor-primaria;
+  font-weight: 700;
+}
+
+.aproveitamentoAlerta {
+  color: $cor-alerta-texto;
+  font-weight: 700;
+}
+
+.valorPerigo {
+  color: $cor-perigo-texto;
+}
+
+.subDado {
+  display: block;
+  font-size: 0.82rem;
+  color: $cor-texto-suave;
+}
+
+.subDadoPequeno {
+  display: block;
+  font-size: 0.78rem;
+  color: $cor-texto-suave;
+}
+
+.subDadoMicro {
+  display: block;
+  font-size: 0.74rem;
+  color: $cor-texto-suave;
+}
+
+.carregandoModal {
+  text-align: center;
+  padding: $esp-6;
+}
+
+.tituloSecaoModal {
+  margin: 0 0 $esp-3 0;
+  font-size: 0.98rem;
+  color: $cor-texto;
+}
+
+.vazioModal {
+  font-size: 0.88rem;
+  color: $cor-texto-suave;
+}
+
+.colunaDireitaModal {
+  text-align: right;
+}
+
+.notaModal {
+  font-size: 1.1rem;
+  color: $cor-primaria;
+  font-weight: 700;
+}
+
+.tabelaContainer {
+  background: $cor-superficie;
+  border-radius: $raio-lg;
+  border: 1px solid $cor-borda;
+  box-shadow: $sombra-cartao;
+  overflow: hidden;
+}
+
+/* ---------- Estilos do Modal de Drill-Down ---------- */
+.conteudoDrillDown {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-5;
+}
+
+.resumoAlunoModal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $esp-3 $esp-4;
+  background: $cor-fundo;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-md;
+}
+
+.evolucaoLista {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: $esp-2;
+}
+
+.cardEvolucaoItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $esp-3 $esp-4;
+  background: $cor-superficie;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-md;
+}

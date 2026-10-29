@@ -26,9 +26,16 @@ const json = (corpo: unknown): RequestInit => ({
 
 export interface DadosDeCadastro {
   codigo: string;
-  nome: string;
+  nome?: string;
   email: string;
   senha: string;
+}
+
+export interface VerificacaoEmailResultado {
+  existe: boolean;
+  nome?: string;
+  status?: string;
+  papeisExistentes?: string[];
 }
 
 export const authService = {
@@ -36,6 +43,9 @@ export const authService = {
   selecionarPapel: (papel: PapelUsuario) => chamar<LoginResultado>('/api/auth/selecionar-papel', json({ papel })),
   logout: () => chamar<{ ok: true }>('/api/auth/logout', { method: 'POST' }),
   sessao: () => chamar<Sessao>('/api/auth/sessao'),
+
+  /** Verifica se um e-mail já existe no LIRA para alterar o formulário dinamicamente */
+  verificarEmail: (email: string) => chamar<VerificacaoEmailResultado>('/api/auth/verificar-email', json({ email })),
 
   /** Cadastro por convite. Não entra automaticamente: o usuário vai para o login. */
   cadastrar: (dados: DadosDeCadastro) => chamar<{ ok: true }>('/api/auth/cadastro', json(dados)),

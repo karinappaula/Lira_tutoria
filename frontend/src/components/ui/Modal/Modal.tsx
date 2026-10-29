@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, type ReactNode } from 'react';
 import { X } from 'lucide-react';
+import { cx } from '@/lib/cx';
 import styles from './Modal.module.scss';
 
 interface Props {
@@ -11,10 +12,12 @@ interface Props {
   children: ReactNode;
   /** Botões de ação, alinhados à direita */
   rodape?: ReactNode;
+  tamanho?: 'sm' | 'md' | 'lg' | 'xl';
+  className?: string;
 }
 
 /** Janela modal usando o elemento nativo <dialog>: foco preso, Esc fecha e leitor de tela entende. */
-export function Modal({ aberto, aoFechar, titulo, children, rodape }: Props) {
+export function Modal({ aberto, aoFechar, titulo, children, rodape, tamanho = 'md', className }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
   const idTitulo = useId();
 
@@ -28,7 +31,7 @@ export function Modal({ aberto, aoFechar, titulo, children, rodape }: Props) {
   return (
     <dialog
       ref={ref}
-      className={styles.modal}
+      className={cx(styles.modal, styles[tamanho], className)}
       aria-labelledby={idTitulo}
       onClose={aoFechar}
       onClick={(e) => {

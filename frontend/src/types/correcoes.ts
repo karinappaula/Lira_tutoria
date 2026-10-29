@@ -128,6 +128,9 @@ export interface ConviteCriado {
   idTutor: number | null;
   expiraEm: string;
   usado: boolean;
+  usos?: number;
+  usosMaximos?: number;
+  vagasRestantes?: number;
 }
 
 /** Item de GET /tarefas na visão do Tutor */
@@ -140,8 +143,17 @@ export interface TarefaDoTutor {
   idTutor: number | null;
   idTema: number | null;
   tema: TemaResumo | null;
-  anexos: Array<{ id: number; nomeArquivo: string; caminhoArquivo: string; tipoArquivo: string }>;
+  anexos: Array<{ id: number; nomeArquivo: string; caminhoArquivo: string; tipoArquivo: string; criadoEm?: string }>;
+  idAdm?: number | null;
+  idTurma?: number | null;
+  idTarefaOrigem?: number | null;
+  turma?: { id: number; nome: string; anoLetivo: number; status: string } | null;
+  tutor?: { idUsuario: number; usuario: { nome: string } } | null;
+  administrador?: { idUsuario: number; usuario: { nome: string } } | null;
+  _count?: { tarefasAplicadas: number; redacoes?: number };
+  criadoEm?: string;
   progresso: { totalTutorados: number; concluidas: number; emCorrecao: number } | null;
 }
 
+export type TarefaGeralAdmin = TarefaDoTutor;
 export type { TarefaDaRedacao };

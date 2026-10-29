@@ -24,6 +24,12 @@
     color: $cor-perigo-texto;
   }
 }
+.alerta.alerta {
+  border-left-color: $cor-alerta;
+  .icone {
+    color: $cor-alerta-texto;
+  }
+}
 .sucesso .icone,
 .info .icone {
   color: $cor-primaria;

@@ -21,3 +21,21 @@ export function formatarDataHora(iso: string): string {
 export function primeiroNome(nome: string): string {
   return nome.trim().split(/\s+/)[0] ?? nome;
 }
+
+export function formatarTempoSegundos(segundosTotais: number | null | undefined): string {
+  if (segundosTotais === null || segundosTotais === undefined || isNaN(segundosTotais) || segundosTotais < 0) {
+    return '00:00';
+  }
+  const horas = Math.floor(segundosTotais / 3600);
+  const minutos = Math.floor((segundosTotais % 3600) / 60);
+  const segundos = Math.floor(segundosTotais % 60);
+
+  const mm = String(minutos).padStart(2, '0');
+  const ss = String(segundos).padStart(2, '0');
+
+  if (horas > 0) {
+    const hh = String(horas).padStart(2, '0');
+    return `${hh}:${mm}:${ss}`;
+  }
+  return `${mm}:${ss}`;
+}

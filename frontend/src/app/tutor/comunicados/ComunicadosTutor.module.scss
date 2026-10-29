@@ -1,0 +1,101 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-5;
+}
+
+.barraControles {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $esp-4;
+  padding: $esp-3 $esp-4;
+  background: $cor-superficie;
+  border-radius: $raio-lg;
+  border: 1px solid $cor-borda;
+  box-shadow: $sombra-cartao;
+
+  @include celular {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.abas {
+  display: flex;
+  gap: $esp-2;
+}
+
+.abaBotao {
+  display: inline-flex;
+  align-items: center;
+  gap: $esp-2;
+  padding: $esp-2 $esp-4;
+  background: transparent;
+  border: none;
+  border-radius: $raio-md;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: $cor-texto-suave;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    color: $cor-primaria;
+    background: $cor-primaria-suave;
+  }
+
+  &.ativa {
+    color: $cor-primaria;
+    background: $cor-primaria-suave;
+  }
+
+  @include celular {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+.filtroStatus {
+  min-width: 200px;
+
+  @include celular {
+    min-width: 100%;
+  }
+}
+
+.tabelaContainer {
+  background: $cor-superficie;
+  border-radius: $raio-lg;
+  border: 1px solid $cor-borda;
+  box-shadow: $sombra-cartao;
+  overflow: hidden;
+}
+
+.tituloTabela {
+  color: $cor-texto;
+  display: block;
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+.resumoMensagem {
+  display: block;
+  font-size: 0.82rem;
+  color: $cor-texto-suave;
+  max-width: 380px;
+  @include truncar;
+
+  @include celular {
+    max-width: 240px;
+  }
+}
+
+.grupoAcoes {
+  display: flex;
+  gap: $esp-2;
+  justify-content: flex-end;
+}

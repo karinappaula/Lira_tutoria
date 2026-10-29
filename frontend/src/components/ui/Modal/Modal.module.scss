@@ -11,6 +11,22 @@
   color: $cor-texto;
   box-shadow: $sombra-modal;
 
+  &.sm {
+    width: min(420px, calc(100% - 32px));
+  }
+
+  &.md {
+    width: min(560px, calc(100% - 32px));
+  }
+
+  &.lg {
+    width: min(840px, calc(100% - 32px));
+  }
+
+  &.xl {
+    width: min(1200px, calc(100% - 32px));
+  }
+
   &::backdrop {
     background: rgba(23, 41, 45, 0.55);
   }

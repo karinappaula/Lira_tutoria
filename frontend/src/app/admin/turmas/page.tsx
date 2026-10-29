@@ -1,8 +1,11 @@
 import type { Metadata } from 'next';
-import { PaginaEmConstrucao } from '@/components/layout/PaginaEmConstrucao';
+import { TurmasAdmin } from './TurmasAdmin';
 
-export const metadata: Metadata = { title: 'Turmas' };
+export const metadata: Metadata = {
+  title: 'Gestão de Turmas · LIRA',
+  description: 'Gestão de turmas, vagas de tutores, remanejamentos e emissão de convites parametrizados.',
+};
 
-export default function Pagina() {
-  return <PaginaEmConstrucao titulo="Turmas" fase="Fase F4" />;
+export default function PaginaTurmasAdmin() {
+  return <TurmasAdmin />;
 }

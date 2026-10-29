@@ -1,17 +1,23 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useState, useRef, type FormEvent, type ChangeEvent } from 'react';
+import { Paperclip, Trash2, UploadCloud } from 'lucide-react';
 import { Alerta } from '@/components/ui/Alerta/Alerta';
 import { Button } from '@/components/ui/Button/Button';
 import { Input, Select, Textarea } from '@/components/ui/Campos/Campos';
 import { Spinner } from '@/components/ui/Spinner/Spinner';
 import { useBuscar } from '@/hooks/useBuscar';
 import { ApiError, mensagemDeErro } from '@/lib/erros';
+import { uploadArquivoCloudinary } from '@/services/cloudinary';
 import { temasService } from '@/services/redacoes';
 import { tutorService, type DadosDeTarefa } from '@/services/tutor';
 import styles from './Tutor.module.scss';
 
 const NOVO_TEMA = 'novo';
+
+const TIPOS_ANEXO_VALIDOS = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
+const EXTENSOES_VALIDAS = ['.pdf', '.jpg', '.jpeg', '.png', '.webp'];
+const TAMANHO_MAXIMO_ANEXO = 10 * 1024 * 1024; // 10 MB
 
 /** Converte o valor do campo de data e hora (horário local) para ISO. */
 function localParaIso(valor: string): string | null {
@@ -87,6 +93,13 @@ interface Erros {
   tituloTema?: string;
 }
 
+interface AnexoEstado {
+  url: string;
+  nomeArquivo: string;
+  tipoArquivo: string;
+  tamanho: number;
+}
+
 export function FormularioDeTarefa({ aoCancelar, aoSalvar }: { aoCancelar: () => void; aoSalvar: () => void }) {
   const temas = useBuscar((signal) => temasService.listar(signal));
   const [titulo, setTitulo] = useState('');
@@ -98,6 +111,57 @@ export function FormularioDeTarefa({ aoCancelar, aoSalvar }: { aoCancelar: () =>
   const [erros, setErros] = useState<Erros>({});
   const [erroGeral, setErroGeral] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
+
+  // Estado do Anexo com upload direto no Cloudinary
+  const [anexo, setAnexo] = useState<AnexoEstado | null>(null);
+  const [enviandoAnexo, setEnviandoAnexo] = useState(false);
+  const [erroAnexo, setErroAnexo] = useState<string | null>(null);
+  const arquivoInputRef = useRef<HTMLInputElement>(null);
+
+  async function aoSelecionarArquivo(e: ChangeEvent<HTMLInputElement>) {
+    const arquivo = e.target.files?.[0];
+    if (!arquivo) return;
+
+    setErroAnexo(null);
+
+    const extensao = '.' + (arquivo.name.split('.').pop()?.toLowerCase() ?? '');
+    const tipoMime = arquivo.type.toLowerCase();
+    const ehTipoValido = TIPOS_ANEXO_VALIDOS.includes(tipoMime) || EXTENSOES_VALIDAS.includes(extensao);
+
+    if (!ehTipoValido) {
+      setErroAnexo('Formato de arquivo não suportado. Utilize PDF, PNG, JPG ou WEBP.');
+      if (arquivoInputRef.current) arquivoInputRef.current.value = '';
+      return;
+    }
+
+    if (arquivo.size > TAMANHO_MAXIMO_ANEXO) {
+      setErroAnexo('O arquivo excede o limite máximo permitido de 10 MB.');
+      if (arquivoInputRef.current) arquivoInputRef.current.value = '';
+      return;
+    }
+
+    setEnviandoAnexo(true);
+    try {
+      const resultado = await uploadArquivoCloudinary(arquivo);
+      setAnexo({
+        url: resultado.url,
+        nomeArquivo: resultado.nomeArquivo,
+        tipoArquivo: resultado.tipoArquivo,
+        tamanho: resultado.tamanho,
+      });
+    } catch (err) {
+      setErroAnexo(err instanceof Error ? err.message : 'Falha ao enviar arquivo para o Cloudinary.');
+      if (arquivoInputRef.current) arquivoInputRef.current.value = '';
+    } finally {
+      setEnviandoAnexo(false);
+    }
+  }
+
+  function removerAnexo() {
+    setAnexo(null);
+    setErroAnexo(null);
+    if (arquivoInputRef.current) arquivoInputRef.current.value = '';
+  }
 
   async function enviar(e: FormEvent) {
     e.preventDefault();
@@ -123,7 +187,26 @@ export function FormularioDeTarefa({ aoCancelar, aoSalvar }: { aoCancelar: () =>
     setEnviando(true);
     setErroGeral(null);
     try {
-      await tutorService.criarTarefa(dados);
+      // 1. Cria a tarefa no backend
+      const novaTarefa = await tutorService.criarTarefa(dados);
+
+      // 2. Se houver anexo enviado ao Cloudinary, envia a URL para a API de Tarefas
+      if (anexo) {
+        try {
+          await tutorService.adicionarAnexo(novaTarefa.id, {
+            nomeArquivo: anexo.nomeArquivo,
+            url: anexo.url,
+            tipoArquivo: anexo.tipoArquivo,
+          });
+        } catch (errAnexo) {
+          // Se a tarefa foi criada mas o anexo falhou, notifica o usuário
+          console.error('Falha ao associar anexo à tarefa:', errAnexo);
+          setErroGeral('A tarefa foi criada, mas não foi possível vincular o anexo à API.');
+          setEnviando(false);
+          return;
+        }
+      }
+
       aoSalvar();
     } catch (err) {
       if (err instanceof ApiError && err.detalhes.length > 0) setErroGeral(err.detalhes.map((d) => d.mensagem).join(' '));
@@ -169,11 +252,70 @@ export function FormularioDeTarefa({ aoCancelar, aoSalvar }: { aoCancelar: () =>
         </>
       )}
 
+      {/* Campo de Anexo com Upload Cloudinary */}
+      <div className={styles.campoAnexo}>
+        <label className={styles.rotuloAnexo}>
+          <span>Material de apoio / Anexo (opcional)</span>
+          <span className={styles.dicaAnexo}>PDF ou imagem (PNG, JPG, WEBP) de até 10 MB</span>
+        </label>
+
+        {erroAnexo && <Alerta tom="erro">{erroAnexo}</Alerta>}
+
+        {anexo ? (
+          <div className={styles.anexoCarregado}>
+            <div className={styles.infoArquivo}>
+              <Paperclip size={18} className={styles.iconeArquivo} aria-hidden="true" />
+              <div className={styles.detalhesArquivo}>
+                <span className={styles.nomeArquivo}>{anexo.nomeArquivo}</span>
+                <span className={styles.tamanhoArquivo}>
+                  {(anexo.tamanho / (1024 * 1024)).toFixed(2)} MB • Pronto para envio
+                </span>
+              </div>
+            </div>
+            <Button
+              type="button"
+              variante="perigo"
+              tamanho="sm"
+              icone={<Trash2 size={14} aria-hidden="true" />}
+              onClick={removerAnexo}
+              disabled={enviando}
+            >
+              Remover
+            </Button>
+          </div>
+        ) : (
+          <div className={styles.uploadContainer}>
+            <input
+              ref={arquivoInputRef}
+              type="file"
+              id="arquivo-anexo"
+              accept=".pdf,image/png,image/jpeg,image/webp"
+              onChange={aoSelecionarArquivo}
+              disabled={enviando || enviandoAnexo}
+              className={styles.inputArquivoOculto}
+            />
+            <label htmlFor="arquivo-anexo" className={styles.botaoUpload}>
+              {enviandoAnexo ? (
+                <>
+                  <Spinner tamanho="sm" rotulo="Enviando para o Cloudinary..." />
+                  <span>Enviando para o Cloudinary...</span>
+                </>
+              ) : (
+                <>
+                  <UploadCloud size={20} aria-hidden="true" />
+                  <span>Selecionar arquivo para anexo</span>
+                </>
+              )}
+            </label>
+          </div>
+        )}
+      </div>
+
       <div className={styles.botoes}>
-        <Button variante="secundario" onClick={aoCancelar} disabled={enviando}>
+        <Button variante="secundario" onClick={aoCancelar} disabled={enviando || enviandoAnexo}>
           Cancelar
         </Button>
-        <Button type="submit" carregando={enviando}>
+        <Button type="submit" carregando={enviando} disabled={enviandoAnexo}>
           Criar tarefa
         </Button>
       </div>

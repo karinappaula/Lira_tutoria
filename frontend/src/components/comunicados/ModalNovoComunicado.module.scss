@@ -1,0 +1,20 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+}
+
+.avisoDestinatarios {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  padding: $esp-3 $esp-4;
+  background: $cor-primaria-suave;
+  border: 1px solid #c2dcd6;
+  border-radius: $raio-md;
+  font-size: 0.88rem;
+  color: #005a5e;
+}

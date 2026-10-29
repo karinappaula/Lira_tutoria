@@ -1,0 +1,28 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-4;
+}
+
+.avisoFiltros {
+  font-size: 0.88rem;
+  color: $cor-texto-suave;
+  background: $cor-fundo;
+  padding: $esp-3;
+  border-radius: $raio-md;
+  border: 1px solid $cor-borda;
+}
+
+.linhaCampos {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $esp-4;
+
+  @include celular {
+    grid-template-columns: 1fr;
+    gap: $esp-3;
+  }
+}
