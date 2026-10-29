@@ -1,0 +1,208 @@
+{
+  "titulo": "Base de Dados e Diretrizes para Correção de Redações - Enem 2025",
+  "fonte_oficial": "Cartilha do(a) Participante - A Redação do Enem 2025 (Inep/MEC)",
+  "estrutura_dissertativa": {
+    "genero": "Texto dissertativo-argumentativo em prosa",
+    "linguagem": "Modalidade escrita formal da língua portuguesa",
+    "componentes_essenciais": [
+      "Defesa de um ponto de vista (tese)",
+      "Argumentação consistente e estruturada",
+      "Projeto de texto estratégico com progressão temática",
+      "Proposta de intervenção social com respeito aos Direitos Humanos"
+    ]
+  },
+  "modulo_1_regras_anulacao_nota_zero": {
+    "descricao": "Critérios operacionais para atribuição imediata de Nota 0 (Anulação da Redação)",
+    "critarios": [
+      {
+        "codigo": "ZERO_FUGA_TEMA",
+        "descricao": "Fuga total ao tema proposto na prova."
+      },
+      {
+        "codigo": "ZERO_TIPO_TEXTUAL",
+        "descricao": "Não atendimento à estrutura dissertativo-argumentativa (predominância de narração, descrição, poema, etc.)."
+      },
+      {
+        "codigo": "ZERO_EM_BRANCO",
+        "descricao": "Ausência de texto escrito na Folha de Redação oficial."
+      },
+      {
+        "codigo": "ZERO_TEXTO_INSUFICIENTE",
+        "descricao": "Extensão de até 7 linhas manuscritas ou até 10 linhas em sistema Braille."
+      },
+      {
+        "codigo": "ZERO_FORMAS_ANULACAO",
+        "descricao": "Presença de impróprios, desenhos, símbolos ou sinais gráficos sem função evidente."
+      },
+      {
+        "codigo": "ZERO_IDENTIFICACAO",
+        "descricao": "Nome, assinatura, rubrica ou qualquer marca de identificação fora do local destinado exclusivamente para isso."
+      },
+      {
+        "codigo": "ZERO_PARTE_DESCONECTADA",
+        "descricao": "Presença de trechos deliberadamente desconectados do tema ou do projeto de texto (bilhetes, orações, mensagens políticas/protesto, trechos de música/poema desarticulados)."
+      },
+      {
+        "codigo": "ZERO_LINGUA_ESTRANGEIRA",
+        "descricao": "Texto escrito predominantemente ou integralmente em língua estrangeira."
+      },
+      {
+        "codigo": "ZERO_ILEGIBILIDADE",
+        "descricao": "Texto ilegível que impossibilite a leitura por dois avaliadores independentes."
+      }
+    ],
+    "regras_de_copia": {
+      "instrucao": "Trechos copiados da Prova de Redação ou Caderno de Questões são desconsiderados na contagem de linhas mínimas.",
+      "impacto": "Se as linhas restantes após o desconto da cópia forem no máximo 7, a redação recebe Nota 0 por texto insuficiente."
+    }
+  },
+  "modulo_2_matriz_de_referencia": {
+    "descricao": "Pontuação de 0 a 200 pontos dividida em 5 competências independentes (Nota Total de 0 a 1000)",
+    "competencias": {
+      "competencia_1": {
+        "nome": "Domínio da Modalidade Escrita Formal da Língua Portuguesa",
+        "foco_avaliacao": [
+          "Estrutura sintática (complexidade, truncamento, justaposição)",
+          "Desvios gramaticais",
+          "Convenções da escrita",
+          "Escolha de registro",
+          "Escolha vocabular"
+        ],
+        "rubrica_niveis": {
+          "200": "Excelente domínio da escrita formal e de escolha de registro. Desvios ou falhas sintáticas aceitos apenas como excepcionalidade e sem reincidência.",
+          "160": "Bom domínio da escrita formal e de escolha de registro, com poucos desvios gramaticais e de convenções da escrita.",
+          "120": "Domínio mediano da escrita formal e de escolha de registro, com alguns desvios gramaticais e de convenções da escrita.",
+          "80": "Domínio insuficiente da escrita formal, com muitos desvios gramaticais, de registro e de convenções da escrita.",
+          "40": "Domínio precário da escrita formal, com diversificados e frequentes desvios gramaticais, de registro e convenções.",
+          "0": "Desconhecimento da modalidade escrita formal da língua portuguesa."
+        }
+      },
+      "competencia_2": {
+        "nome": "Compreensão do Tema e Aplicação das Áreas do Conhecimento (Tipologia e Repertório)",
+        "foco_avaliacao": [
+          "Desenvolvimento do recorte temático completo (sem tangenciamento)",
+          "Uso de Repertório Sociocultural Legítimo, Pertinente e Produtivo",
+          "Evitar 'Repertório de Bolso' (citações genéricas/decoradas sem articulação real)",
+          "Adequação ao tipo dissertativo-argumentativo"
+        ],
+        "rubrica_niveis": {
+          "200": "Desenvolve o tema por meio de argumentação consistente, a partir de repertório sociocultural produtivo, e apresenta excelente domínio do tipo dissertativo-argumentativo.",
+          "160": "Desenvolve o tema com argumentação consistente e bom domínio estrutural (proposição, argumentação e conclusão).",
+          "120": "Desenvolve o tema com argumentação previsível e domínio mediano do tipo dissertativo-argumentativo.",
+          "80": "Desenvolve o tema recorrendo à cópia dos textos motivadores ou apresenta domínio insuficiente da estrutura.",
+          "40": "Apresenta o assunto tangenciando o tema ou demonstra domínio precário do texto dissertativo com traços de outros tipos.",
+          "0": "Fuga total ao tema ou não atendimento à estrutura dissertativo-argumentativa."
+        }
+      },
+      "competencia_3": {
+        "nome": "Seleção, Relação, Organização e Interpretação de Argumentos (Projeto de Texto)",
+        "foco_avaliacao": [
+          "Presença explícita de Projeto de Texto planejado",
+          "Coerência e plausibilidade entre as ideias",
+          "Progressão temática fluida",
+          "Desenvolvimento e aprofundamento dos argumentos sem lacunas"
+        ],
+        "rubrica_niveis": {
+          "200": "Apresenta informações, fatos e opiniões relacionados ao tema, de forma organizada e bem desenvolvida em defesa de um ponto de vista (projeto de texto estratégico e indícios claros de autoria).",
+          "160": "Apresenta informações, fatos e opiniões organizados, com indícios de autoria, em defesa de um ponto de vista.",
+          "120": "Apresenta informações/fatos limitados aos argumentos dos textos motivadores e pouco organizados.",
+          "80": "Apresenta informações desorganizadas ou contraditórias e limitadas aos textos motivadores.",
+          "40": "Apresenta informações pouco relacionadas ao tema ou incoerentes e sem defesa de ponto de vista.",
+          "0": "Apresenta informações não relacionadas ao tema e sem defesa de ponto de vista."
+        }
+      },
+      "competencia_4": {
+        "nome": "Mecanismos Linguísticos para a Construção da Argumentação (Coesão Textual)",
+        "foco_avaliacao": [
+          "Articulação interparágrafos e intraparágrafos",
+          "Uso diversificado de operadores argumentativos e conectivos",
+          "Estratégias de referenciação (evitar repetições excessivas)",
+          "Ausência de inadequações coesivas"
+        ],
+        "rubrica_niveis": {
+          "200": "Articula bem as partes do texto e apresenta repertório diversificado de recursos coesivos, sem inadequações.",
+          "160": "Articula as partes do texto com poucas inadequações e repertório diversificado de recursos coesivos.",
+          "120": "Articula as partes do texto de forma mediana, com algumas inadequações e repertório pouco diversificado.",
+          "80": "Articula as partes do texto de forma insuficiente, com muitas inadequações e repertório limitado.",
+          "40": "Articula as partes do texto de forma precária.",
+          "0": "Não articula as informações."
+        }
+      },
+      "competencia_5": {
+        "nome": "Elaboração de Proposta de Intervenção e Respeito aos Direitos Humanos",
+        "foco_avaliacao": [
+          "Presença dos 5 elementos constitutivos da proposta",
+          "Articulação com a discussão e tese desenvolvidas no texto",
+          "Respeito estrito aos Direitos Humanos (dignidade, igualdade, laicidade, não-violência)"
+        ],
+        "elementos_obrigatorios": [
+          {
+            "elemento": "Agente",
+            "pergunta": "Quem executa a ação?"
+          },
+          {
+            "elemento": "Ação",
+            "pergunta": "O que deve ser feito?"
+          },
+          {
+            "elemento": "Meio/Modo",
+            "pergunta": "Como/Por meio de que a solução será viabilizada?"
+          },
+          {
+            "elemento": "Efeito",
+            "pergunta": "Qual resultado/finalidade se pretende alcançar?"
+          },
+          {
+            "elemento": "Detalhamento",
+            "pergunta": "Que informação adicional exemplifica, explica ou especifica um dos elementos?"
+          }
+        ],
+        "rubrica_niveis": {
+          "200": "Elabora muito bem proposta de intervenção, detalhada (com os 5 elementos), relacionada ao tema e articulada à discussão.",
+          "160": "Elabora bem proposta de intervenção relacionada ao tema e articulada (4 elementos completos).",
+          "120": "Elabora de forma mediana proposta relacionada ao tema e articulada (3 elementos completos).",
+          "80": "Elabora de forma insuficiente proposta relacionada ao tema ou não articulada (2 elementos completos).",
+          "40": "Apresenta proposta vaga, precária ou relacionada apenas ao assunto (1 elemento completo).",
+          "0": "Não apresenta proposta de intervenção ou apresenta proposta não relacionada ao tema/assunto, ou desrespeita os Direitos Humanos (penalização total nesta competência)."
+        }
+      }
+    }
+  },
+  "modulo_3_regras_de_avaliacao_e_discrepancia": {
+    "processo_correcao": "Avaliação por dois corretores independentes graduados em Letras/Linguística.",
+    "nota_final_padrao": "Média aritmética simples das notas totais dos dois avaliadores.",
+    "criterios_discrepancia": [
+      "Diferença maior que 100 pontos na NOTA TOTAL entre os dois avaliadores",
+      "Diferença superior a 80 pontos em QUALQUER UMA das 5 competências"
+    ],
+    "resolucao_discrepancia": {
+      "terceira_avaliacao": "Encaminhamento a um 3º avaliador independente. A nota final será a média aritmética das duas notas totais que mais se aproximarem.",
+      "banca_examinadora": "Se a discrepância persistir após a 3ª avaliação, a redação é submetida a uma banca presencial de três examinadores para nota soberana."
+    }
+  },
+  "modulo_4_exemplos_nota_1000_para_calibracao": [
+    {
+      "autor": "Ana Clara Pereira",
+      "tema_referencia": "Desafios para a valorização da herança africana no Brasil",
+      "tese": "O racismo estrutural e a negligência por parte da sociedade dificultam a valorização da herança africana.",
+      "repertorios_utilizados": [
+        "Obra 'Quarto de Despejo' de Carolina Maria de Jesus",
+        "Conceito de exclusão espacial do filósofo Elijah Anderson",
+        "Dados estatísticos do Atlas da Violência (2019)",
+        "Crítica ao mito da democracia racial por Florestan Fernandes"
+      ],
+      "pontos_forte_intervencao": "Propostas detalhadas direcionadas ao Ministério da Educação (componente curricular) e ao Ministério da Igualdade Racial (campanhas de conscientização)."
+    },
+    {
+      "autor": "Camila Oliveira Costa",
+      "tema_referencia": "Desafios para a valorização da herança africana no Brasil",
+      "tese": "Legado racista do período escravocrata e negligência educacional geram invisibilidade da cultura afrodescendente.",
+      "repertorios_utilizados": [
+        "Teoria da Banalidade do Mal de Hannah Arendt",
+        "Música 'Negro Drama' do Racionais MC's",
+        "Citação de Nelson Mandela sobre o papel transformador da educação"
+      ],
+      "pontos_forte_intervencao": "Atuação do Ministério da Educação na criação de itinerários formativos específicos e divulgação midiática antirracista."
+    }
+  ]
+}

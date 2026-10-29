@@ -795,6 +795,55 @@ Authorization: Bearer <token-do-tutor>
 
 Convites têm validade de 30 dias.
 
+## Inteligência artificial para redações
+
+A rota de digitalização exige token de sessão com o perfil `ALUNO`. A rota de
+avaliação exige token de sessão com o perfil `TUTOR`. O resultado é retornado
+na resposta e não é salvo no banco de dados. Configure `GEMINI_API_KEY` no
+`.env` do backend. Ambas as operações usam exclusivamente o modelo
+`gemini-3.5-flash-lite`.
+A rota de avaliação usa como referência a base ENEM versionada em
+`backend/src/data/base-dados-correcao-enem-2025.json`; mantenha esse conteúdo
+no backend e atualize-o quando a rubrica de referência mudar.
+
+### Digitalizar imagem
+
+```http
+POST /ia/digitalizar
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+```
+
+Envie uma única imagem no campo `imagem` (JPG, PNG ou WEBP; até 10 MB). Exemplo
+de resposta:
+
+```json
+{ "texto": "Texto transcrito da redação..." }
+```
+
+### Avaliar redação
+
+```http
+POST /ia/avaliar
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+```json
+{
+  "texto": "Texto completo da redação...",
+  "tema": "Tema proposto (opcional)"
+}
+```
+
+`tema` é opcional e `texto` aceita até 100.000 caracteres. A resposta contém
+`c1` a `c5` (nota e feedback), `nota_total` (soma das competências) e
+`sugestoes`. Cada competência recebe nota de 0 a 200, em múltiplos de 40.
+
+Erros próprios dessas rotas incluem `IA_NAO_CONFIGURADA` (503),
+`FALHA_PROVEDOR_IA` (502), `RESPOSTA_IA_INVALIDA` (502),
+`TEMPO_LIMITE_IA` (504), `IMAGEM_MUITO_GRANDE` (413) e erros de validação (400).
+
 ## Erros
 
 As respostas usam:

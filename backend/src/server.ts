@@ -1,5 +1,5 @@
 
-import "dotenv/config";
+import "./config/ambiente";
 import { app } from "./app";
 
 const PORT = Number(process.env.PORT ?? 3333);

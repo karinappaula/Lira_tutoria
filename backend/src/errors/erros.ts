@@ -25,3 +25,14 @@ export class ErroNegocio extends Error {
     this.name = "ErroNegocio";
   }
 }
+
+export class ErroIA extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+    public readonly codigo: string
+  ) {
+    super(message);
+    this.name = "ErroIA";
+  }
+}

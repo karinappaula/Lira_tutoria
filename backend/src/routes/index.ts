@@ -12,6 +12,7 @@ import simuladoRoute from "./simulado.route";
 import comunicadoRoute from "./comunicado.route";
 import indicadoresRoute from "./indicadores.route";
 import vinculoRoute from "./vinculo.route";
+import iaRoute from "./ia.route";
 
 
 const router = Router();
@@ -20,6 +21,7 @@ router.use(saudeRoute);
 router.use(turmaRoute);
 router.use("/auth", authRoute);
 router.use(vinculoRoute);
+router.use(iaRoute);
 router.use(conviteRoute);
 router.use(participacaoRoute);
 router.use(temaRoute);

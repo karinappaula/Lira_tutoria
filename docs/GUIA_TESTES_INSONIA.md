@@ -96,6 +96,56 @@ Os principais códigos HTTP são:
 
 ---
 
+## Testar as APIs de IA
+
+Antes de iniciar o backend, configure a chave no arquivo `backend/.env`:
+
+```env
+GEMINI_API_KEY="sua-chave-do-google-ai-studio"
+```
+
+Reinicie o servidor após salvar a variável. As rotas exigem autenticação:
+use um token de sessão com o perfil ativo correto, obtido no login como descrito
+na seção 1.3. A digitalização exige perfil `ALUNO`; a avaliação exige perfil
+`TUTOR`.
+
+### Digitalizar uma imagem
+
+Crie uma requisição `POST http://localhost:3333/ia/digitalizar` com um token de
+perfil `ALUNO` e informe o
+token em **Authorization > Bearer Token**. Em **Body > Multipart Form**, crie
+o campo `imagem`, mude seu tipo para **File** e selecione uma imagem JPG, PNG
+ou WEBP de até 10 MB. Não defina manualmente o `Content-Type`: o Insomnia e o
+Postman devem incluir o boundary do multipart.
+
+Resposta esperada (`200 OK`):
+
+```json
+{ "texto": "Transcrição da redação..." }
+```
+
+### Avaliar o texto da redação
+
+Crie uma requisição `POST http://localhost:3333/ia/avaliar`, com um token de
+perfil `TUTOR`. Em **Body > JSON**, envie:
+
+```json
+{
+  "texto": "Digite ou cole aqui o texto completo da redação.",
+  "tema": "Tema da redação (opcional)"
+}
+```
+
+Resposta `200 OK`: objeto com as competências `c1` a `c5` (cada uma com
+`nota` e `feedback`), `nota_total` e `sugestoes`. Cada nota é múltipla de 40
+entre 0 e 200 e a nota total é a soma das cinco.
+
+Se receber `503 IA_NAO_CONFIGURADA`, confirme a variável `GEMINI_API_KEY` e
+reinicie o backend. Outros erros retornam `erro` e `codigo`; por exemplo,
+imagem maior que 10 MB retorna `413 IMAGEM_MUITO_GRANDE`.
+
+---
+
 ## 00-HEALTH
 
 ### 00.01 — Verificar API

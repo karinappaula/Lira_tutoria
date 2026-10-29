@@ -2,7 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import { Prisma } from "@prisma/client";
 import { ErroAutenticacao } from "../services/login.service";
 import { ErroTokenInvalido } from "../services/token.service";
-import { ErroNegocio, ErroValidacao, type DetalheValidacao } from "../errors/erros";
+import { ErroIA, ErroNegocio, ErroValidacao, type DetalheValidacao } from "../errors/erros";
+import { MulterError } from "multer";
 
 const STATUS_AUTENTICACAO: Record<ErroAutenticacao["codigo"], number> = {
   CREDENCIAIS_INVALIDAS: 401,
@@ -46,6 +47,29 @@ export function errorHandler(
 
   if (err instanceof ErroNegocio) {
     return responder(res, err.status, err.message, err.codigo);
+  }
+
+  if (err instanceof ErroIA) {
+    return responder(res, err.status, err.message, err.codigo);
+  }
+
+  if (err instanceof MulterError) {
+    const status = err.code === "LIMIT_FILE_SIZE" ? 413 : 400;
+    const codigo = err.code === "LIMIT_FILE_SIZE" ? "IMAGEM_MUITO_GRANDE" : "UPLOAD_INVALIDO";
+    const mensagem =
+      err.code === "LIMIT_FILE_SIZE"
+        ? "A imagem excede o limite de 10 MB."
+        : "O envio da imagem é inválido. Envie um único arquivo no campo 'imagem'.";
+    return responder(res, status, mensagem, codigo);
+  }
+
+  if (
+    typeof err === "object" &&
+    err !== null &&
+    "type" in err &&
+    err.type === "entity.too.large"
+  ) {
+    return responder(res, 413, "O corpo da requisição excede o limite permitido.", "CORPO_MUITO_GRANDE");
   }
 
   // Violação de UNIQUE no banco (ex.: dois cadastros simultâneos com o mesmo e-mail).
