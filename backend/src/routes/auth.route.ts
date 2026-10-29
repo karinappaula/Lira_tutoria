@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { cadastro, login, me, selecionarPapelHandler } from "../controllers/auth.controller";
+import { cadastro, login, me, selecionarPapelHandler, verificarEmail } from "../controllers/auth.controller";
 import {
   esqueciSenha,
   redefinirSenhaHandler,
@@ -10,6 +10,7 @@ const router = Router();
 
 router.post("/login", login);
 router.post("/cadastro", cadastro);
+router.post("/verificar-email", verificarEmail);
 router.post("/selecionar-papel", selecionarPapelHandler);
 router.post("/esqueci-senha", esqueciSenha);
 router.post("/redefinir-senha", redefinirSenhaHandler);

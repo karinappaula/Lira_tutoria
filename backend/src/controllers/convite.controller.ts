@@ -14,7 +14,14 @@ function idTurma(req: Request): number {
 export async function criarConviteTutor(req: Request, res: Response, next: NextFunction) {
   try {
     const autenticada = req as RequestAutenticada;
-    const convite = await gerarConviteTutor(autenticada.autenticacao.idUsuario, idTurma(req));
+    let usosMaximos = 1;
+    if (req.body && typeof req.body === "object" && req.body.usosMaximos !== undefined) {
+      const parsed = Number(req.body.usosMaximos);
+      if (Number.isInteger(parsed) && parsed >= 1) {
+        usosMaximos = parsed;
+      }
+    }
+    const convite = await gerarConviteTutor(autenticada.autenticacao.idUsuario, idTurma(req), usosMaximos);
     res.status(201).json(convite);
   } catch (erro) {
     next(erro);
@@ -24,7 +31,8 @@ export async function criarConviteTutor(req: Request, res: Response, next: NextF
 export async function criarConviteAluno(req: Request, res: Response, next: NextFunction) {
   try {
     const autenticada = req as RequestAutenticada;
-    const convite = await gerarConviteAluno(autenticada.autenticacao.idUsuario);
+    const renovar = Boolean(req.body?.renovar || req.query.renovar === "true");
+    const convite = await gerarConviteAluno(autenticada.autenticacao.idUsuario, renovar);
     res.status(201).json(convite);
   } catch (erro) {
     next(erro);

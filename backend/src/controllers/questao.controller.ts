@@ -10,6 +10,7 @@ import {
   criarQuestao,
   excluirAssunto,
   excluirQuestao,
+  listarAnosCadastrados,
   listarAssuntos,
   listarQuestoes,
   type AlternativaInput,
@@ -211,4 +212,12 @@ export async function deleteAssunto(req: Request, res: Response, next: NextFunct
     await excluirAssunto(auth.idUsuario, id(req, "idAssunto"));
     res.status(204).send();
   } catch (erro) { next(erro); }
+}
+
+export async function getAnos(_req: Request, res: Response, next: NextFunction) {
+  try {
+    res.status(200).json(await listarAnosCadastrados());
+  } catch (erro) {
+    next(erro);
+  }
 }

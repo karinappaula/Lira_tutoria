@@ -15,6 +15,7 @@ import {
 import {
   deleteAssunto,
   deleteQuestao,
+  getAnos,
   getAssuntos,
   getQuestao,
   getQuestoes,
@@ -33,6 +34,7 @@ const admin = [exigirAutenticacao, exigirPapel("ADMINISTRADOR")];
 const todos = [exigirAutenticacao, exigirPapel("ADMINISTRADOR", "TUTOR", "ALUNO")];
 
 router.get("/questoes", ...todos, getQuestoes);
+router.get("/questoes/anos", ...todos, getAnos);
 router.get("/questoes/:idQuestao", ...admin, getQuestao);
 router.post("/questoes", ...admin, postQuestao);
 router.patch("/questoes/:idQuestao", ...admin, patchQuestao);

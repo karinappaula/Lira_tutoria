@@ -395,3 +395,13 @@ export async function alterarStatusQuestao(
     return questao;
   });
 }
+
+
+export async function listarAnosCadastrados(): Promise<number[]> {
+  const registros = await prisma.questao.findMany({
+    select: { ano: true },
+    distinct: ["ano"],
+    orderBy: { ano: "desc" },
+  });
+  return registros.map((r) => r.ano);
+}

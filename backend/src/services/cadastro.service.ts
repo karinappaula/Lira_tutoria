@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "../db/prisma";
-import { gerarHashSenha } from "./senha.service";
+import { conferirSenha, gerarHashSenha } from "./senha.service";
 import { MAX_TUTORES_POR_TURMA, MAX_TUTORADOS_POR_TUTOR } from "../config/limitesNegocio";
 import { ErroNegocio } from "../errors/erros";
 
@@ -41,8 +41,8 @@ export async function cadastrarViaConvite(
         "CONVITE_NAO_ENCONTRADO"
       );
     }
-    if (convite.usado) {
-      throw new ErroNegocio("Este convite já foi utilizado.", 409, "CONVITE_USADO");
+    if (convite.usado || convite.usos >= convite.usosMaximos) {
+      throw new ErroNegocio("Este convite já atingiu o limite máximo de utilizações.", 409, "CONVITE_USADO");
     }
     if (convite.expiraEm < new Date()) {
       throw new ErroNegocio("Este convite expirou. Peça um novo link.", 400, "CONVITE_EXPIRADO");
@@ -68,6 +68,30 @@ export async function cadastrarViaConvite(
           senhaHash,
         },
       });
+    } else {
+      // Conta já existia: precisa validar a senha atual fornecida para autorizar o vínculo do novo papel
+      if (!input.senha) {
+        throw new ErroNegocio(
+          "Informe a sua senha atual para vincular o novo perfil à sua conta.",
+          400,
+          "SENHA_OBRIGATORIA"
+        );
+      }
+      const senhaValida = await conferirSenha(input.senha, usuario.senhaHash);
+      if (!senhaValida) {
+        throw new ErroNegocio(
+          "Senha incorreta. Confirme a senha atual da sua conta para autorizar o vínculo.",
+          401,
+          "CREDENCIAIS_INVALIDAS"
+        );
+      }
+      if (usuario.status !== "ATIVO") {
+        throw new ErroNegocio(
+          "Esta conta está inativa. Fale com a Administração.",
+          403,
+          "CONTA_INATIVA"
+        );
+      }
     }
 
     // 3. Anexar o papel correspondente (na mesma transação)
@@ -90,10 +114,16 @@ export async function cadastrarViaConvite(
       );
     }
 
-    // 4. Marcar convite como utilizado
+    // 4. Incrementar usos e marcar 'usado = true' APENAS quando atingir o limite
+    const novosUsos = convite.usos + 1;
+    const agoraUsado = novosUsos >= convite.usosMaximos;
+
     await tx.convite.update({
       where: { codigo: convite.codigo },
-      data: { usado: true },
+      data: {
+        usos: novosUsos,
+        usado: agoraUsado,
+      },
     });
 
     return {

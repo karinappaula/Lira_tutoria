@@ -50,8 +50,19 @@ const correcaoInclude = {
     include: {
       redacao: {
         include: {
-          aluno: { include: { usuario: { select: { id: true, nome: true, email: true } } } },
-          tarefa: { select: { id: true, modalidade: true, prazoEntrega: true } },
+          aluno: {
+            include: {
+              usuario: { select: { id: true, nome: true, email: true } },
+              tutor: {
+                include: {
+                  turma: { select: { id: true, nome: true } },
+                  usuario: { select: { id: true, nome: true, email: true } },
+                },
+              },
+            },
+          },
+          tarefa: { select: { id: true, modalidade: true, prazoEntrega: true, tituloTarefa: true } },
+          tema: { select: { id: true, tituloTema: true } },
         },
       },
     },

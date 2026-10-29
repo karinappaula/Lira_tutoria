@@ -25,6 +25,10 @@ const redacaoInclude = {
     include: {
       tema: { select: { id: true, tituloTema: true, textoMotivador: true } },
       turma: { select: { id: true, nome: true, anoLetivo: true, status: true } },
+      anexos: {
+        select: { id: true, nomeArquivo: true, caminhoArquivo: true, tipoArquivo: true, criadoEm: true },
+        orderBy: { id: "asc" as const },
+      },
     },
   },
   tema: { select: { id: true, tituloTema: true, textoMotivador: true } },
@@ -50,6 +54,19 @@ const redacaoDetalheInclude = {
     },
   },
 } as const;
+
+function enriquecerTarefa<T extends { tarefa?: any }>(item: T): T {
+  if (!item.tarefa) return item;
+  const anexoPrincipal = item.tarefa.anexos?.[0]?.caminhoArquivo ?? null;
+  return {
+    ...item,
+    tarefa: {
+      ...item.tarefa,
+      anexoUrl: anexoPrincipal,
+      arquivoUrl: anexoPrincipal,
+    },
+  };
+}
 
 const CONTEUDO_MAXIMO = 100_000;
 
@@ -193,7 +210,7 @@ export async function criarRascunho(
       });
       idTemaFinal = novoTema.id;
     }
-    return tx.redacao.create({
+    const criada = await tx.redacao.create({
       data: {
         idAluno: aluno.idUsuario,
         idTarefa: input.idTarefa,
@@ -209,6 +226,7 @@ export async function criarRascunho(
       },
       include: redacaoInclude,
     });
+    return enriquecerTarefa(criada);
   });
 }
 
@@ -405,11 +423,12 @@ export async function listarRedacoesVisiveis(
         ? { idAluno: idUsuario }
         : { aluno: { tutor: { idUsuario } } };
 
-  return prisma.redacao.findMany({
+  const redacoes = await prisma.redacao.findMany({
     where,
     orderBy: { criadoEm: "desc" },
     include: redacaoInclude,
   });
+  return redacoes.map((r) => enriquecerTarefa(r));
 }
 
 export async function buscarRedacaoVisivel(
@@ -431,8 +450,9 @@ export async function buscarRedacaoVisivel(
     }
     // O aluno só enxerga correções já liberadas (RN02/RN03) e sem os
     // campos internos (recado do Tutor e observação da Administração).
+    const comAnexo = enriquecerTarefa(redacao);
     return {
-      ...redacao,
+      ...comAnexo,
       versoes: redacao.versoes.map((versao) => ({
         ...versao,
         statusVersao:
@@ -447,7 +467,7 @@ export async function buscarRedacaoVisivel(
   if (papelAtivo === "TUTOR" && redacao.aluno.tutor.idUsuario !== idUsuario) {
     throw new ErroNegocio("Você não possui acesso a esta redação.", 403, "SEM_PERMISSAO");
   }
-  return redacao;
+  return enriquecerTarefa(redacao);
 }
 
 // Fila do Tutor: versões enviadas pelos seus tutorados que ainda precisam

@@ -95,6 +95,8 @@ model Convite {
   idTutor     Int?     @map("id_tutor") // Preenchido quando papel = ALUNO
   idCriadoPor Int      @map("id_criado_por")
   usado       Boolean  @default(false)
+  usos        Int      @default(0)
+  usosMaximos Int      @default(1) @map("usos_maximos")
   expiraEm    DateTime @map("expira_em")
   criadoEm    DateTime @default(now()) @map("criado_em")
 

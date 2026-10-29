@@ -496,7 +496,18 @@ export async function listarCadernoErros(idUsuario: number, idAssunto?: number) 
       ...(idAssunto ? { questao: { assuntos: { some: { idAssunto } } } } : {}),
     },
     orderBy: { dataUltimoErro: "desc" },
-    include: { questao: questaoPublica },
+    include: {
+      questao: {
+        include: {
+          alternativas: {
+            orderBy: { letraOpcao: 'asc' },
+          },
+          assuntos: {
+            include: { assunto: true },
+          },
+        },
+      },
+    },
   });
 }
 

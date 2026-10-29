@@ -190,7 +190,12 @@ function paraVisaoDoAluno(tarefa: TarefaListada) {
   const { administrador, _count, ...publico } = tarefa;
   void administrador;
   void _count;
-  return publico;
+  const anexoPrincipal = tarefa.anexos?.[0]?.caminhoArquivo ?? null;
+  return {
+    ...publico,
+    anexoUrl: anexoPrincipal,
+    arquivoUrl: anexoPrincipal,
+  };
 }
 
 // Acrescenta o que cada papel precisa na lista:

@@ -4,6 +4,7 @@ import { cadastrarViaConvite } from "../services/cadastro.service";
 import type { PapelAtivo, PayloadSessao } from "../services/token.service";
 import type { RequestAutenticada } from "../middlewares/auth.middleware";
 import { ErroValidacao, type DetalheValidacao } from "../errors/erros";
+import { prisma } from "../db/prisma";
 
 const PAPEIS: readonly PapelAtivo[] = ["ADMINISTRADOR", "TUTOR", "ALUNO"];
 const REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -120,6 +121,47 @@ export async function cadastro(req: Request, res: Response, next: NextFunction) 
 
     const resultado = await cadastrarViaConvite({ codigo, email, nome, senha });
     res.status(201).json(resultado);
+  } catch (erro) {
+    next(erro);
+  }
+}
+
+// POST /auth/verificar-email
+export async function verificarEmail(req: Request, res: Response, next: NextFunction) {
+  try {
+    const b = corpo(req);
+    const d: DetalheValidacao[] = [];
+    const email = emailObrigatorio(b.email, d);
+    exigirValido(d);
+
+    const emailNormalizado = email.trim().toLowerCase();
+    const usuario = await prisma.usuario.findUnique({
+      where: { email: emailNormalizado },
+      select: {
+        id: true,
+        nome: true,
+        status: true,
+        administrador: { select: { idUsuario: true } },
+        tutor: { select: { idUsuario: true } },
+        aluno: { select: { idUsuario: true } },
+      },
+    });
+
+    if (!usuario) {
+      return res.status(200).json({ existe: false });
+    }
+
+    const papeisExistentes: string[] = [];
+    if (usuario.administrador) papeisExistentes.push("ADMINISTRADOR");
+    if (usuario.tutor) papeisExistentes.push("TUTOR");
+    if (usuario.aluno) papeisExistentes.push("ALUNO");
+
+    return res.status(200).json({
+      existe: true,
+      nome: usuario.nome,
+      status: usuario.status,
+      papeisExistentes,
+    });
   } catch (erro) {
     next(erro);
   }
