@@ -115,6 +115,7 @@ model Tema {
   id             Int      @id @default(autoincrement()) @map("id_tema")
   tituloTema     String   @map("titulo_tema") @db.VarChar(200)
   textoMotivador String?  @map("texto_motivador") @db.Text
+  imagemUrl      String?  @map("imagem_url") @db.VarChar(500)
   origem         String?  @db.VarChar(100)
   idCriador      Int?     @map("id_criador")
   criador        Usuario? @relation("TemaCriador", fields: [idCriador], references: [id])

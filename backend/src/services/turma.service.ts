@@ -256,6 +256,10 @@ export async function atualizarTurma(idTurma: number, input: AtualizarTurmaInput
     throw new ErroNegocio("Esta turma já está arquivada.", 409, "TURMA_JA_ARQUIVADA");
   }
 
+  if (input.status === "ATIVA" && turmaExistente.status === "ATIVA") {
+    throw new ErroNegocio("Esta turma já está ativa.", 409, "TURMA_JA_ATIVA");
+  }
+
   if (input.nome || input.anoLetivo) {
     const novoNome = input.nome ?? turmaExistente.nome;
     const novoAno = input.anoLetivo ?? turmaExistente.anoLetivo;
@@ -288,4 +292,11 @@ export async function atualizarTurma(idTurma: number, input: AtualizarTurmaInput
  */
 export async function arquivarTurma(idTurma: number) {
   return atualizarTurma(idTurma, { status: "ARQUIVADA" });
+}
+
+/**
+ * Desarquiva uma turma alterando seu status para "ATIVA".
+ */
+export async function desarquivarTurma(idTurma: number) {
+  return atualizarTurma(idTurma, { status: "ATIVA" });
 }

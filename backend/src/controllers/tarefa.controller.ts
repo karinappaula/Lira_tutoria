@@ -42,12 +42,12 @@ function validarPrazo(valor: unknown, detalhes: Detalhe[]): Date | undefined {
 
 // idTurma e modalidade deixaram de ser aceitos: a turma vem do Tutor e a
 // modalidade vem de quem cria (Tutor = AVALIATIVA, Administração = GERAL).
-function dadosTarefa(body: unknown, parcial = false) {
+function dadosTarefa(body: unknown, parcial = false, exigirTema = false) {
   const dados = corpo(body);
   const detalhes: Detalhe[] = [];
   const resultado: {
     idTema?: number;
-    novoTema?: { tituloTema: string; textoMotivador?: string };
+    novoTema?: { tituloTema: string; textoMotivador?: string; imagemUrl?: string };
     tituloTarefa?: string;
     descricao?: string;
     prazoEntrega?: Date;
@@ -63,16 +63,24 @@ function dadosTarefa(body: unknown, parcial = false) {
     const bruto = typeof dados.novoTema === "object" ? (dados.novoTema as Record<string, unknown>) : {};
     const titulo = typeof bruto.tituloTema === "string" ? bruto.tituloTema.trim() : "";
     const motivador = bruto.textoMotivador;
+    const imagem = bruto.imagemUrl;
     if (!titulo || titulo.length > 200) {
       detalhes.push({ campo: "novoTema.tituloTema", mensagem: "Informe um título de até 200 caracteres." });
     }
     if (motivador !== undefined && (typeof motivador !== "string" || motivador.length > 10000)) {
       detalhes.push({ campo: "novoTema.textoMotivador", mensagem: "Deve ser um texto de até 10000 caracteres." });
     }
+    if (imagem !== undefined && (typeof imagem !== "string" || imagem.length > 500)) {
+      detalhes.push({ campo: "novoTema.imagemUrl", mensagem: "Deve ser uma URL de até 500 caracteres." });
+    }
     resultado.novoTema = {
       tituloTema: titulo,
       textoMotivador: typeof motivador === "string" && motivador.trim() ? motivador.trim() : undefined,
+      imagemUrl: typeof imagem === "string" && imagem.trim() ? imagem.trim() : undefined,
     };
+  }
+  if (exigirTema && !parcial && !resultado.idTema && !resultado.novoTema) {
+    detalhes.push({ campo: "idTema", mensagem: "O tema é obrigatório para a criação de tarefas gerais." });
   }
   if (!parcial || dados.tituloTarefa !== undefined) {
     if (typeof dados.tituloTarefa !== "string" || dados.tituloTarefa.trim() === "") {
@@ -120,15 +128,16 @@ function dadosAnexo(body: unknown) {
 export async function postTarefa(req: Request, res: Response, next: NextFunction) {
   try {
     const auth = (req as RequestAutenticada).autenticacao;
-    const dados = dadosTarefa(req.body) as {
+    const ehAdmin = auth.papelAtivo === "ADMINISTRADOR";
+    const dados = dadosTarefa(req.body, false, ehAdmin) as {
       idTema?: number;
-      novoTema?: { tituloTema: string; textoMotivador?: string };
+      novoTema?: { tituloTema: string; textoMotivador?: string; imagemUrl?: string };
       tituloTarefa: string;
       descricao?: string;
       prazoEntrega: Date;
     };
     const tarefa =
-      auth.papelAtivo === "ADMINISTRADOR"
+      ehAdmin
         ? await criarTarefaGeral(auth.idUsuario, dados)
         : await criarTarefaPorTutor(auth.idUsuario, dados);
     res.status(201).json(tarefa);

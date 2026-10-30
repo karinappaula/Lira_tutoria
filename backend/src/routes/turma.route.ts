@@ -4,6 +4,7 @@ import {
   getTurmas,
   patchTurma,
   postArquivarTurma,
+  postDesarquivarTurma,
   postTurma,
 } from "../controllers/turma.controller";
 import { exigirAutenticacao, exigirPapel } from "../middlewares/auth.middleware";
@@ -39,6 +40,12 @@ router.post(
   exigirAutenticacao,
   exigirPapel("ADMINISTRADOR"),
   postArquivarTurma
+);
+router.post(
+  "/turmas/:idTurma/desarquivar",
+  exigirAutenticacao,
+  exigirPapel("ADMINISTRADOR"),
+  postDesarquivarTurma
 );
 
 export default router;

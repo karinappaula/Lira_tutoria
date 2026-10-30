@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { autenticar, obterSessaoAtual, selecionarPapel } from "../services/login.service";
 import { cadastrarViaConvite } from "../services/cadastro.service";
+import { consultarDetalhesConvite } from "../services/convite.service";
 import type { PapelAtivo, PayloadSessao } from "../services/token.service";
 import type { RequestAutenticada } from "../middlewares/auth.middleware";
 import { ErroValidacao, type DetalheValidacao } from "../errors/erros";
@@ -121,6 +122,20 @@ export async function cadastro(req: Request, res: Response, next: NextFunction) 
 
     const resultado = await cadastrarViaConvite({ codigo, email, nome, senha });
     res.status(201).json(resultado);
+  } catch (erro) {
+    next(erro);
+  }
+}
+
+// GET /auth/convite/:codigo
+export async function obterDetalhesConvite(req: Request, res: Response, next: NextFunction) {
+  try {
+    const codigo = String(req.params.codigo ?? "").trim().toUpperCase();
+    if (!codigo) {
+      throw new ErroValidacao([{ campo: "codigo", mensagem: "Código de convite obrigatório." }]);
+    }
+    const detalhes = await consultarDetalhesConvite(codigo);
+    res.status(200).json(detalhes);
   } catch (erro) {
     next(erro);
   }

@@ -7,6 +7,7 @@ import type { PapelAtivo } from "./token.service";
 export interface NovoTemaInput {
   tituloTema: string;
   textoMotivador?: string;
+  imagemUrl?: string;
 }
 
 export interface CriarTarefaInput {
@@ -39,12 +40,12 @@ export const TIPOS_ANEXO_PERMITIDOS = [
 ];
 
 // Situação das versões, usada para montar o progresso da tarefa.
-const STATUS_CONCLUIDA = ["CORRIGIDA", "AGUARDANDO_REESCRITA"];
-const STATUS_EM_CORRECAO = ["ENVIADA", "EM_CORRECAO", "AJUSTE_SOLICITADO"];
+const STATUS_CONCLUIDA = ["CORRIGIDA", "AGUARDANDO_REESCRITA", "REESCRITA_SOLICITADA"];
+const STATUS_EM_CORRECAO = ["ENVIADA", "EM_CORRECAO", "EM_REVISAO_FINAL", "AJUSTE_SOLICITADO"];
 
 const tarefaInclude = {
   turma: { select: { id: true, nome: true, anoLetivo: true, status: true } },
-  tema: { select: { id: true, tituloTema: true, textoMotivador: true } },
+  tema: { select: { id: true, tituloTema: true, textoMotivador: true, imagemUrl: true } },
   tutor: { select: { idUsuario: true, usuario: { select: { nome: true } } } },
   administrador: { select: { idUsuario: true, usuario: { select: { nome: true } } } },
   anexos: {
@@ -82,8 +83,11 @@ async function validarTema(idTema: number | undefined, idUsuario: number, papelA
   const tema = await prisma.tema.findUnique({ where: { id: idTema } });
   const permitido =
     !!tema &&
-    (tema.idCriador === null ||
-      (papelAtivo === "TUTOR" && tema.origem === "TUTOR" && tema.idCriador === idUsuario));
+    (tema.origem === "ADMIN" ||
+      tema.origem === "TUTOR" ||
+      tema.origem === "OFICIAL" ||
+      tema.idCriador === null ||
+      tema.idCriador === idUsuario);
   if (!permitido) {
     throw new ErroNegocio("Tema não encontrado.", 404, "TEMA_NAO_ENCONTRADO");
   }
@@ -111,6 +115,7 @@ export async function criarTarefaPorTutor(idUsuarioTutor: number, input: CriarTa
         data: {
           tituloTema: input.novoTema.tituloTema,
           textoMotivador: input.novoTema.textoMotivador,
+          imagemUrl: input.novoTema.imagemUrl,
           origem: "TUTOR",
           idCriador: idUsuarioTutor,
         },
@@ -140,18 +145,27 @@ export async function criarTarefaPorTutor(idUsuarioTutor: number, input: CriarTa
 // Administração: cria atividade GERAL (RF09 / RN07). Funciona como modelo:
 // não pertence a uma turma e os Tutores a aplicam aos seus grupos.
 export async function criarTarefaGeral(idUsuarioAdmin: number, input: CriarTarefaInput) {
+  if (!input.idTema && !input.novoTema) {
+    throw new ErroNegocio(
+      "O tema é obrigatório para a criação de tarefas gerais.",
+      400,
+      "TEMA_OBRIGATORIO"
+    );
+  }
   exigirApenasUmTema(input);
   await validarTema(input.idTema, idUsuarioAdmin, "ADMINISTRADOR");
 
   return prisma.$transaction(async (tx) => {
-    // Na Administração, o tema criado junto é oficial.
+    // Na Administração, o tema criado junto recebe origem 'ADMIN' e idCriador do Admin logado.
     let idTema = input.idTema;
     if (input.novoTema) {
       const tema = await tx.tema.create({
         data: {
           tituloTema: input.novoTema.tituloTema,
           textoMotivador: input.novoTema.textoMotivador,
-          origem: "OFICIAL",
+          imagemUrl: input.novoTema.imagemUrl,
+          origem: "ADMIN",
+          idCriador: idUsuarioAdmin,
         },
       });
       idTema = tema.id;

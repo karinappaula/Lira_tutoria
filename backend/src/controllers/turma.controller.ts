@@ -4,6 +4,7 @@ import {
   atualizarTurma,
   buscarTurmaVisivelPorId,
   criarTurma,
+  desarquivarTurma,
   listarTurmasVisiveis,
 } from "../services/turma.service";
 import type { RequestAutenticada } from "../middlewares/auth.middleware";
@@ -122,6 +123,15 @@ export async function patchTurma(req: Request, res: Response, next: NextFunction
 export async function postArquivarTurma(req: Request, res: Response, next: NextFunction) {
   try {
     const turma = await arquivarTurma(obterIdTurma(req));
+    return res.status(200).json(turma);
+  } catch (erro) {
+    next(erro);
+  }
+}
+
+export async function postDesarquivarTurma(req: Request, res: Response, next: NextFunction) {
+  try {
+    const turma = await desarquivarTurma(obterIdTurma(req));
     return res.status(200).json(turma);
   } catch (erro) {
     next(erro);

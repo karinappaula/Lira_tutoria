@@ -62,7 +62,7 @@ const correcaoInclude = {
             },
           },
           tarefa: { select: { id: true, modalidade: true, prazoEntrega: true, tituloTarefa: true } },
-          tema: { select: { id: true, tituloTema: true } },
+          tema: { select: { id: true, tituloTema: true, textoMotivador: true, imagemUrl: true } },
         },
       },
     },
@@ -178,7 +178,7 @@ export async function criarCorrecao(idUsuarioTutor: number, input: CriarCorrecao
   // RN02: treino não passa pela Administração; avaliativa passa (RN03).
   const ehTreino = versao.redacao.tipoFluxo === "TREINO";
   const statusAprovacao = ehTreino ? STATUS_CORRECAO.LIBERADA : STATUS_CORRECAO.PENDENTE;
-  const statusVersao = ehTreino ? "CORRIGIDA" : "EM_CORRECAO";
+  const statusVersao = ehTreino ? "CORRIGIDA" : "EM_REVISAO_FINAL";
 
   const numeroAjuste = (versao.correcoes[0]?.numeroAjuste ?? -1) + 1;
   return prisma.$transaction(async (tx) => {
@@ -359,7 +359,10 @@ export async function buscarCorrecaoVisivel(
   if (
     papel === "ALUNO" &&
     correcao.versao.redacao.aluno.idUsuario === idUsuario &&
-    STATUS_VISIVEIS_AO_ALUNO.includes(correcao.statusAprovacao)
+    (STATUS_VISIVEIS_AO_ALUNO.includes(correcao.statusAprovacao) ||
+      correcao.versao.statusVersao === "REESCRITA_SOLICITADA" ||
+      correcao.versao.statusVersao === "AGUARDANDO_REESCRITA" ||
+      correcao.versao.numeroVersao === 1)
   ) {
     const { administrador, tutor, ...resto } = paraVisaoDoAluno(correcao);
     void administrador;

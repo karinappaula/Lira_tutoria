@@ -10,7 +10,7 @@ export interface CriarRedacaoInput {
   tipoFluxo: TipoFluxoRedacao;
   idTarefa?: number;
   idTema?: number;
-  temaProprio?: { tituloTema: string; textoMotivador?: string };
+  temaProprio?: { tituloTema: string; textoMotivador?: string; imagemUrl?: string };
   conteudoTexto?: string;
 }
 
@@ -23,7 +23,7 @@ const redacaoInclude = {
   },
   tarefa: {
     include: {
-      tema: { select: { id: true, tituloTema: true, textoMotivador: true } },
+      tema: { select: { id: true, tituloTema: true, textoMotivador: true, imagemUrl: true } },
       turma: { select: { id: true, nome: true, anoLetivo: true, status: true } },
       anexos: {
         select: { id: true, nomeArquivo: true, caminhoArquivo: true, tipoArquivo: true, criadoEm: true },
@@ -31,7 +31,7 @@ const redacaoInclude = {
       },
     },
   },
-  tema: { select: { id: true, tituloTema: true, textoMotivador: true } },
+  tema: { select: { id: true, tituloTema: true, textoMotivador: true, imagemUrl: true } },
   versoes: {
     orderBy: { numeroVersao: "asc" as const },
   },
@@ -184,13 +184,15 @@ export async function criarRascunho(
       throw new ErroNegocio("Informe o tema da redação.", 400, "TEMA_OBRIGATORIO");
     }
     const tema = await prisma.tema.findUnique({ where: { id: idTema } });
-    // Pode usar: tema oficial, o próprio tema ou tema do seu Tutor.
-    // Tema de outro aluno ou de outro Tutor é tratado como inexistente.
+    // Pode usar: tema oficial/admin, o próprio tema ou tema do seu Tutor.
+    // Tema de outro aluno é tratado como inexistente.
     const visivel =
       !!tema &&
       (tema.idCriador === null ||
+        tema.origem === "ADMIN" ||
+        tema.origem === "OFICIAL" ||
         tema.idCriador === aluno.idUsuario ||
-        (tema.origem === "TUTOR" && tema.idCriador === aluno.idTutor));
+        (tema.origem === "TUTOR" && (aluno.idTutor ? tema.idCriador === aluno.idTutor : true)));
     if (!visivel) {
       throw new ErroNegocio("Tema não encontrado.", 404, "TEMA_NAO_ENCONTRADO");
     }
@@ -204,6 +206,7 @@ export async function criarRascunho(
         data: {
           tituloTema: temaProprio.tituloTema,
           textoMotivador: temaProprio.textoMotivador,
+          imagemUrl: temaProprio.imagemUrl,
           origem: "ALUNO",
           idCriador: aluno.idUsuario,
         },
@@ -267,6 +270,23 @@ export async function salvarRascunho(
   });
 }
 
+export const MIN_LINHAS = 8;
+export const MAX_LINHAS = 30;
+
+export function contarLinhas(texto: string): number {
+  if (!texto || !texto.trim()) return 0;
+  const CARACTERES_POR_LINHA = 75;
+  const paragrafos = texto.split(/\r?\n/);
+  let totalLinhas = 0;
+  for (const p of paragrafos) {
+    const trimmed = p.trim();
+    if (!trimmed) continue;
+    const linhasEstimadas = Math.ceil(trimmed.length / CARACTERES_POR_LINHA);
+    totalLinhas += Math.max(1, linhasEstimadas);
+  }
+  return totalLinhas;
+}
+
 export async function enviarVersao(idUsuarioAluno: number, idRedacao: number) {
   const redacao = await obterRedacaoDoUsuario(idRedacao, idUsuarioAluno);
   const versao = redacao.versoes[redacao.versoes.length - 1];
@@ -280,6 +300,16 @@ export async function enviarVersao(idUsuarioAluno: number, idRedacao: number) {
   if (!versao.conteudoTexto.trim()) {
     throw new ErroNegocio("Não é possível enviar uma redação vazia.", 400, "CONTEUDO_OBRIGATORIO");
   }
+
+  const linhas = contarLinhas(versao.conteudoTexto);
+  if (linhas < MIN_LINHAS) {
+    throw new ErroNegocio(
+      "Sua redação possui menos de 8 linhas. Mínimo exigido: 8 linhas",
+      400,
+      "LIMITE_LINHAS_MINIMO"
+    );
+  }
+
   // O prazo da tarefa vale para a primeira versão. A reescrita acontece
   // depois da correção, portanto depois do prazo, e não deve ser bloqueada.
   if (versao.numeroVersao === 1 && redacao.tarefa && redacao.tarefa.prazoEntrega < new Date()) {
@@ -315,7 +345,7 @@ export async function criarReescrita(idUsuarioAluno: number, idRedacao: number) 
     );
   }
   const versaoUm = redacao.versoes.find((item) => item.numeroVersao === 1);
-  if (!versaoUm || versaoUm.statusVersao !== "AGUARDANDO_REESCRITA") {
+  if (!versaoUm || (versaoUm.statusVersao !== "AGUARDANDO_REESCRITA" && versaoUm.statusVersao !== "REESCRITA_SOLICITADA")) {
     throw new ErroNegocio(
       "A reescrita só pode ser iniciada depois que o tutor a solicitar.",
       409,
@@ -353,7 +383,7 @@ export async function criarReescrita(idUsuarioAluno: number, idRedacao: number) 
 
 // RF07 / US15: é o TUTOR quem pede a reescrita, depois que a correção
 // da versão 1 foi liberada ao aluno (treino: ao corrigir; avaliativa:
-// após a aprovação da Administração). Só existe uma reescrita (RN05).
+// após a aprovação da Administração) ou diretamente no painel de correção. Só existe uma reescrita (RN05).
 export async function solicitarReescrita(idUsuarioTutor: number, idRedacao: number) {
   const redacao = await prisma.redacao.findUnique({
     where: { id: idRedacao },
@@ -373,9 +403,9 @@ export async function solicitarReescrita(idUsuarioTutor: number, idRedacao: numb
     );
   }
   const versaoUm = redacao.versoes.find((item) => item.numeroVersao === 1);
-  if (!versaoUm || versaoUm.statusVersao !== "CORRIGIDA") {
+  if (!versaoUm || !["CORRIGIDA", "ENVIADA", "AJUSTE_SOLICITADO", "EM_CORRECAO", "EM_REVISAO_FINAL"].includes(versaoUm.statusVersao)) {
     throw new ErroNegocio(
-      "A reescrita só pode ser solicitada depois que a correção da versão 1 for liberada ao aluno.",
+      "A reescrita só pode ser solicitada para a primeira versão da redação.",
       409,
       "REESCRITA_INDISPONIVEL"
     );
@@ -384,7 +414,12 @@ export async function solicitarReescrita(idUsuarioTutor: number, idRedacao: numb
   return prisma.$transaction(async (tx) => {
     const atualizada = await tx.versaoRedacao.update({
       where: { id: versaoUm.id },
-      data: { statusVersao: "AGUARDANDO_REESCRITA" },
+      data: { statusVersao: "REESCRITA_SOLICITADA" },
+    });
+    // Se havia correção pendente de aprovação (ex: avaliativa), libera para visualização do aluno
+    await tx.correcao.updateMany({
+      where: { idVersao: versaoUm.id, statusAprovacao: "PENDENTE_APROVACAO" },
+      data: { statusAprovacao: "LIBERADA" },
     });
     await registrarAuditoria(
       {
@@ -453,14 +488,29 @@ export async function buscarRedacaoVisivel(
     const comAnexo = enriquecerTarefa(redacao);
     return {
       ...comAnexo,
-      versoes: redacao.versoes.map((versao) => ({
-        ...versao,
-        statusVersao:
-          versao.statusVersao === "AJUSTE_SOLICITADO" ? "EM_CORRECAO" : versao.statusVersao,
-        correcoes: versao.correcoes
-          .filter((correcao) => STATUS_VISIVEIS_AO_ALUNO.includes(correcao.statusAprovacao))
-          .map((correcao) => paraVisaoDoAluno(correcao)),
-      })),
+      versoes: redacao.versoes.map((versao) => {
+        const pendenteAprovacao =
+          versao.statusVersao === "AJUSTE_SOLICITADO" ||
+          versao.statusVersao === "EM_CORRECAO" ||
+          versao.statusVersao === "EM_REVISAO_FINAL";
+
+        const statusVersao = pendenteAprovacao ? "EM_REVISAO_FINAL" : versao.statusVersao;
+
+        return {
+          ...versao,
+          statusVersao,
+          correcoes: pendenteAprovacao
+            ? []
+            : versao.correcoes
+                .filter(
+                  (correcao) =>
+                    STATUS_VISIVEIS_AO_ALUNO.includes(correcao.statusAprovacao) ||
+                    versao.statusVersao === "REESCRITA_SOLICITADA" ||
+                    versao.statusVersao === "AGUARDANDO_REESCRITA"
+                )
+                .map((correcao) => paraVisaoDoAluno(correcao)),
+        };
+      }),
     };
   }
 

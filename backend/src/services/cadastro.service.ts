@@ -41,16 +41,57 @@ export async function cadastrarViaConvite(
         "CONVITE_NAO_ENCONTRADO"
       );
     }
-    if (convite.usado || convite.usos >= convite.usosMaximos) {
-      throw new ErroNegocio("Este convite já atingiu o limite máximo de utilizações.", 409, "CONVITE_USADO");
-    }
     if (convite.expiraEm < new Date()) {
       throw new ErroNegocio("Este convite expirou. Peça um novo link.", 400, "CONVITE_EXPIRADO");
+    }
+
+    if (convite.papel === "ALUNO") {
+      if (!convite.idTutor) {
+        throw new ErroNegocio(
+          "O convite de aluno precisa estar associado a um tutor válido.",
+          400,
+          "CONVITE_INVALIDO"
+        );
+      }
+      // Regra de limite de 10 vagas validada via contagem de alunos ativos vinculados ao idTutor
+      const alunosAtivos = await tx.aluno.count({
+        where: { idTutor: convite.idTutor, usuario: { status: "ATIVO" } },
+      });
+      if (alunosAtivos >= MAX_TUTORADOS_POR_TUTOR) {
+        throw new ErroNegocio(
+          `O limite de vagas deste tutor foi atingido (${MAX_TUTORADOS_POR_TUTOR} alunos ativos vinculados). Novos cadastros estão bloqueados.`,
+          409,
+          "LIMITE_ATINGIDO"
+        );
+      }
+    } else {
+      if (convite.usado || convite.usos >= convite.usosMaximos) {
+        throw new ErroNegocio("Este convite já atingiu o limite máximo de utilizações.", 409, "CONVITE_USADO");
+      }
     }
 
     // 2. Buscar ou criar o usuário
     let usuario = await tx.usuario.findUnique({ where: { email: emailNormalizado } });
     const contaJaExistia = !!usuario;
+
+    // Impedir que um Tutor tente se cadastrar como aluno (próprio link ou perfil de tutor)
+    if (convite.papel === "ALUNO" && usuario) {
+      if (usuario.id === convite.idTutor) {
+        throw new ErroNegocio(
+          "Você é o tutor responsável por este convite e não pode se cadastrar como seu próprio aluno.",
+          400,
+          "TUTOR_AUTO_CADASTRO"
+        );
+      }
+      const perfilTutor = await tx.tutor.findUnique({ where: { idUsuario: usuario.id } });
+      if (perfilTutor) {
+        throw new ErroNegocio(
+          "Contas com perfil de Tutor não podem utilizar convites de aluno.",
+          400,
+          "PERFIL_INCOMPATIVEL"
+        );
+      }
+    }
 
     if (!usuario) {
       if (!input.nome || !input.senha) {
@@ -98,14 +139,7 @@ export async function cadastrarViaConvite(
     if (convite.papel === "TUTOR") {
       await anexarPapelTutor(tx, usuario.id, convite.idTurma);
     } else if (convite.papel === "ALUNO") {
-      if (!convite.idTutor) {
-        throw new ErroNegocio(
-          "O convite de aluno precisa estar associado a um tutor válido.",
-          400,
-          "CONVITE_INVALIDO"
-        );
-      }
-      await anexarPapelAluno(tx, usuario.id, convite.idTutor);
+      await anexarPapelAluno(tx, usuario.id, convite.idTutor!);
     } else {
       throw new ErroNegocio(
         `Papel de convite desconhecido: ${convite.papel}`,
@@ -114,17 +148,30 @@ export async function cadastrarViaConvite(
       );
     }
 
-    // 4. Incrementar usos e marcar 'usado = true' APENAS quando atingir o limite
-    const novosUsos = convite.usos + 1;
-    const agoraUsado = novosUsos >= convite.usosMaximos;
-
-    await tx.convite.update({
-      where: { codigo: convite.codigo },
-      data: {
-        usos: novosUsos,
-        usado: agoraUsado,
-      },
-    });
+    // 4. Atualizar usos do convite e status de usado
+    if (convite.papel === "ALUNO") {
+      const alunosAtivosAposCadastro = await tx.aluno.count({
+        where: { idTutor: convite.idTutor!, usuario: { status: "ATIVO" } },
+      });
+      const agoraUsado = alunosAtivosAposCadastro >= MAX_TUTORADOS_POR_TUTOR;
+      await tx.convite.update({
+        where: { codigo: convite.codigo },
+        data: {
+          usos: alunosAtivosAposCadastro,
+          usado: agoraUsado,
+        },
+      });
+    } else {
+      const novosUsos = convite.usos + 1;
+      const agoraUsado = novosUsos >= convite.usosMaximos;
+      await tx.convite.update({
+        where: { codigo: convite.codigo },
+        data: {
+          usos: novosUsos,
+          usado: agoraUsado,
+        },
+      });
+    }
 
     return {
       idUsuario: usuario.id,
@@ -181,6 +228,23 @@ async function anexarPapelAluno(
   idUsuario: number,
   idTutor: number
 ) {
+  if (idUsuario === idTutor) {
+    throw new ErroNegocio(
+      "Você é o tutor responsável por este convite e não pode se cadastrar como seu próprio aluno.",
+      400,
+      "TUTOR_AUTO_CADASTRO"
+    );
+  }
+
+  const tutorExistente = await tx.tutor.findUnique({ where: { idUsuario } });
+  if (tutorExistente) {
+    throw new ErroNegocio(
+      "Contas com perfil de Tutor não podem ser vinculadas como aluno.",
+      400,
+      "PERFIL_INCOMPATIVEL"
+    );
+  }
+
   const alunoExistente = await tx.aluno.findUnique({ where: { idUsuario } });
 
   if (alunoExistente) {
@@ -192,10 +256,12 @@ async function anexarPapelAluno(
     );
   }
 
-  const quantidadeTutoradosDoTutor = await tx.aluno.count({ where: { idTutor } });
+  const quantidadeTutoradosDoTutor = await tx.aluno.count({
+    where: { idTutor, usuario: { status: "ATIVO" } },
+  });
   if (quantidadeTutoradosDoTutor >= MAX_TUTORADOS_POR_TUTOR) {
     throw new ErroNegocio(
-      `Este tutor já atingiu o limite de ${MAX_TUTORADOS_POR_TUTOR} tutorados.`,
+      `O limite de vagas deste tutor foi atingido (${MAX_TUTORADOS_POR_TUTOR} alunos ativos vinculados). Novos cadastros estão bloqueados.`,
       409,
       "LIMITE_ATINGIDO"
     );

@@ -7,7 +7,7 @@ import type { PapelAtivo } from "./token.service";
 // (avaliativa) ou liberada direto pelo Tutor (treino). Só estas contam nas notas.
 const STATUS_LIBERADA = ["APROVADA", "LIBERADA"];
 // Versões que ainda dependem do Tutor ou da Administração.
-const STATUS_PENDENTE = ["ENVIADA", "EM_CORRECAO", "AJUSTE_SOLICITADO"];
+const STATUS_PENDENTE = ["ENVIADA", "EM_CORRECAO", "EM_REVISAO_FINAL", "AJUSTE_SOLICITADO"];
 
 // Competências oficiais do ENEM (RF16).
 const COMPETENCIAS = [

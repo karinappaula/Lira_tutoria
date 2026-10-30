@@ -19,7 +19,7 @@ function idTema(req: Request): number {
 
 function lerDados(body: unknown, parcial: boolean) {
   const dados = typeof body === "object" && body !== null ? body as Record<string, unknown> : {};
-  const resultado: { tituloTema?: string; textoMotivador?: string; origem?: string } = {};
+  const resultado: { tituloTema?: string; textoMotivador?: string; imagemUrl?: string; origem?: string } = {};
   const detalhes: { campo: string; mensagem: string }[] = [];
 
   if (!parcial || dados.tituloTema !== undefined) {
@@ -35,6 +35,15 @@ function lerDados(body: unknown, parcial: boolean) {
       if (typeof dados[campo] !== "string" || dados[campo].trim().length > max) {
         detalhes.push({ campo, mensagem: `Deve ser um texto de até ${max} caracteres.` });
       } else resultado[campo] = dados[campo].trim();
+    }
+  }
+  if (dados.imagemUrl !== undefined) {
+    if (dados.imagemUrl === null || dados.imagemUrl === "") {
+      resultado.imagemUrl = undefined;
+    } else if (typeof dados.imagemUrl !== "string" || dados.imagemUrl.trim().length > 500) {
+      detalhes.push({ campo: "imagemUrl", mensagem: "Deve ser um texto/URL de até 500 caracteres." });
+    } else {
+      resultado.imagemUrl = dados.imagemUrl.trim();
     }
   }
   if (parcial && Object.keys(resultado).length === 0 && detalhes.length === 0) {

@@ -49,21 +49,26 @@ function criarInput(body: unknown) {
       detalhes.push({ campo, mensagem: "Informe um identificador inteiro positivo." });
     }
   }
-  let temaProprio: { tituloTema: string; textoMotivador?: string } | undefined;
+  let temaProprio: { tituloTema: string; textoMotivador?: string; imagemUrl?: string } | undefined;
   if (dados.temaProprio !== undefined && dados.temaProprio !== null) {
     const bruto =
       typeof dados.temaProprio === "object" ? (dados.temaProprio as Record<string, unknown>) : {};
     const titulo = typeof bruto.tituloTema === "string" ? bruto.tituloTema.trim() : "";
     const motivador = bruto.textoMotivador;
+    const imagem = bruto.imagemUrl;
     if (!titulo || titulo.length > 200) {
       detalhes.push({ campo: "temaProprio.tituloTema", mensagem: "Informe um título de até 200 caracteres." });
     }
     if (motivador !== undefined && (typeof motivador !== "string" || motivador.length > 10000)) {
       detalhes.push({ campo: "temaProprio.textoMotivador", mensagem: "Deve ser um texto de até 10000 caracteres." });
     }
+    if (imagem !== undefined && (typeof imagem !== "string" || imagem.length > 500)) {
+      detalhes.push({ campo: "temaProprio.imagemUrl", mensagem: "Deve ser uma URL de até 500 caracteres." });
+    }
     temaProprio = {
       tituloTema: titulo,
       textoMotivador: typeof motivador === "string" && motivador.trim() ? motivador.trim() : undefined,
+      imagemUrl: typeof imagem === "string" && imagem.trim() ? imagem.trim() : undefined,
     };
   }
   if (detalhes.length) throw new ErroValidacao(detalhes);

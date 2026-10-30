@@ -115,6 +115,77 @@ export async function gerarConviteTutor(
   );
 }
 
+export interface DetalhesConvitePublico {
+  codigo: string;
+  papel: "TUTOR" | "ALUNO";
+  idTurma: number;
+  nomeTurma: string;
+  idTutor?: number | null;
+  nomeTutor?: string | null;
+  usos: number;
+  usosMaximos: number;
+  vagasRestantes: number;
+  lotado: boolean;
+  expirado: boolean;
+}
+
+export async function consultarDetalhesConvite(codigo: string): Promise<DetalhesConvitePublico> {
+  const codigoNormalizado = codigo.trim().toUpperCase();
+  const convite = await prisma.convite.findUnique({
+    where: { codigo: codigoNormalizado },
+    include: {
+      turma: { select: { id: true, nome: true } },
+      tutor: { include: { usuario: { select: { nome: true } } } },
+    },
+  });
+
+  if (!convite) {
+    throw new ErroNegocio("Convite não encontrado. Confira o código recebido.", 404, "CONVITE_NAO_ENCONTRADO");
+  }
+
+  const expirado = convite.expiraEm < new Date();
+
+  if (convite.papel === "ALUNO" && convite.idTutor) {
+    const alunosAtivos = await prisma.aluno.count({
+      where: {
+        idTutor: convite.idTutor,
+        usuario: { status: "ATIVO" },
+      },
+    });
+    const lotado = convite.usado || alunosAtivos >= MAX_TUTORADOS_POR_TUTOR;
+    return {
+      codigo: convite.codigo,
+      papel: "ALUNO",
+      idTurma: convite.idTurma,
+      nomeTurma: convite.turma.nome,
+      idTutor: convite.idTutor,
+      nomeTutor: convite.tutor?.usuario.nome ?? null,
+      usos: alunosAtivos,
+      usosMaximos: MAX_TUTORADOS_POR_TUTOR,
+      vagasRestantes: Math.max(0, MAX_TUTORADOS_POR_TUTOR - alunosAtivos),
+      lotado,
+      expirado,
+    };
+  }
+
+  // Convite para TUTOR
+  const tutoresAtuais = await prisma.tutor.count({ where: { idTurma: convite.idTurma } });
+  const lotado = convite.usado || convite.usos >= convite.usosMaximos || tutoresAtuais >= MAX_TUTORES_POR_TURMA;
+  return {
+    codigo: convite.codigo,
+    papel: "TUTOR",
+    idTurma: convite.idTurma,
+    nomeTurma: convite.turma.nome,
+    idTutor: null,
+    nomeTutor: null,
+    usos: convite.usos,
+    usosMaximos: convite.usosMaximos,
+    vagasRestantes: Math.max(0, convite.usosMaximos - convite.usos),
+    lotado,
+    expirado,
+  };
+}
+
 export async function gerarConviteAluno(
   idUsuarioTutor: number,
   renovar?: boolean
@@ -131,6 +202,14 @@ export async function gerarConviteAluno(
     throw new ErroNegocio("Não é possível gerar convite para uma turma inativa.", 409, "TURMA_INATIVA");
   }
 
+  // Contagem de alunos ativos vinculados ao idTutor no banco de dados (COUNT(tutorados) <= 10)
+  const alunosAtivos = await prisma.aluno.count({
+    where: {
+      idTutor: idUsuarioTutor,
+      usuario: { status: "ATIVO" },
+    },
+  });
+
   // Reutiliza o convite ativo do tutor se não foi solicitada a renovação explícita
   if (!renovar) {
     const conviteAtivo = await prisma.convite.findFirst({
@@ -143,24 +222,34 @@ export async function gerarConviteAluno(
     });
 
     if (conviteAtivo) {
+      const vagasRestantes = Math.max(0, MAX_TUTORADOS_POR_TUTOR - alunosAtivos);
+      const usado = conviteAtivo.usado || alunosAtivos >= MAX_TUTORADOS_POR_TUTOR;
+
+      // Sincroniza usos com contagem de alunos ativos no banco
+      if (conviteAtivo.usos !== alunosAtivos || conviteAtivo.usado !== usado) {
+        await prisma.convite.update({
+          where: { codigo: conviteAtivo.codigo },
+          data: { usos: alunosAtivos, usado },
+        });
+      }
+
       return {
         codigo: conviteAtivo.codigo,
         papel: conviteAtivo.papel as "ALUNO",
         idTurma: conviteAtivo.idTurma,
         idTutor: conviteAtivo.idTutor,
         expiraEm: conviteAtivo.expiraEm,
-        usado: conviteAtivo.usado,
-        usos: conviteAtivo.usos,
-        usosMaximos: conviteAtivo.usosMaximos,
-        vagasRestantes: Math.max(0, conviteAtivo.usosMaximos - conviteAtivo.usos),
+        usado,
+        usos: alunosAtivos,
+        usosMaximos: MAX_TUTORADOS_POR_TUTOR,
+        vagasRestantes,
       };
     }
   }
 
-  const alunosAtuais = await prisma.aluno.count({ where: { idTutor: idUsuarioTutor } });
-  if (alunosAtuais >= MAX_TUTORADOS_POR_TUTOR) {
+  if (alunosAtivos >= MAX_TUTORADOS_POR_TUTOR) {
     throw new ErroNegocio(
-      `Este tutor já atingiu o limite de ${MAX_TUTORADOS_POR_TUTOR} tutorados.`,
+      `O limite de vagas deste tutor foi atingido (${MAX_TUTORADOS_POR_TUTOR} alunos ativos vinculados).`,
       409,
       "LIMITE_ATINGIDO"
     );
@@ -178,13 +267,15 @@ export async function gerarConviteAluno(
     });
   }
 
+  // Ao gerar ou renovar o código de convite, a contagem de alunos ativos do tutor NÃO deve ser zerada.
+  // O novo link gerado permite cadastros apenas até completar o limite global de 10 alunos por tutor.
   return criarConviteComCodigo(
     {
       papel: "ALUNO" as const,
       turma: { connect: { id: tutor.idTurma } },
       tutor: { connect: { idUsuario: idUsuarioTutor } },
       criadoPor: { connect: { id: idUsuarioTutor } },
-      usos: 0,
+      usos: alunosAtivos,
       usosMaximos: MAX_TUTORADOS_POR_TUTOR,
       expiraEm: dataExpiracao(),
     },
@@ -236,6 +327,23 @@ async function anexarAluno(
   idUsuario: number,
   idTutor: number
 ): Promise<void> {
+  if (idUsuario === idTutor) {
+    throw new ErroNegocio(
+      "Você é o tutor responsável por este convite e não pode se cadastrar como seu próprio aluno.",
+      400,
+      "TUTOR_AUTO_CADASTRO"
+    );
+  }
+
+  const tutorExistente = await tx.tutor.findUnique({ where: { idUsuario } });
+  if (tutorExistente) {
+    throw new ErroNegocio(
+      "Contas com perfil de Tutor não podem ser vinculadas como aluno.",
+      400,
+      "PERFIL_INCOMPATIVEL"
+    );
+  }
+
   const alunoExistente = await tx.aluno.findUnique({ where: { idUsuario } });
   if (alunoExistente) {
     throw new ErroNegocio(
@@ -245,10 +353,12 @@ async function anexarAluno(
     );
   }
 
-  const quantidade = await tx.aluno.count({ where: { idTutor } });
+  const quantidade = await tx.aluno.count({
+    where: { idTutor, usuario: { status: "ATIVO" } },
+  });
   if (quantidade >= MAX_TUTORADOS_POR_TUTOR) {
     throw new ErroNegocio(
-      `Este tutor já atingiu o limite de ${MAX_TUTORADOS_POR_TUTOR} tutorados.`,
+      `O limite de vagas deste tutor foi atingido (${MAX_TUTORADOS_POR_TUTOR} alunos ativos vinculados). Novos cadastros estão bloqueados.`,
       409,
       "LIMITE_ATINGIDO"
     );
@@ -259,15 +369,6 @@ async function anexarAluno(
 
 export async function participarComoAluno(idUsuario: number, codigo: string) {
   return prisma.$transaction(async (tx) => {
-    const tutorDoUsuario = await tx.tutor.findUnique({ where: { idUsuario } });
-    if (!tutorDoUsuario) {
-      throw new ErroNegocio(
-        "A participação como aluno está disponível para contas de tutor.",
-        403,
-        "SEM_PERMISSAO"
-      );
-    }
-
     const convite = await tx.convite.findUnique({ where: { codigo } });
     if (!convite) {
       throw new ErroNegocio("Convite não encontrado.", 404, "CONVITE_NAO_ENCONTRADO");
@@ -275,17 +376,36 @@ export async function participarComoAluno(idUsuario: number, codigo: string) {
     if (convite.papel !== "ALUNO" || !convite.idTutor) {
       throw new ErroNegocio("Este código não é um convite de aluno.", 400, "CONVITE_INVALIDO");
     }
-    if (convite.usado || convite.usos >= convite.usosMaximos) {
-      throw new ErroNegocio("Este convite já atingiu o limite máximo de utilizações.", 409, "CONVITE_USADO");
+    if (convite.idTutor === idUsuario) {
+      throw new ErroNegocio(
+        "Você é o tutor responsável por este convite e não pode se cadastrar como seu próprio aluno.",
+        400,
+        "TUTOR_AUTO_CADASTRO"
+      );
+    }
+    const ehTutor = await tx.tutor.findUnique({ where: { idUsuario } });
+    if (ehTutor) {
+      throw new ErroNegocio(
+        "Contas com perfil de Tutor não podem utilizar convites de aluno.",
+        400,
+        "PERFIL_INCOMPATIVEL"
+      );
     }
     if (convite.expiraEm < new Date()) {
       throw new ErroNegocio("Este convite expirou.", 400, "CONVITE_EXPIRADO");
     }
 
+    const alunosAtivos = await tx.aluno.count({
+      where: { idTutor: convite.idTutor, usuario: { status: "ATIVO" } },
+    });
+    if (convite.usado || alunosAtivos >= MAX_TUTORADOS_POR_TUTOR) {
+      throw new ErroNegocio("O limite de 10 vagas deste tutor foi atingido.", 409, "LIMITE_ATINGIDO");
+    }
+
     await anexarAluno(tx, idUsuario, convite.idTutor);
 
-    const novosUsos = convite.usos + 1;
-    const agoraUsado = novosUsos >= convite.usosMaximos;
+    const novosUsos = alunosAtivos + 1;
+    const agoraUsado = novosUsos >= MAX_TUTORADOS_POR_TUTOR;
 
     await tx.convite.update({
       where: { codigo },

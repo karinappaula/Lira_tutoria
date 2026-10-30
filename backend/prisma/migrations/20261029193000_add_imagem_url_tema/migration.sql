@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `TEMA` ADD COLUMN `imagem_url` VARCHAR(500) NULL;

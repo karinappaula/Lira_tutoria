@@ -6,6 +6,7 @@ import type { PapelAtivo } from "./token.service";
 export interface CriarTemaInput {
   tituloTema: string;
   textoMotivador?: string;
+  imagemUrl?: string;
   origem?: string;
 }
 
@@ -13,48 +14,46 @@ export type AtualizarTemaInput = Partial<CriarTemaInput>;
 
 const contagens = { _count: { select: { tarefas: true, redacoes: true } } } as const;
 
-// "TUTOR" e "ALUNO" são origens reservadas: só o sistema as atribui.
-const ORIGENS_RESERVADAS = ["TUTOR", "ALUNO"];
-
 // Quem enxerga cada tema:
-// - oficial (sem criador, criado pela Administração): todos;
-// - tema do Tutor (origem TUTOR): o próprio Tutor, os tutorados dele e a Administração;
-// - tema do aluno (origem ALUNO): só o próprio aluno e a Administração.
+// - Administrador: todos os temas cadastrados no acervo;
+// - Tutor: todos os temas criados por Tutores e Admins (e temas oficiais do acervo);
+// - Aluno: temas oficiais/admin, temas do seu tutor e temas criados pelo próprio aluno.
 async function filtroDeVisibilidade(idUsuario: number, papelAtivo: PapelAtivo): Promise<Prisma.TemaWhereInput> {
   if (papelAtivo === "ADMINISTRADOR") return {};
   if (papelAtivo === "TUTOR") {
-    return { OR: [{ idCriador: null }, { idCriador: idUsuario }] };
+    return {
+      OR: [
+        { origem: "ADMIN" },
+        { origem: "TUTOR" },
+        { origem: "OFICIAL" },
+        { idCriador: null },
+        { idCriador: idUsuario },
+      ],
+    };
   }
   const aluno = await prisma.aluno.findUnique({ where: { idUsuario }, select: { idTutor: true } });
   return {
     OR: [
       { idCriador: null },
+      { origem: "ADMIN" },
+      { origem: "OFICIAL" },
       { idCriador: idUsuario },
-      ...(aluno ? [{ idCriador: aluno.idTutor, origem: "TUTOR" }] : []),
+      ...(aluno ? [{ idCriador: aluno.idTutor, origem: "TUTOR" }, { idCriador: aluno.idTutor }] : []),
     ],
   };
 }
 
-function validarOrigemDaAdministracao(origem: string | undefined) {
-  if (origem && ORIGENS_RESERVADAS.includes(origem.trim().toUpperCase())) {
-    throw new ErroNegocio(
-      "As origens TUTOR e ALUNO são reservadas ao sistema.",
-      400,
-      "ORIGEM_RESERVADA"
-    );
-  }
-}
-
-// Administração cria tema oficial. O Tutor cria tema próprio, que serve às
-// tarefas dele (e fica visível aos tutorados dele).
+// O campo 'origem' representa ESTRITAMENTE o perfil do criador ('ADMIN' ou 'TUTOR')
+// e é atribuído automaticamente no backend com base na sessão autenticada.
 export async function criarTema(idUsuario: number, papelAtivo: PapelAtivo, input: CriarTemaInput) {
   if (papelAtivo === "ADMINISTRADOR") {
-    validarOrigemDaAdministracao(input.origem);
     return prisma.tema.create({
       data: {
         tituloTema: input.tituloTema,
         textoMotivador: input.textoMotivador,
-        origem: input.origem ?? "OFICIAL",
+        imagemUrl: input.imagemUrl,
+        origem: "ADMIN",
+        idCriador: idUsuario,
       },
     });
   }
@@ -65,6 +64,7 @@ export async function criarTema(idUsuario: number, papelAtivo: PapelAtivo, input
     data: {
       tituloTema: input.tituloTema,
       textoMotivador: input.textoMotivador,
+      imagemUrl: input.imagemUrl,
       origem: "TUTOR",
       idCriador: idUsuario,
     },
@@ -125,14 +125,14 @@ export async function atualizarTema(
   input: AtualizarTemaInput
 ) {
   await obterTemaParaAlterar(idTema, idUsuario, papelAtivo);
-  if (papelAtivo === "ADMINISTRADOR") {
-    validarOrigemDaAdministracao(input.origem);
-    return prisma.tema.update({ where: { id: idTema }, data: input });
-  }
-  // O Tutor não muda a origem.
+  // O campo origem não se altera: representa estritamente o criador original
   return prisma.tema.update({
     where: { id: idTema },
-    data: { tituloTema: input.tituloTema, textoMotivador: input.textoMotivador },
+    data: {
+      tituloTema: input.tituloTema,
+      textoMotivador: input.textoMotivador,
+      imagemUrl: input.imagemUrl,
+    },
   });
 }
 
