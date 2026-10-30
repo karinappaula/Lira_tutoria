@@ -1,18 +1,15 @@
 'use client';
 
 import { useMemo, type CSSProperties } from 'react';
-import Link from 'next/link';
 import {
   AlertCircle,
   Award,
   CheckCircle2,
   FileText,
   GraduationCap,
-  Notebook,
   TrendingUp,
 } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { Button } from '@/components/ui/Button/Button';
 import { EmptyState, ErrorState } from '@/components/ui/Estados/Estados';
 import { CarregandoPagina } from '@/components/ui/Spinner/Spinner';
 import { useBuscar } from '@/hooks/useBuscar';
@@ -64,20 +61,7 @@ export function EstatisticasAluno() {
       <PageHeader
         titulo="Minhas Estatísticas"
         descricao="Acompanhe sua evolução pedagógica, notas por competência do ENEM e taxa de acertos em simulados."
-        acao={
-          <div className={styles.acoesHeader}>
-            <Link href="/aluno/caderno-erros">
-              <Button variante="secundario" icone={<Notebook size={16} aria-hidden="true" />}>
-                Caderno de Erros
-              </Button>
-            </Link>
-            <Link href="/aluno/simulados">
-              <Button variante="primario" icone={<GraduationCap size={16} aria-hidden="true" />}>
-                Novo Simulado
-              </Button>
-            </Link>
-          </div>
-        }
+        
       />
 
       {/* Grade de KPIs */}

@@ -196,6 +196,8 @@
     padding-inline: $esp-5;
   }
   @include celular {
+    flex-direction: column;
+    align-items: stretch;
     padding-inline: $esp-4;
   }
 }
@@ -215,9 +217,28 @@
 
   @include celular {
     font-size: 0.9rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
 
     span {
-      display: none;
+      display: inline;
+    }
+  }
+}
+
+.botoesBarraFixa {
+  display: flex;
+  align-items: center;
+  gap: $esp-3;
+  flex-wrap: wrap;
+
+  @include celular {
+    width: 100%;
+
+    > * {
+      flex: 1;
+      min-height: 44px;
     }
   }
 }
@@ -226,6 +247,12 @@
   display: flex;
   flex-direction: column;
   gap: $esp-3;
+}
+
+.instrucaoModal {
+  color: $cor-texto-suave;
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 
 .notas {

@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/Campos/Campos';
 import { useToast } from '@/components/ui/Toast/Toast';
 import { ApiError, mensagemDeErro } from '@/lib/erros';
 import { validarCodigoConvite, validarEmail, validarNome, validarObrigatorio, validarSenhaMinima } from '@/lib/validacao';
-import { authService, type VerificacaoEmailResultado } from '@/services/auth';
+import { authService, type DetalhesConvitePublico, type VerificacaoEmailResultado } from '@/services/auth';
 
 interface Erros {
   codigo?: string;
@@ -59,7 +59,36 @@ export function CadastroForm() {
   const [enviando, setEnviando] = useState(false);
   const [contaExistente, setContaExistente] = useState<VerificacaoEmailResultado | null>(null);
   const [verificandoEmail, setVerificandoEmail] = useState(false);
+  const [detalhesConvite, setDetalhesConvite] = useState<DetalhesConvitePublico | null>(null);
+  const [verificandoConvite, setVerificandoConvite] = useState(false);
   const jaTentou = useRef(false);
+
+  // Consulta detalhes e ocupação do convite
+  useEffect(() => {
+    const cod = valores.codigo.trim().toUpperCase();
+    if (!cod || Boolean(validarCodigoConvite(cod))) {
+      setDetalhesConvite(null);
+      return;
+    }
+
+    let ativo = true;
+    setVerificandoConvite(true);
+    authService
+      .detalhesConvite(cod)
+      .then((det) => {
+        if (ativo) setDetalhesConvite(det);
+      })
+      .catch(() => {
+        if (ativo) setDetalhesConvite(null);
+      })
+      .finally(() => {
+        if (ativo) setVerificandoConvite(false);
+      });
+
+    return () => {
+      ativo = false;
+    };
+  }, [valores.codigo]);
 
   // Verificação de e-mail existente com debounce
   useEffect(() => {
@@ -99,9 +128,26 @@ export function CadastroForm() {
     if (jaTentou.current) setErros(validar(novos, Boolean(contaExistente?.existe)));
   }
 
+  const ehPapelAluno = detalhesConvite?.papel === 'ALUNO' || valores.codigo.startsWith('ALU-');
+  const bloqueadoPorVagas = Boolean(detalhesConvite?.papel === 'ALUNO' && (detalhesConvite.lotado || detalhesConvite.vagasRestantes <= 0));
+  const bloqueadoPorExpiracao = Boolean(detalhesConvite?.expirado);
+  const ehTutorAutoCadastro = Boolean(ehPapelAluno && contaExistente?.papeisExistentes?.includes('TUTOR'));
+  const bloqueioGeral = bloqueadoPorVagas || bloqueadoPorExpiracao || ehTutorAutoCadastro;
+
   async function aoEnviar(e: FormEvent) {
     e.preventDefault();
     jaTentou.current = true;
+    if (bloqueioGeral) {
+      if (ehTutorAutoCadastro) {
+        setErroGeral('Contas com perfil de Tutor não podem utilizar convites de aluno.');
+      } else if (bloqueadoPorVagas) {
+        setErroGeral('O limite de vagas deste tutor foi atingido. Novos cadastros estão bloqueados.');
+      } else if (bloqueadoPorExpiracao) {
+        setErroGeral('Este convite expirou. Solicite um novo link.');
+      }
+      return;
+    }
+
     const contaExiste = Boolean(contaExistente?.existe);
     const encontrados = validar(valores, contaExiste);
     setErros(encontrados);
@@ -149,7 +195,41 @@ export function CadastroForm() {
         </AuthAviso>
       )}
 
-      {ehContaExistente && (
+      {bloqueadoPorVagas && (
+        <AuthAviso>
+          <Alerta tom="erro">
+            O limite de 10 tutorados deste grupo foi atingido ({detalhesConvite?.usos}/{detalhesConvite?.usosMaximos} alunos ativos). Novos cadastros estão bloqueados.
+          </Alerta>
+        </AuthAviso>
+      )}
+
+      {bloqueadoPorExpiracao && (
+        <AuthAviso>
+          <Alerta tom="erro">
+            Este convite expirou. Solicite um novo link atualizado ao seu tutor.
+          </Alerta>
+        </AuthAviso>
+      )}
+
+      {ehTutorAutoCadastro && (
+        <AuthAviso>
+          <Alerta tom="erro">
+            Sua conta possui perfil de Tutor. Não é permitido utilizar convites de aluno (auto-cadastro não permitido).
+          </Alerta>
+        </AuthAviso>
+      )}
+
+      {detalhesConvite && !bloqueioGeral && detalhesConvite.papel === 'ALUNO' && (
+        <AuthAviso>
+          <Alerta tom="sucesso">
+            Turma: <strong>{detalhesConvite.nomeTurma}</strong>
+            {detalhesConvite.nomeTutor ? ` • Tutor: ${detalhesConvite.nomeTutor}` : ''} •{' '}
+            <strong>{detalhesConvite.vagasRestantes} {detalhesConvite.vagasRestantes === 1 ? 'vaga restante' : 'vagas restantes'}</strong> de {detalhesConvite.usosMaximos}
+          </Alerta>
+        </AuthAviso>
+      )}
+
+      {ehContaExistente && !bloqueioGeral && (
         <AuthAviso>
           <Alerta tom="info">
             Identificamos que você já possui cadastro no LIRA {contaExistente?.nome ? `(${contaExistente.nome})` : ''}.
@@ -168,7 +248,7 @@ export function CadastroForm() {
           value={valores.codigo}
           onChange={(e) => alterar('codigo', e.target.value)}
           erro={erros.codigo}
-          dica={codigoDoLink ? 'Preenchido pelo link do seu convite.' : 'Você recebeu este código do seu professor ou tutor.'}
+          dica={verificandoConvite ? 'Verificando convite...' : codigoDoLink ? 'Preenchido pelo link do seu convite.' : 'Você recebeu este código do seu professor ou tutor.'}
         />
 
         <Input
@@ -212,7 +292,7 @@ export function CadastroForm() {
           dica={ehContaExistente ? 'Digite sua senha cadastrada no LIRA para confirmar o vínculo.' : undefined}
         />
 
-        <AuthBotao type="submit" carregando={enviando}>
+        <AuthBotao type="submit" carregando={enviando} disabled={bloqueioGeral}>
           {ehContaExistente ? 'Vincular Perfil' : 'Cadastrar'}
         </AuthBotao>
       </AuthFormulario>

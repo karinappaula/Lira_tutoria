@@ -20,9 +20,12 @@ export function statusParaAluno(versao: VersaoRedacao | undefined): { rotulo: st
     RASCUNHO: reescrita ? { rotulo: 'Reescrita em andamento', tom: 'alerta' } : { rotulo: 'Rascunho', tom: 'neutro' },
     ENVIADA: { rotulo: reescrita ? 'Reescrita aguardando correção' : 'Aguardando correção', tom: 'alerta' },
     EM_CORRECAO: { rotulo: 'Em revisão final', tom: 'alerta' },
+    EM_REVISAO_FINAL: { rotulo: 'Em revisão final', tom: 'alerta' },
     AJUSTE_SOLICITADO: { rotulo: 'Em revisão final', tom: 'alerta' },
     CORRIGIDA: { rotulo: reescrita ? 'Reescrita corrigida' : 'Corrigida', tom: 'sucesso' },
+    CONCLUIDA: { rotulo: reescrita ? 'Reescrita corrigida' : 'Corrigida', tom: 'sucesso' },
     AGUARDANDO_REESCRITA: { rotulo: 'Reescrita solicitada', tom: 'alerta' },
+    REESCRITA_SOLICITADA: { rotulo: 'Reescrita solicitada', tom: 'alerta' },
   };
   return tabela[versao.statusVersao];
 }
@@ -36,6 +39,35 @@ export function podeExcluir(redacao: Redacao): boolean {
 
 export function contarPalavras(texto: string): number {
   return texto.trim().match(/\S+/g)?.length ?? 0;
+}
+
+export const MIN_LINHAS = 8;
+export const MAX_LINHAS = 30;
+export const CARACTERES_POR_LINHA = 75;
+
+/**
+ * Contagem de quebras de linha ('\n') no texto
+ */
+export function contarQuebrasLinha(texto: string): number {
+  if (!texto) return 0;
+  return (texto.match(/\n/g) || []).length;
+}
+
+/**
+ * Contagem de linhas baseada no padrão ENEM (parágrafos e estimativa de 75 caracteres por linha).
+ * Estritamente idêntica à regra de cálculo do backend (redacao.service.ts).
+ */
+export function contarLinhas(texto: string): number {
+  if (!texto || !texto.trim()) return 0;
+  const paragrafos = texto.split(/\r?\n/);
+  let totalLinhas = 0;
+  for (const p of paragrafos) {
+    const trimmed = p.trim();
+    if (!trimmed) continue;
+    const linhasEstimadas = Math.ceil(trimmed.length / CARACTERES_POR_LINHA);
+    totalLinhas += Math.max(1, linhasEstimadas);
+  }
+  return totalLinhas;
 }
 
 export function prazoEncerrado(prazoIso: string, agora: number = Date.now()): boolean {
@@ -55,6 +87,7 @@ export function urlSegura(url: string): string | null {
 export function formatarHora(data: Date): string {
   return new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }).format(data);
 }
+
 /** Status como o Tutor e a Administração veem (mostram o ajuste pedido e a revisão da Administração). */
 export function statusParaGestao(versao: VersaoRedacao | undefined): { rotulo: string; tom: TomDoBadge } {
   if (!versao) return { rotulo: 'Sem versão', tom: 'neutro' };
@@ -62,9 +95,12 @@ export function statusParaGestao(versao: VersaoRedacao | undefined): { rotulo: s
     RASCUNHO: { rotulo: 'Rascunho do aluno', tom: 'neutro' },
     ENVIADA: { rotulo: 'Aguardando correção', tom: 'alerta' },
     EM_CORRECAO: { rotulo: 'Aguardando revisão do Admin', tom: 'alerta' },
+    EM_REVISAO_FINAL: { rotulo: 'Aguardando revisão do Admin', tom: 'alerta' },
     AJUSTE_SOLICITADO: { rotulo: 'Ajuste solicitado', tom: 'perigo' },
     CORRIGIDA: { rotulo: 'Corrigida', tom: 'sucesso' },
+    CONCLUIDA: { rotulo: 'Concluída', tom: 'sucesso' },
     AGUARDANDO_REESCRITA: { rotulo: 'Reescrita solicitada', tom: 'alerta' },
+    REESCRITA_SOLICITADA: { rotulo: 'Reescrita solicitada', tom: 'alerta' },
   };
   return tabela[versao.statusVersao];
 }

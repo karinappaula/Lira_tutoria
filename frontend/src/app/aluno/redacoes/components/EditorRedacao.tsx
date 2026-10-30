@@ -2,15 +2,27 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import { BookOpen, Check, CloudOff, ExternalLink, FileText, History, Loader2, Paperclip, Send, Trash2 } from 'lucide-react';
+import { Check, CloudOff, ExternalLink, FileText, Loader2, Paperclip, Send, Trash2 } from 'lucide-react';
 import { Alerta } from '@/components/ui/Alerta/Alerta';
 import { Button } from '@/components/ui/Button/Button';
+import { Card } from '@/components/ui/Card/Card';
 import { Textarea } from '@/components/ui/Campos/Campos';
 import { Modal } from '@/components/ui/Modal/Modal';
 import { useToast } from '@/components/ui/Toast/Toast';
 import { useAutosave } from '@/hooks/useAutosave';
 import { ApiError, mensagemDeErro } from '@/lib/erros';
-import { contarPalavras, formatarHora, podeExcluir, prazoEncerrado, ultimaVersao, urlSegura } from '@/lib/redacoes';
+import {
+  contarLinhas,
+  contarPalavras,
+  contarQuebrasLinha,
+  formatarHora,
+  MAX_LINHAS,
+  MIN_LINHAS,
+  podeExcluir,
+  prazoEncerrado,
+  ultimaVersao,
+  urlSegura,
+} from '@/lib/redacoes';
 import { redacoesService } from '@/services/redacoes';
 import type { RedacaoDetalhada } from '@/types/correcoes';
 import { ultimaCorrecao } from '@/lib/correcoes';
@@ -18,7 +30,7 @@ import { ResultadoDaCorrecao } from '@/components/redacao/ResultadoDaCorrecao';
 import { PainelDoTema } from './PainelDoTema';
 import styles from './EditorRedacao.module.scss';
 
-type Janela = 'tema' | 'enviar' | 'excluir' | 'versao1' | null;
+type Janela = 'enviar' | 'excluir' | null;
 
 export function EditorRedacao({ redacao }: { redacao: RedacaoDetalhada }) {
   const router = useRouter();
@@ -33,8 +45,13 @@ export function EditorRedacao({ redacao }: { redacao: RedacaoDetalhada }) {
 
   const ehReescrita = versao?.numeroVersao === 2;
   const versaoUm = redacao.versoes.find((v) => v.numeroVersao === 1);
+  const correcaoV1 = versaoUm ? ultimaCorrecao(versaoUm) : undefined;
+  const [abaLateral, setAbaLateral] = useState<'tema' | 'correcao'>(ehReescrita && versaoUm ? 'correcao' : 'tema');
+
   const prazoVencido = !ehReescrita && redacao.tarefa ? prazoEncerrado(redacao.tarefa.prazoEntrega) : false;
   const palavras = useMemo(() => contarPalavras(texto), [texto]);
+  const quebrasDeLinha = useMemo(() => contarQuebrasLinha(texto), [texto]);
+  const linhas = useMemo(() => contarLinhas(texto), [texto]);
   const vazio = texto.trim() === '';
 
   const urlBruta =
@@ -72,6 +89,10 @@ export function EditorRedacao({ redacao }: { redacao: RedacaoDetalhada }) {
   }
 
   async function enviar() {
+    if (linhas < MIN_LINHAS) {
+      setErroDaJanela('Sua redação possui menos de 8 linhas. Mínimo exigido: 8 linhas');
+      return;
+    }
     setProcessando(true);
     setErroDaJanela(null);
     try {
@@ -131,9 +152,6 @@ export function EditorRedacao({ redacao }: { redacao: RedacaoDetalhada }) {
               <span>{indicador.texto}</span>
             </p>
             <div className={styles.atalhos}>
-              <Button variante="secundario" tamanho="sm" icone={<BookOpen size={16} aria-hidden="true" />} className={styles.soCelular} onClick={() => setJanela('tema')}>
-                Ver tema
-              </Button>
               {urlAnexo && (
                 <a
                   href={urlAnexo}
@@ -146,11 +164,6 @@ export function EditorRedacao({ redacao }: { redacao: RedacaoDetalhada }) {
                   <span>Anexo</span>
                   <ExternalLink size={13} aria-hidden="true" />
                 </a>
-              )}
-              {ehReescrita && versaoUm && (
-                <Button variante="secundario" tamanho="sm" icone={<History size={16} aria-hidden="true" />} onClick={() => setJanela('versao1')}>
-                  Ver versão 1
-                </Button>
               )}
             </div>
           </div>
@@ -169,7 +182,9 @@ export function EditorRedacao({ redacao }: { redacao: RedacaoDetalhada }) {
           )}
           {ehReescrita && (
             <div className={styles.espaco}>
-              <Alerta tom="info">Esta é a sua reescrita. Depois de enviada, ela será a versão final e não haverá nova tentativa.</Alerta>
+              <Alerta tom="alerta">
+                Reescrita em andamento: Seu tutor avaliou a versão anterior. Consulte a correção no painel lateral para reescrever seu texto.
+              </Alerta>
             </div>
           )}
 
@@ -201,40 +216,119 @@ export function EditorRedacao({ redacao }: { redacao: RedacaoDetalhada }) {
             lang="pt-BR"
           />
 
+          {/* Avisos dinâmicos de limite de linhas */}
+          {!vazio && linhas < MIN_LINHAS && (
+            <div className={styles.avisoLinhas}>
+              <Alerta tom="erro">
+                Sua redação possui menos de 8 linhas. Mínimo exigido: 8 linhas
+              </Alerta>
+            </div>
+          )}
+          {linhas > MAX_LINHAS && (
+            <div className={styles.avisoLinhas}>
+              <Alerta tom="alerta">
+                Atenção: Sua redação ultrapassou o limite máximo de 30 linhas. Pode continuar escrevendo, porém lembre-se de que, em uma redação do Enem, o máximo são 30 linhas.
+              </Alerta>
+            </div>
+          )}
+
           <div className={styles.rodape}>
-            <p className={styles.contagem} aria-live="off">
-              {palavras} {palavras === 1 ? 'palavra' : 'palavras'} · {texto.length.toLocaleString('pt-BR')} caracteres
-            </p>
+            <div className={styles.contagemWrapper}>
+              <p className={styles.contagem} aria-live="off">
+                {palavras} {palavras === 1 ? 'palavra' : 'palavras'} · {texto.length.toLocaleString('pt-BR')} caracteres · {quebrasDeLinha} {quebrasDeLinha === 1 ? 'quebra de linha' : 'quebras de linha'}
+              </p>
+              <div
+                className={`${styles.indicadorLinhas} ${
+                  vazio
+                    ? styles.indicadorNeutro
+                    : linhas < MIN_LINHAS
+                    ? styles.indicadorErro
+                    : linhas > MAX_LINHAS
+                    ? styles.indicadorAlerta
+                    : styles.indicadorNeutro
+                }`}
+                role="status"
+              >
+                <span>Linhas: {linhas}/30</span>
+              </div>
+            </div>
             <div className={styles.botoes}>
               {podeExcluir(redacao) && (
                 <Button variante="perigo" icone={<Trash2 size={16} aria-hidden="true" />} onClick={() => setJanela('excluir')} disabled={bloqueado}>
                   Excluir rascunho
                 </Button>
               )}
-              <Button icone={<Send size={16} aria-hidden="true" />} onClick={() => setJanela('enviar')} disabled={vazio || bloqueado || prazoVencido}>
+              <Button
+                icone={<Send size={16} aria-hidden="true" />}
+                onClick={() => setJanela('enviar')}
+                disabled={vazio || bloqueado || prazoVencido || linhas < MIN_LINHAS}
+                title={
+                  vazio
+                    ? 'Digite sua redação antes de enviar'
+                    : linhas < MIN_LINHAS
+                    ? 'Sua redação possui menos de 8 linhas. Mínimo exigido: 8 linhas'
+                    : prazoVencido
+                    ? 'O prazo desta tarefa já foi encerrado'
+                    : undefined
+                }
+              >
                 {ehReescrita ? 'Enviar reescrita' : 'Enviar redação'}
               </Button>
             </div>
           </div>
         </section>
 
-        <aside className={styles.lateral} aria-label="Tema da redação">
-          <h2 className={styles.lateralTitulo}>Tema e Apoio</h2>
-          <PainelDoTema redacao={redacao} />
+        <aside className={styles.lateral} aria-label="Tema e apoio da redação">
+          {ehReescrita && versaoUm ? (
+            <>
+              <div className={styles.abasLateral} role="tablist">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={abaLateral === 'correcao'}
+                  className={`${styles.abaBotao} ${abaLateral === 'correcao' ? styles.abaAtiva : ''}`}
+                  onClick={() => setAbaLateral('correcao')}
+                >
+                  Correção da Versão 1
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={abaLateral === 'tema'}
+                  className={`${styles.abaBotao} ${abaLateral === 'tema' ? styles.abaAtiva : ''}`}
+                  onClick={() => setAbaLateral('tema')}
+                >
+                  Tema e Apoio
+                </button>
+              </div>
+
+              {abaLateral === 'correcao' ? (
+                <div className={styles.painelCorrecaoLateral}>
+                  {correcaoV1 ? (
+                    <ResultadoDaCorrecao texto={versaoUm.conteudoTexto} correcao={correcaoV1} coluna />
+                  ) : (
+                    <div className={styles.versaoUmSemCorrecao}>
+                      <p className={styles.semCorrecao}>
+                        Nenhuma correção detalhada encontrada para a versão 1.
+                      </p>
+                      <Card titulo="Texto da Versão 1">
+                        <p className={styles.textoVersaoUm}>{versaoUm.conteudoTexto}</p>
+                      </Card>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <PainelDoTema redacao={redacao} />
+              )}
+            </>
+          ) : (
+            <>
+              <h2 className={styles.lateralTitulo}>Tema e Apoio</h2>
+              <PainelDoTema redacao={redacao} />
+            </>
+          )}
         </aside>
       </div>
-
-      <Modal aberto={janela === 'tema'} aoFechar={fechar} titulo="Tema da redação">
-        <PainelDoTema redacao={redacao} />
-      </Modal>
-
-      <Modal aberto={janela === 'versao1'} aoFechar={fechar} titulo="Sua versão 1 e a correção">
-        {versaoUm && ultimaCorrecao(versaoUm) ? (
-          <ResultadoDaCorrecao texto={versaoUm.conteudoTexto} correcao={ultimaCorrecao(versaoUm)!} coluna />
-        ) : (
-          <p className={styles.versaoUm}>{versaoUm?.conteudoTexto || 'Texto vazio.'}</p>
-        )}
-      </Modal>
 
       <Modal
         aberto={janela === 'enviar'}
@@ -245,7 +339,12 @@ export function EditorRedacao({ redacao }: { redacao: RedacaoDetalhada }) {
             <Button variante="secundario" onClick={fechar} disabled={processando}>
               Continuar escrevendo
             </Button>
-            <Button icone={<Send size={16} aria-hidden="true" />} carregando={processando} onClick={() => void enviar()}>
+            <Button
+              icone={<Send size={16} aria-hidden="true" />}
+              carregando={processando}
+              disabled={linhas < MIN_LINHAS}
+              onClick={() => void enviar()}
+            >
               Confirmar envio
             </Button>
           </>
@@ -254,8 +353,13 @@ export function EditorRedacao({ redacao }: { redacao: RedacaoDetalhada }) {
         <div className={styles.confirmacao}>
           {erroDaJanela && <Alerta tom="erro">{erroDaJanela}</Alerta>}
           <p>
-            Seu texto tem <strong>{palavras} palavras</strong>.
+            Seu texto tem <strong>{linhas} {linhas === 1 ? 'linha' : 'linhas'}</strong>, <strong>{quebrasDeLinha} {quebrasDeLinha === 1 ? 'quebra de linha' : 'quebras de linha'}</strong> e <strong>{palavras} palavras</strong>.
           </p>
+          {linhas > MAX_LINHAS && (
+            <Alerta tom="alerta">
+              Atenção: Sua redação ultrapassou o limite máximo de 30 linhas
+            </Alerta>
+          )}
           <p className={styles.resumoEnvio}>
             {ehReescrita
               ? 'Esta reescrita será enviada para o seu tutor. Não será possível fazer novas alterações depois.'

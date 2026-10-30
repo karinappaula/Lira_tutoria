@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { BookOpen, Edit2, Eye, Plus, Sparkles, Trash2, UserCheck, Users } from 'lucide-react';
+import { BookOpen, Edit2, Eye, Image as ImageIcon, Plus, Sparkles, Trash2, UserCheck, Users } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Alerta } from '@/components/ui/Alerta/Alerta';
 import { Badge, type TomDoBadge } from '@/components/ui/Badge/Badge';
@@ -15,6 +15,7 @@ import { useToast } from '@/components/ui/Toast/Toast';
 import { useBuscar } from '@/hooks/useBuscar';
 import { ApiError, mensagemDeErro } from '@/lib/erros';
 import { temasService, type DadosDeTema } from '@/services/temas';
+import { TextoMotivador } from '@/components/redacao/TextoMotivador';
 import type { Tema } from '@/types/redacoes';
 import styles from './TemasAdmin.module.scss';
 
@@ -25,12 +26,10 @@ type JanelaTema =
   | { tipo: 'excluir'; tema: Tema }
   | null;
 
-const ORIGENS_PRESET = ['OFICIAL', 'ENEM', 'FUVEST', 'UNICAMP', 'UNESP', 'UERJ', 'OUTRO'] as const;
-
 function obterTomOrigem(origem: string | null): TomDoBadge {
-  if (!origem) return 'neutro';
+  if (!origem) return 'sucesso';
   const maiusculo = origem.toUpperCase();
-  if (maiusculo === 'OFICIAL') return 'sucesso';
+  if (maiusculo === 'ADMIN' || maiusculo === 'OFICIAL') return 'sucesso';
   if (maiusculo === 'TUTOR') return 'alerta';
   if (maiusculo === 'ALUNO') return 'neutro';
   return 'sucesso';
@@ -46,18 +45,19 @@ export function TemasAdmin() {
 
   // Estados de formulário
   const [titulo, setTitulo] = useState('');
-  const [origemSelect, setOrigemSelect] = useState<string>('OFICIAL');
-  const [origemCustom, setOrigemCustom] = useState('');
   const [textoMotivador, setTextoMotivador] = useState('');
+  const [imagemUrl, setImagemUrl] = useState('');
   const [erroTitulo, setErroTitulo] = useState<string | undefined>();
-  const [erroOrigem, setErroOrigem] = useState<string | undefined>();
   const [erroGeral, setErroGeral] = useState<string | null>(null);
   const [salvando, setSalvando] = useState(false);
   const [excluindo, setExcluindo] = useState(false);
 
   // Métricas
   const totalTemas = temas?.length ?? 0;
-  const oficiaisTotal = (temas ?? []).filter((t) => (t.origem || 'OFICIAL').toUpperCase() === 'OFICIAL').length;
+  const adminTotal = (temas ?? []).filter((t) => {
+    const o = (t.origem || 'ADMIN').toUpperCase();
+    return o === 'ADMIN' || o === 'OFICIAL';
+  }).length;
   const tutoresTotal = (temas ?? []).filter((t) => (t.origem || '').toUpperCase() === 'TUTOR').length;
   const alunosTotal = (temas ?? []).filter((t) => (t.origem || '').toUpperCase() === 'ALUNO').length;
 
@@ -74,11 +74,10 @@ export function TemasAdmin() {
       if (!matchBusca) return false;
 
       if (filtroOrigem !== 'todos') {
-        const o = (t.origem || 'OFICIAL').toUpperCase();
-        if (filtroOrigem === 'OFICIAL' && o !== 'OFICIAL') return false;
+        const o = (t.origem || 'ADMIN').toUpperCase();
+        if (filtroOrigem === 'ADMIN' && o !== 'ADMIN' && o !== 'OFICIAL') return false;
         if (filtroOrigem === 'TUTOR' && o !== 'TUTOR') return false;
         if (filtroOrigem === 'ALUNO' && o !== 'ALUNO') return false;
-        if (filtroOrigem === 'VESTIBULARES' && ['OFICIAL', 'TUTOR', 'ALUNO'].includes(o)) return false;
       }
 
       return true;
@@ -87,11 +86,9 @@ export function TemasAdmin() {
 
   function abrirCriacao() {
     setTitulo('');
-    setOrigemSelect('OFICIAL');
-    setOrigemCustom('');
     setTextoMotivador('');
+    setImagemUrl('');
     setErroTitulo(undefined);
-    setErroOrigem(undefined);
     setErroGeral(null);
     setJanela({ tipo: 'novo' });
   }
@@ -99,16 +96,8 @@ export function TemasAdmin() {
   function abrirEdicao(tema: Tema) {
     setTitulo(tema.tituloTema);
     setTextoMotivador(tema.textoMotivador ?? '');
-    const o = tema.origem || 'OFICIAL';
-    if (ORIGENS_PRESET.includes(o as (typeof ORIGENS_PRESET)[number])) {
-      setOrigemSelect(o);
-      setOrigemCustom('');
-    } else {
-      setOrigemSelect('OUTRO');
-      setOrigemCustom(o);
-    }
+    setImagemUrl(tema.imagemUrl ?? '');
     setErroTitulo(undefined);
-    setErroOrigem(undefined);
     setErroGeral(null);
     setJanela({ tipo: 'editar', tema });
   }
@@ -117,7 +106,7 @@ export function TemasAdmin() {
     setJanela(null);
     setErroGeral(null);
     setErroTitulo(undefined);
-    setErroOrigem(undefined);
+    setImagemUrl('');
   }
 
   async function salvar(e: React.FormEvent) {
@@ -132,26 +121,13 @@ export function TemasAdmin() {
       return;
     }
 
-    let origemFinal = origemSelect === 'OUTRO' ? origemCustom.trim() : origemSelect;
-    if (!origemFinal) origemFinal = 'OFICIAL';
-
-    const origemUpper = origemFinal.toUpperCase();
-    if (origemUpper === 'TUTOR' || origemUpper === 'ALUNO') {
-      setErroOrigem('As origens TUTOR e ALUNO são reservadas exclusivamente pelo sistema.');
-      return;
-    }
-    if (origemFinal.length > 100) {
-      setErroOrigem('A origem deve ter até 100 caracteres.');
-      return;
-    }
-
     setSalvando(true);
     setErroGeral(null);
 
     const dadosPayload: DadosDeTema = {
       tituloTema: tituloLimpo,
-      origem: origemFinal,
       textoMotivador: textoMotivador.trim() ? textoMotivador.trim() : undefined,
+      imagemUrl: imagemUrl.trim() ? imagemUrl.trim() : undefined,
     };
 
     try {
@@ -202,13 +178,21 @@ export function TemasAdmin() {
         <div className={styles.celulaTitulo}>
           <strong>{t.tituloTema}</strong>
           {t.textoMotivador && <span className={styles.previaTexto}>{t.textoMotivador}</span>}
+          {t.imagemUrl && (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.78rem', color: '#006b70', marginTop: '2px' }}>
+              <ImageIcon size={13} aria-hidden="true" /> Possui imagem motivadora
+            </span>
+          )}
         </div>
       ),
     },
     {
       chave: 'origem',
       titulo: 'Origem',
-      celula: (t) => <Badge tom={obterTomOrigem(t.origem)}>{t.origem || 'OFICIAL'}</Badge>,
+      celula: (t) => {
+        const o = (t.origem || 'ADMIN').toUpperCase();
+        return <Badge tom={obterTomOrigem(o)}>{o}</Badge>;
+      },
     },
     {
       chave: 'tarefas',
@@ -291,8 +275,8 @@ export function TemasAdmin() {
             <Sparkles size={22} aria-hidden="true" />
           </div>
           <div className={styles.textosMetrica}>
-            <span className={styles.rotuloMetrica}>Oficiais</span>
-            <span className={styles.valorMetrica}>{oficiaisTotal}</span>
+            <span className={styles.rotuloMetrica}>Admin</span>
+            <span className={styles.valorMetrica}>{adminTotal}</span>
             <span className={styles.subMetrica}>Administração</span>
           </div>
         </div>
@@ -302,7 +286,7 @@ export function TemasAdmin() {
             <UserCheck size={22} aria-hidden="true" />
           </div>
           <div className={styles.textosMetrica}>
-            <span className={styles.rotuloMetrica}>De Tutores</span>
+            <span className={styles.rotuloMetrica}>Tutores</span>
             <span className={styles.valorMetrica}>{tutoresTotal}</span>
             <span className={styles.subMetrica}>Criados por tutores</span>
           </div>
@@ -313,7 +297,7 @@ export function TemasAdmin() {
             <Users size={22} aria-hidden="true" />
           </div>
           <div className={styles.textosMetrica}>
-            <span className={styles.rotuloMetrica}>De Alunos</span>
+            <span className={styles.rotuloMetrica}>Alunos</span>
             <span className={styles.valorMetrica}>{alunosTotal}</span>
             <span className={styles.subMetrica}>Redações de treino</span>
           </div>
@@ -328,7 +312,7 @@ export function TemasAdmin() {
               rotulo="Buscar tema"
               ocultarRotulo
               type="search"
-              placeholder="Buscar por título, coletânea ou vestibular..."
+              placeholder="Buscar por título ou coletânea..."
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
             />
@@ -341,10 +325,9 @@ export function TemasAdmin() {
               onChange={(e) => setFiltroOrigem(e.target.value)}
             >
               <option value="todos">Todas as origens ({totalTemas})</option>
-              <option value="OFICIAL">Oficiais da Administração ({oficiaisTotal})</option>
+              <option value="ADMIN">Criados pela Administração ({adminTotal})</option>
               <option value="TUTOR">Criados por Tutores ({tutoresTotal})</option>
-              <option value="ALUNO">Criados por Alunos ({alunosTotal})</option>
-              <option value="VESTIBULARES">Vestibulares / Outros</option>
+              {alunosTotal > 0 && <option value="ALUNO">Criados por Alunos ({alunosTotal})</option>}
             </Select>
           </div>
         </div>
@@ -403,40 +386,8 @@ export function TemasAdmin() {
             required
           />
 
-          <div className={styles.linhaDupla}>
-            <Select
-              rotulo="Origem / Vestibular"
-              value={origemSelect}
-              onChange={(e) => {
-                setOrigemSelect(e.target.value);
-                if (erroOrigem) setErroOrigem(undefined);
-              }}
-              erro={erroOrigem}
-              dica="Identifica a fonte ou banca examinadora."
-            >
-              <option value="OFICIAL">OFICIAL (Administração LIRA)</option>
-              <option value="ENEM">ENEM</option>
-              <option value="FUVEST">FUVEST</option>
-              <option value="UNICAMP">UNICAMP</option>
-              <option value="UNESP">UNESP</option>
-              <option value="UERJ">UERJ</option>
-              <option value="OUTRO">Outra origem personalizada...</option>
-            </Select>
-
-            {origemSelect === 'OUTRO' && (
-              <Input
-                rotulo="Nome da Origem"
-                placeholder="Ex.: ITA, FGV, UFRGS..."
-                value={origemCustom}
-                onChange={(e) => {
-                  setOrigemCustom(e.target.value);
-                  if (erroOrigem) setErroOrigem(undefined);
-                }}
-                maxLength={100}
-                erro={erroOrigem}
-                dica="TUTOR e ALUNO são origens reservadas."
-              />
-            )}
+          <div style={{ marginBottom: '16px' }}>
+            <Badge tom="sucesso">Origem atribuída: ADMIN</Badge>
           </div>
 
           <Textarea
@@ -446,7 +397,16 @@ export function TemasAdmin() {
             onChange={(e) => setTextoMotivador(e.target.value)}
             maxLength={10000}
             rows={6}
-            dica="Texto de apoio aos estudantes (até 10.000 caracteres)."
+            dica="Texto de apoio aos estudantes (até 10.000 caracteres). Dica: Digite [IMAGEM] para posicionar a imagem no local desejado."
+          />
+
+          <Input
+            rotulo="URL da Imagem Motivadora / Coletânea Visual (opcional)"
+            placeholder="https://exemplo.com/imagem-coletanea.png"
+            value={imagemUrl}
+            onChange={(e) => setImagemUrl(e.target.value)}
+            maxLength={500}
+            dica="URL pública de uma imagem ilustrativa para a coletânea do tema (até 500 caracteres)."
           />
 
           <div className={styles.botoesModal}>
@@ -472,7 +432,7 @@ export function TemasAdmin() {
               <div className={styles.metaDetalhe}>
                 <span>Origem:</span>
                 <Badge tom={obterTomOrigem(janela.tema.origem)}>
-                  {janela.tema.origem || 'OFICIAL'}
+                  {(janela.tema.origem || 'ADMIN').toUpperCase()}
                 </Badge>
               </div>
               <div className={styles.estatisticasUso}>
@@ -487,13 +447,11 @@ export function TemasAdmin() {
 
             <div className={styles.blocoMotivador}>
               <h4>Texto Motivador e Coletânea</h4>
-              {janela.tema.textoMotivador ? (
-                <p>{janela.tema.textoMotivador}</p>
-              ) : (
-                <p style={{ color: 'var(--cor-texto-suave, #6b7d80)', fontStyle: 'italic' }}>
-                  Nenhum texto motivador cadastrado para este tema.
-                </p>
-              )}
+              <TextoMotivador
+                texto={janela.tema.textoMotivador}
+                imagemUrl={janela.tema.imagemUrl}
+                titulo={janela.tema.tituloTema}
+              />
             </div>
 
             <div className={styles.botoesModal}>

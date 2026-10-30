@@ -30,6 +30,7 @@ import { prazoEncerrado, urlSegura } from '@/lib/redacoes';
 import { adminService } from '@/services/admin';
 import { uploadArquivoCloudinary } from '@/services/cloudinary';
 import { temasService } from '@/services/temas';
+import { TextoMotivador } from '@/components/redacao/TextoMotivador';
 import type { DadosDeTarefa } from '@/services/tutor';
 import type { TarefaDoTutor } from '@/types/correcoes';
 import styles from './TarefasAdmin.module.scss';
@@ -83,6 +84,7 @@ export function TarefasAdmin() {
   const [temaId, setTemaId] = useState('');
   const [tituloNovoTema, setTituloNovoTema] = useState('');
   const [textoNovoTema, setTextoNovoTema] = useState('');
+  const [imagemNovoTema, setImagemNovoTema] = useState('');
 
   // Erros e Envio
   const [erroTitulo, setErroTitulo] = useState<string | undefined>();
@@ -147,6 +149,7 @@ export function TarefasAdmin() {
     setTemaId('');
     setTituloNovoTema('');
     setTextoNovoTema('');
+    setImagemNovoTema('');
     setAnexoNovo(null);
     setErroGeral(null);
     setJanela({ tipo: 'novo' });
@@ -159,6 +162,7 @@ export function TarefasAdmin() {
     setTemaId(tarefa.idTema ? String(tarefa.idTema) : '');
     setTituloNovoTema('');
     setTextoNovoTema('');
+    setImagemNovoTema('');
     setAnexoNovo(null);
     setErroGeral(null);
     setJanela({ tipo: 'editar', tarefa });
@@ -233,7 +237,10 @@ export function TarefasAdmin() {
       setErroPrazo(undefined);
     }
 
-    if (temaId === NOVO_TEMA && !tituloNovoTema.trim()) {
+    if (!temaId) {
+      setErroTema('O tema é obrigatório para a criação de tarefas gerais.');
+      temErro = true;
+    } else if (temaId === NOVO_TEMA && !tituloNovoTema.trim()) {
       setErroTema('Informe o título da proposta do novo tema.');
       temErro = true;
     } else {
@@ -255,6 +262,7 @@ export function TarefasAdmin() {
       dadosBase.novoTema = {
         tituloTema: tituloNovoTema.trim(),
         ...(textoNovoTema.trim() ? { textoMotivador: textoNovoTema.trim() } : {}),
+        ...(imagemNovoTema.trim() ? { imagemUrl: imagemNovoTema.trim() } : {}),
       };
     } else if (temaId) {
       dadosBase.idTema = Number(temaId);
@@ -621,22 +629,23 @@ export function TarefasAdmin() {
             />
 
             <Select
-              rotulo="Tema Associado"
+              rotulo="Tema Associado (Obrigatório)"
               value={temaId}
               onChange={(e) => {
                 setTemaId(e.target.value);
                 if (erroTema) setErroTema(undefined);
               }}
               erro={erroTema}
-              dica="Selecione um tema do acervo ou cadastre um novo."
+              dica="Selecione um tema obrigatório do acervo ou cadastre um novo."
+              required
             >
-              <option value="">Sem tema vinculado</option>
+              <option value="">Selecione um tema obrigatório...</option>
               {(temas ?? []).map((t) => (
                 <option key={t.id} value={t.id}>
-                  {t.tituloTema} ({t.origem || 'OFICIAL'})
+                  {t.tituloTema} ({t.origem || 'ADMIN'})
                 </option>
               ))}
-              {janela?.tipo === 'novo' && <option value={NOVO_TEMA}>＋ Cadastrar novo tema oficial agora</option>}
+              {janela?.tipo === 'novo' && <option value={NOVO_TEMA}>＋ Cadastrar novo tema agora</option>}
             </Select>
           </div>
 
@@ -656,11 +665,20 @@ export function TarefasAdmin() {
               />
               <Textarea
                 rotulo="Texto Motivador / Coletânea do Novo Tema (opcional)"
-                placeholder="Excertos de textos, leis ou dados estatísticos da proposta..."
+                placeholder="Excertos de textos, leis ou dados estatísticos da proposta... Use a tag [IMAGEM] onde a imagem deve aparecer."
                 value={textoNovoTema}
                 onChange={(e) => setTextoNovoTema(e.target.value)}
                 maxLength={10000}
                 rows={3}
+                dica="Texto de apoio aos alunos. Digite [IMAGEM] para posicionar a imagem da proposta."
+              />
+              <Input
+                rotulo="URL da Imagem Motivadora / Coletânea Visual (opcional)"
+                placeholder="https://exemplo.com/imagem-coletanea.png"
+                value={imagemNovoTema}
+                onChange={(e) => setImagemNovoTema(e.target.value)}
+                maxLength={500}
+                dica="URL pública da imagem de apoio. No texto motivador, use a tag [IMAGEM] onde ela deve aparecer."
               />
             </div>
           )}
@@ -669,7 +687,7 @@ export function TarefasAdmin() {
           {janela?.tipo === 'novo' && (
             <div className={styles.campoAnexo}>
               <div className={styles.rotuloAnexo}>
-                <span>Material de Apoio / Anexo (Cloudinary)</span>
+                <span>Material de Apoio / Anexo </span>
                 <span className={styles.dicaAnexo}>PDF ou imagem (PNG, JPG, WEBP) de até 10 MB</span>
               </div>
 
@@ -711,13 +729,13 @@ export function TarefasAdmin() {
                   <label htmlFor="anexo-modal-admin" className={styles.botaoUpload}>
                     {enviandoAnexo ? (
                       <>
-                        <Spinner tamanho="sm" rotulo="Enviando para o Cloudinary..." />
+                        <Spinner tamanho="sm" rotulo="Enviando..." />
                         <span>Enviando para o Cloudinary...</span>
                       </>
                     ) : (
                       <>
                         <UploadCloud size={20} aria-hidden="true" />
-                        <span>Selecionar arquivo de anexo (Cloudinary)</span>
+                        <span>Selecionar arquivo de anexo</span>
                       </>
                     )}
                   </label>
@@ -856,7 +874,7 @@ export function TarefasAdmin() {
                     {enviandoAnexo ? (
                       <>
                         <Spinner tamanho="sm" rotulo="Enviando para o Cloudinary..." />
-                        <span>Enviando para o Cloudinary...</span>
+                        <span>Enviando...</span>
                       </>
                     ) : (
                       <>
@@ -917,9 +935,11 @@ export function TarefasAdmin() {
               <div className={styles.blocoTema}>
                 <h4>Tema de Redação Associado</h4>
                 <strong>{janela.tarefa.tema.tituloTema}</strong>
-                {janela.tarefa.tema.textoMotivador && (
-                  <p>{janela.tarefa.tema.textoMotivador}</p>
-                )}
+                <TextoMotivador
+                  texto={janela.tarefa.tema.textoMotivador}
+                  imagemUrl={janela.tarefa.tema.imagemUrl}
+                  titulo={janela.tarefa.tema.tituloTema}
+                />
               </div>
             ) : (
               <Alerta tom="info">Esta atividade não possui um tema de redação associado.</Alerta>

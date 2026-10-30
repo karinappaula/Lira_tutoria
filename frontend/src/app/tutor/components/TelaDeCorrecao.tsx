@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Send, Trash2 } from 'lucide-react';
+import { ArrowLeft, RotateCcw, Send, Trash2 } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { TextoMarcado, type SelecaoDeTrecho } from '@/components/redacao/TextoMarcado';
 import { Alerta } from '@/components/ui/Alerta/Alerta';
@@ -36,7 +36,7 @@ interface MarcaEditavel {
 
 type Niveis = Array<Nivel | null>;
 
-const comoNivel = (valor: number): Nivel | null => (NIVEIS as readonly number[]).includes(valor) ? (valor as Nivel) : null;
+const comoNivel = (valor: number): Nivel | null => ((NIVEIS as readonly number[]).includes(valor) ? (valor as Nivel) : null);
 
 export function TelaDeCorrecao({ id }: { id: number }) {
   const { dados, carregando, erro, recarregar } = useBuscar((signal) => redacoesService.obter(id, signal), id);
@@ -120,6 +120,11 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
   const [confirmando, setConfirmando] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [erroEnvio, setErroEnvio] = useState<string | null>(null);
+
+  const [confirmandoReescrita, setConfirmandoReescrita] = useState(false);
+  const [enviandoReescrita, setEnviandoReescrita] = useState(false);
+  const [erroReescrita, setErroReescrita] = useState<string | null>(null);
+
   const topoRef = useRef<HTMLDivElement>(null);
 
   const aoSelecionar = useCallback((s: SelecaoDeTrecho) => {
@@ -196,6 +201,59 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
     } catch (e) {
       setErroEnvio(e instanceof ApiError ? e.message : mensagemDeErro(e));
       setEnviando(false);
+    }
+  }
+
+  async function solicitarReescritaPelaCorrecao() {
+    setEnviandoReescrita(true);
+    setErroReescrita(null);
+    try {
+      // Se houver marcações, parecer ou comentários parciais, tenta persistir para orientar o aluno na V2
+      const temApontamentos =
+        marcas.length > 0 ||
+        parecer.trim().length > 0 ||
+        comentarios.some((c) => c.trim().length > 0) ||
+        niveis.some((n) => n !== null);
+
+      if (temApontamentos) {
+        try {
+          const n = niveis.map((x) => x ?? 0);
+          const c = comentarios.map((x) => x.trim());
+          await tutorService.corrigir({
+            idVersao: versao.id,
+            notaComp1: n[0] ?? 0,
+            notaComp2: n[1] ?? 0,
+            notaComp3: n[2] ?? 0,
+            notaComp4: n[3] ?? 0,
+            notaComp5: n[4] ?? 0,
+            comentarioComp1: c[0] ?? '',
+            comentarioComp2: c[1] ?? '',
+            comentarioComp3: c[2] ?? '',
+            comentarioComp4: c[3] ?? '',
+            comentarioComp5: c[4] ?? '',
+            ...(parecer.trim() ? { parecerGeral: parecer.trim() } : {}),
+            ...(ehAvaliativa && recado.trim() ? { recadoAdmin: recado.trim() } : {}),
+            anotacoes: marcas.map((m) => ({
+              posicaoInicio: m.inicio,
+              posicaoFinal: m.fim,
+              textoSelecionado: texto.slice(m.inicio, m.fim),
+              tipoErro: m.tipoErro,
+              ...(m.sugestao ? { sugestaoComentario: m.sugestao } : {}),
+            })),
+          });
+        } catch {
+          // Continua para a solicitação de reescrita caso o preenchimento não esteja 100% completo
+        }
+      }
+
+      await tutorService.solicitarReescrita(redacao.id);
+      avisarFilaMudou();
+      toast.sucesso('Reescrita solicitada com sucesso! O envio foi reaberto para o aluno.');
+      setConfirmandoReescrita(false);
+      router.replace('/tutor/fila');
+    } catch (e) {
+      setErroReescrita(e instanceof ApiError ? e.message : mensagemDeErro(e));
+      setEnviandoReescrita(false);
     }
   }
 
@@ -327,9 +385,28 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
           Nota parcial: <strong>{parcial}</strong>/1000
           {faltam > 0 && <span> · faltam {faltam} {faltam === 1 ? 'competência' : 'competências'}</span>}
         </p>
-        <Button icone={<Send size={16} aria-hidden="true" />} onClick={() => validar() && setConfirmando(true)}>
-          Enviar correção
-        </Button>
+        <div className={styles.botoesBarraFixa}>
+          {versao.numeroVersao === 1 && (
+            <Button
+              variante="secundario"
+              icone={<RotateCcw size={16} aria-hidden="true" />}
+              onClick={() => {
+                setErroReescrita(null);
+                setConfirmandoReescrita(true);
+              }}
+              disabled={enviando || enviandoReescrita}
+            >
+              Solicitar reescrita
+            </Button>
+          )}
+          <Button
+            icone={<Send size={16} aria-hidden="true" />}
+            onClick={() => validar() && setConfirmando(true)}
+            disabled={enviando || enviandoReescrita}
+          >
+            Enviar correção
+          </Button>
+        </div>
       </div>
 
       <Modal
@@ -364,6 +441,41 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
             Nota final: <strong>{parcial}/1000</strong>
           </p>
           <p>{ehAvaliativa ? 'Ela seguirá para a revisão da Administração.' : 'Ela será liberada para o aluno imediatamente.'}</p>
+        </div>
+      </Modal>
+
+      <Modal
+        aberto={confirmandoReescrita}
+        aoFechar={() => {
+          if (!enviandoReescrita) {
+            setConfirmandoReescrita(false);
+            setErroReescrita(null);
+          }
+        }}
+        titulo="Solicitar reescrita ao aluno?"
+        rodape={
+          <>
+            <Button variante="secundario" disabled={enviandoReescrita} onClick={() => setConfirmandoReescrita(false)}>
+              Cancelar
+            </Button>
+            <Button
+              icone={<RotateCcw size={16} aria-hidden="true" />}
+              carregando={enviandoReescrita}
+              onClick={() => void solicitarReescritaPelaCorrecao()}
+            >
+              Confirmar solicitação
+            </Button>
+          </>
+        }
+      >
+        <div className={styles.resumo}>
+          {erroReescrita && <Alerta tom="erro">{erroReescrita}</Alerta>}
+          <p>
+            Ao confirmar, o status da redação será alterado para <strong>'Reescrita solicitada'</strong> e o envio será reaberto para o aluno.
+          </p>
+          <p className={styles.instrucaoModal}>
+            O aluno receberá a notificação de reescrita e poderá redigir a <strong>Versão 2</strong> (com validação obrigatória de 8 a 30 linhas), consultando suas marcações e feedback no painel dele.
+          </p>
         </div>
       </Modal>
     </>

@@ -56,9 +56,25 @@ export function ModalConviteTutor({ turma, aberto, aoFechar, aoSucesso }: Props)
       : '';
 
   async function copiar(texto: string) {
+    if (!texto) return;
     try {
-      await navigator.clipboard.writeText(texto);
-      toast.sucesso('Link copiado!');
+      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText && window.isSecureContext) {
+        await navigator.clipboard.writeText(texto);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = texto;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-999999px';
+        textarea.style.top = '-999999px';
+        textarea.setAttribute('readonly', '');
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        const copiado = document.execCommand('copy');
+        document.body.removeChild(textarea);
+        if (!copiado) throw new Error('Fallback falhou');
+      }
+      toast.sucesso('Link copiado para a área de transferência!');
     } catch {
       toast.erro('Não foi possível copiar o link.');
     }

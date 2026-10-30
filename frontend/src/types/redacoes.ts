@@ -6,18 +6,27 @@
 
 export type TipoFluxo = 'TREINO' | 'AVALIATIVA';
 
-export type StatusVersao =
-  | 'RASCUNHO'
-  | 'ENVIADA'
-  | 'EM_CORRECAO'
-  | 'CORRIGIDA'
-  | 'AGUARDANDO_REESCRITA'
-  | 'AJUSTE_SOLICITADO';
+export const StatusRedacao = {
+  RASCUNHO: 'RASCUNHO',
+  ENVIADA: 'ENVIADA',
+  EM_CORRECAO: 'EM_CORRECAO',
+  EM_REVISAO_FINAL: 'EM_REVISAO_FINAL',
+  CORRIGIDA: 'CORRIGIDA',
+  CONCLUIDA: 'CONCLUIDA',
+  AGUARDANDO_REESCRITA: 'AGUARDANDO_REESCRITA',
+  REESCRITA_SOLICITADA: 'REESCRITA_SOLICITADA',
+  AJUSTE_SOLICITADO: 'AJUSTE_SOLICITADO',
+} as const;
+
+export type StatusRedacao = (typeof StatusRedacao)[keyof typeof StatusRedacao];
+export type StatusVersao = StatusRedacao;
+  
 
 export interface TemaResumo {
   id: number;
   tituloTema: string;
   textoMotivador: string | null;
+  imagemUrl?: string | null;
 }
 
 /** Item de GET /temas */
@@ -104,5 +113,5 @@ export interface TarefaDoAluno {
 /** Corpo de POST /redacoes */
 export type NovaRedacao =
   | { tipoFluxo: 'TREINO'; idTema: number }
-  | { tipoFluxo: 'TREINO'; temaProprio: { tituloTema: string; textoMotivador?: string } }
+  | { tipoFluxo: 'TREINO'; temaProprio: { tituloTema: string; textoMotivador?: string; imagemUrl?: string } }
   | { tipoFluxo: 'AVALIATIVA'; idTarefa: number };

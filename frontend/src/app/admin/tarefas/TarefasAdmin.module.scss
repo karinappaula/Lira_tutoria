@@ -443,24 +443,20 @@
   padding: $esp-4;
   background: $cor-primaria-suave;
   border-radius: $raio-md;
+  display: flex;
+  flex-direction: column;
+  gap: $esp-2;
 
   h4 {
     font-size: 0.9rem;
     font-weight: 600;
     color: $cor-primaria;
-    margin-bottom: $esp-1;
+    margin: 0;
   }
 
   strong {
     display: block;
     font-size: 1rem;
-    color: $cor-texto;
-    margin-bottom: $esp-2;
-  }
-
-  p {
-    white-space: pre-wrap;
-    font-size: 0.88rem;
     color: $cor-texto;
     margin: 0;
   }

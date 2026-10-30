@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { BookOpen, Calendar, Eye, Paperclip, Plus, Trash2 } from 'lucide-react';
+import { Calendar, Eye, Paperclip, Plus, Trash2 } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Badge } from '@/components/ui/Badge/Badge';
 import { Button } from '@/components/ui/Button/Button';
@@ -23,7 +22,6 @@ import styles from './Tutor.module.scss';
 type Janela = { tipo: 'nova' } | { tipo: 'detalhes' | 'prazo' | 'remover' | 'aplicar'; tarefa: TarefaDoTutor } | null;
 
 export function TarefasDoTutor() {
-  const router = useRouter();
   const toast = useToast();
   const { dados, carregando, erro, recarregar } = useBuscar((signal) => tutorService.tarefas(signal));
   const [janela, setJanela] = useState<Janela>(null);
@@ -135,13 +133,6 @@ export function TarefasDoTutor() {
         descricao="Gerencie as tarefas de redação e acompanhe as entregas."
         acao={
           <div className={styles.grupoBotoesHeader}>
-            <Button
-              variante="secundario"
-              icone={<BookOpen size={18} aria-hidden="true" />}
-              onClick={() => router.push('/tutor/temas')}
-            >
-              Banco de temas
-            </Button>
             <Button icone={<Plus size={18} aria-hidden="true" />} onClick={() => setJanela({ tipo: 'nova' })}>
               Nova tarefa
             </Button>

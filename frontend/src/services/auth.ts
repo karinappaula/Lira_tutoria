@@ -38,11 +38,29 @@ export interface VerificacaoEmailResultado {
   papeisExistentes?: string[];
 }
 
+export interface DetalhesConvitePublico {
+  codigo: string;
+  papel: 'TUTOR' | 'ALUNO';
+  idTurma: number;
+  nomeTurma: string;
+  idTutor?: number | null;
+  nomeTutor?: string | null;
+  usos: number;
+  usosMaximos: number;
+  vagasRestantes: number;
+  lotado: boolean;
+  expirado: boolean;
+}
+
 export const authService = {
   login: (email: string, senha: string) => chamar<LoginResultado>('/api/auth/login', json({ email, senha })),
   selecionarPapel: (papel: PapelUsuario) => chamar<LoginResultado>('/api/auth/selecionar-papel', json({ papel })),
   logout: () => chamar<{ ok: true }>('/api/auth/logout', { method: 'POST' }),
   sessao: () => chamar<Sessao>('/api/auth/sessao'),
+
+  /** Consulta detalhes públicos e lotação de um convite */
+  detalhesConvite: (codigo: string) =>
+    chamar<DetalhesConvitePublico>(`/api/auth/convite/${encodeURIComponent(codigo)}`),
 
   /** Verifica se um e-mail já existe no LIRA para alterar o formulário dinamicamente */
   verificarEmail: (email: string) => chamar<VerificacaoEmailResultado>('/api/auth/verificar-email', json({ email })),

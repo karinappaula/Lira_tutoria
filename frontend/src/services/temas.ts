@@ -4,6 +4,7 @@ import type { Tema } from '@/types/redacoes';
 export interface DadosDeTema {
   tituloTema: string;
   textoMotivador?: string;
+  imagemUrl?: string;
   origem?: string;
 }
 

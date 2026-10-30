@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import {
   Archive,
+  ArchiveRestore,
   BookOpen,
   GraduationCap,
   LayoutGrid,
@@ -45,6 +46,8 @@ export function TurmasAdmin() {
   const [modalIntegrantesAberto, setModalIntegrantesAberto] = useState(false);
   const [turmaParaArquivar, setTurmaParaArquivar] = useState<TurmaAdmin | null>(null);
   const [arquivando, setArquivando] = useState(false);
+  const [turmaParaDesarquivar, setTurmaParaDesarquivar] = useState<TurmaAdmin | null>(null);
+  const [desarquivando, setDesarquivando] = useState(false);
 
   const { dados, carregando, erro, recarregar } = useBuscar((signal) =>
     adminService.turmas(signal)
@@ -101,6 +104,21 @@ export function TurmasAdmin() {
       toast.erro(mensagemDeErro(e));
     } finally {
       setArquivando(false);
+    }
+  }
+
+  async function confirmarDesarquivamento() {
+    if (!turmaParaDesarquivar) return;
+    setDesarquivando(true);
+    try {
+      await adminService.desarquivarTurma(turmaParaDesarquivar.id);
+      toast.sucesso(`Turma "${turmaParaDesarquivar.nome}" desarquivada com sucesso.`);
+      setTurmaParaDesarquivar(null);
+      recarregar();
+    } catch (e) {
+      toast.erro(mensagemDeErro(e));
+    } finally {
+      setDesarquivando(false);
     }
   }
 
@@ -171,7 +189,7 @@ export function TurmasAdmin() {
           >
             Convidar
           </Button>
-          {t.status === 'ATIVA' && (
+          {t.status === 'ATIVA' ? (
             <Button
               variante="perigo"
               tamanho="sm"
@@ -180,6 +198,16 @@ export function TurmasAdmin() {
               aria-label={`Arquivar turma ${t.nome}`}
             >
               Arquivar
+            </Button>
+          ) : (
+            <Button
+              variante="secundario"
+              tamanho="sm"
+              icone={<ArchiveRestore size={14} aria-hidden="true" />}
+              onClick={() => setTurmaParaDesarquivar(t)}
+              aria-label={`Desarquivar turma ${t.nome}`}
+            >
+              Desarquivar
             </Button>
           )}
         </div>
@@ -403,7 +431,7 @@ export function TurmasAdmin() {
                   >
                     Convidar
                   </Button>
-                  {turma.status === 'ATIVA' && (
+                  {turma.status === 'ATIVA' ? (
                     <Button
                       variante="perigo"
                       tamanho="sm"
@@ -412,6 +440,16 @@ export function TurmasAdmin() {
                       aria-label={`Arquivar ${turma.nome}`}
                     >
                       Arquivar
+                    </Button>
+                  ) : (
+                    <Button
+                      variante="secundario"
+                      tamanho="sm"
+                      icone={<ArchiveRestore size={15} aria-hidden="true" />}
+                      onClick={() => setTurmaParaDesarquivar(turma)}
+                      aria-label={`Desarquivar ${turma.nome}`}
+                    >
+                      Desarquivar
                     </Button>
                   )}
                 </div>
@@ -487,6 +525,38 @@ export function TurmasAdmin() {
           Tem certeza de que deseja arquivar a turma{' '}
           <strong>{turmaParaArquivar?.nome}</strong>? Turmas arquivadas deixam de aceitar
           novos convites e novas submissões de redações pelos alunos.
+        </p>
+      </Modal>
+
+      {/* Modal Confirmar Desarquivamento */}
+      <Modal
+        aberto={Boolean(turmaParaDesarquivar)}
+        aoFechar={() => setTurmaParaDesarquivar(null)}
+        titulo="Confirmar Desarquivamento de Turma"
+        tamanho="sm"
+        rodape={
+          <>
+            <Button
+              variante="secundario"
+              onClick={() => setTurmaParaDesarquivar(null)}
+              disabled={desarquivando}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variante="primario"
+              carregando={desarquivando}
+              onClick={() => void confirmarDesarquivamento()}
+            >
+              Desarquivar turma
+            </Button>
+          </>
+        }
+      >
+        <p className={styles.textoInstrucao}>
+          Tem certeza de que deseja desarquivar a turma{' '}
+          <strong>{turmaParaDesarquivar?.nome}</strong>? A turma voltará ao status ATIVA e
+          seus alunos e tutores poderão utilizá-la normalmente para envio e correção de redações.
         </p>
       </Modal>
     </>

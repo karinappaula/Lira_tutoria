@@ -68,7 +68,11 @@ export function DetalheDoTutor({ id }: { id: number }) {
         redacao={dados}
         visaoInterna
         mensagem={(v) =>
-          v.statusVersao === 'AGUARDANDO_REESCRITA' ? 'Reescrita solicitada. Aguardando o aluno escrever a nova versão.' : v.statusVersao === 'RASCUNHO' ? 'O aluno ainda está escrevendo esta versão.' : null
+          v.statusVersao === 'AGUARDANDO_REESCRITA' || v.statusVersao === 'REESCRITA_SOLICITADA'
+            ? 'Reescrita solicitada. Aguardando o aluno escrever a nova versão.'
+            : v.statusVersao === 'RASCUNHO'
+            ? 'O aluno ainda está escrevendo esta versão.'
+            : null
         }
         acoes={(v) => {
           if (v.id !== ultima?.id) return null;

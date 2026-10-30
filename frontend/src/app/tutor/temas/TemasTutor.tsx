@@ -16,6 +16,7 @@ import { useToast } from '@/components/ui/Toast/Toast';
 import { useBuscar } from '@/hooks/useBuscar';
 import { ApiError, mensagemDeErro } from '@/lib/erros';
 import { temasService, type DadosDeTema } from '@/services/temas';
+import { TextoMotivador } from '@/components/redacao/TextoMotivador';
 import type { Tema } from '@/types/redacoes';
 import styles from './TemasTutor.module.scss';
 
@@ -40,6 +41,7 @@ export function TemasTutor() {
   // Estados de formulário (criar/editar)
   const [titulo, setTitulo] = useState('');
   const [textoMotivador, setTextoMotivador] = useState('');
+  const [imagemUrl, setImagemUrl] = useState('');
   const [erroTitulo, setErroTitulo] = useState<string | undefined>();
   const [erroGeral, setErroGeral] = useState<string | null>(null);
   const [salvando, setSalvando] = useState(false);
@@ -76,6 +78,7 @@ export function TemasTutor() {
   function abrirCriacao() {
     setTitulo('');
     setTextoMotivador('');
+    setImagemUrl('');
     setErroTitulo(undefined);
     setErroGeral(null);
     setJanela({ tipo: 'novo' });
@@ -84,6 +87,7 @@ export function TemasTutor() {
   function abrirEdicao(tema: Tema) {
     setTitulo(tema.tituloTema);
     setTextoMotivador(tema.textoMotivador ?? '');
+    setImagemUrl(tema.imagemUrl ?? '');
     setErroTitulo(undefined);
     setErroGeral(null);
     setJanela({ tipo: 'editar', tema });
@@ -113,6 +117,7 @@ export function TemasTutor() {
     const dadosPayload: DadosDeTema = {
       tituloTema: tituloLimpo,
       textoMotivador: textoMotivador.trim() ? textoMotivador.trim() : undefined,
+      imagemUrl: imagemUrl.trim() ? imagemUrl.trim() : undefined,
     };
 
     try {
@@ -173,7 +178,7 @@ export function TemasTutor() {
         const meu = ehMeuTema(t);
         return (
           <Badge tom={meu ? 'sucesso' : 'neutro'}>
-            {meu ? 'Criado por você' : t.origem || 'Oficial'}
+            {meu ? 'Criado por você' : (t.origem || 'ADMIN').toUpperCase()}
           </Badge>
         );
       },
@@ -367,12 +372,21 @@ export function TemasTutor() {
 
           <Textarea
             rotulo="Texto Motivador / Coletânea (opcional)"
-            placeholder="Insira o texto motivador, dados estatísticos, excertos de leis ou orientações para a produção textual..."
+            placeholder="Insira o texto motivador, dados estatísticos, excertos de leis ou orientações para a produção textual... Use [IMAGEM] para posicionar a imagem da coletânea."
             value={textoMotivador}
             onChange={(e) => setTextoMotivador(e.target.value)}
             maxLength={10000}
             rows={6}
-            dica="Texto de apoio para os alunos elaborarem a redação (até 10.000 caracteres)."
+            dica="Texto de apoio para os alunos. Digite [IMAGEM] para posicionar a imagem no local desejado."
+          />
+
+          <Input
+            rotulo="URL da Imagem Motivadora / Coletânea Visual (opcional)"
+            placeholder="https://exemplo.com/imagem-coletanea.png"
+            value={imagemUrl}
+            onChange={(e) => setImagemUrl(e.target.value)}
+            maxLength={500}
+            dica="URL pública de uma imagem ilustrativa para a coletânea do tema (até 500 caracteres)."
           />
 
           <div className={styles.botoesModal}>
@@ -413,13 +427,11 @@ export function TemasTutor() {
 
             <div className={styles.blocoMotivador}>
               <h4>Texto Motivador e Coletânea</h4>
-              {janela.tema.textoMotivador ? (
-                <p>{janela.tema.textoMotivador}</p>
-              ) : (
-                <p style={{ color: 'var(--cor-texto-suave, #6b7d80)', fontStyle: 'italic' }}>
-                  Nenhum texto motivador cadastrado para este tema.
-                </p>
-              )}
+              <TextoMotivador
+                texto={janela.tema.textoMotivador}
+                imagemUrl={janela.tema.imagemUrl}
+                titulo={janela.tema.tituloTema}
+              />
             </div>
 
             <div className={styles.botoesModal}>

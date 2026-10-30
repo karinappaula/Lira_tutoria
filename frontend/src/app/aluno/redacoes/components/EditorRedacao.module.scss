@@ -171,6 +171,10 @@
   }
 }
 
+.avisoLinhas {
+  margin-top: $esp-3;
+}
+
 .rodape {
   display: flex;
   flex-wrap: wrap;
@@ -191,9 +195,53 @@
   }
 }
 
+.contagemWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  @include celular {
+    width: 100%;
+  }
+}
+
 .contagem {
   color: $cor-texto-suave;
   font-size: 0.88rem;
+}
+
+.indicadorLinhas {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: $raio-sm;
+  padding: 2px 8px;
+  width: fit-content;
+}
+
+.indicadorNeutro {
+  background: $cor-fundo;
+  color: $cor-texto-suave;
+  border: 1px solid $cor-borda;
+}
+
+.indicadorAlerta {
+  background: $cor-alerta-suave;
+  color: $cor-alerta-texto;
+  border: 1px solid $cor-alerta;
+}
+
+.indicadorErro {
+  background: $cor-perigo-suave;
+  color: $cor-perigo-texto;
+  border: 1px solid $cor-perigo;
+}
+
+.indicadorOk {
+  background: $cor-primaria-suave;
+  color: $cor-primaria;
+  border: 1px solid $cor-borda-forte;
 }
 
 .botoes {
@@ -220,7 +268,9 @@
   box-shadow: $sombra-cartao;
 
   @include tablet {
-    display: none;
+    position: static;
+    display: block;
+    margin-top: $esp-4;
   }
 }
 
@@ -249,6 +299,85 @@
 .resumoEnvio {
   color: $cor-texto-suave;
   font-size: 0.9rem;
+}
+
+.alertaReescritaConteudo {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+
+  @include tablet {
+    align-items: flex-start;
+  }
+}
+
+.abasLateral {
+  display: flex;
+  gap: $esp-2;
+  margin-bottom: $esp-4;
+  border-bottom: 1px solid $cor-borda;
+  padding-bottom: $esp-2;
+}
+
+.abaBotao {
+  flex: 1;
+  padding: $esp-2 $esp-3;
+  background: none;
+  border: none;
+  border-radius: $raio-sm;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: $cor-texto-suave;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease-in-out;
+
+  &:hover {
+    color: $cor-primaria;
+    background: $cor-primaria-suave;
+  }
+}
+
+.abaAtiva {
+  color: $cor-primaria;
+  background: $cor-primaria-suave;
+  font-weight: 700;
+}
+
+.painelCorrecaoLateral {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.cabecalhoCorrecaoLateral {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: $esp-2;
+}
+
+.semCorrecao {
+  font-size: 0.88rem;
+  color: $cor-texto-suave;
+  font-style: italic;
+  padding: $esp-3 0;
+}
+
+.versaoUmSemCorrecao {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-2;
+}
+
+.textoVersaoUm {
+  white-space: pre-wrap;
+  line-height: 1.6;
+  color: $cor-texto;
+  font-size: 0.92rem;
+  margin: 0;
 }
 
 @keyframes girar {

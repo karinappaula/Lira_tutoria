@@ -108,6 +108,7 @@ export function FormularioDeTarefa({ aoCancelar, aoSalvar }: { aoCancelar: () =>
   const [tema, setTema] = useState('');
   const [tituloTema, setTituloTema] = useState('');
   const [textoTema, setTextoTema] = useState('');
+  const [imagemTema, setImagemTema] = useState('');
   const [erros, setErros] = useState<Erros>({});
   const [erroGeral, setErroGeral] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
@@ -180,7 +181,13 @@ export function FormularioDeTarefa({ aoCancelar, aoSalvar }: { aoCancelar: () =>
       prazoEntrega: p.iso,
       ...(descricao.trim() ? { descricao: descricao.trim() } : {}),
       ...(tema === NOVO_TEMA
-        ? { novoTema: { tituloTema: tituloTema.trim(), ...(textoTema.trim() ? { textoMotivador: textoTema.trim() } : {}) } }
+        ? {
+            novoTema: {
+              tituloTema: tituloTema.trim(),
+              ...(textoTema.trim() ? { textoMotivador: textoTema.trim() } : {}),
+              ...(imagemTema.trim() ? { imagemUrl: imagemTema.trim() } : {}),
+            },
+          }
         : { idTema: Number(tema) }),
     };
 
@@ -248,7 +255,21 @@ export function FormularioDeTarefa({ aoCancelar, aoSalvar }: { aoCancelar: () =>
       {tema === NOVO_TEMA && (
         <>
           <Input rotulo="Título do novo tema" value={tituloTema} onChange={(e) => setTituloTema(e.target.value)} maxLength={200} erro={erros.tituloTema} />
-          <Textarea rotulo="Texto motivador (opcional)" value={textoTema} onChange={(e) => setTextoTema(e.target.value)} maxLength={10000} />
+          <Textarea
+            rotulo="Texto motivador (opcional)"
+            value={textoTema}
+            onChange={(e) => setTextoTema(e.target.value)}
+            maxLength={10000}
+            dica="Texto de apoio aos alunos. Digite [IMAGEM] para posicionar a imagem da coletânea no local desejado."
+          />
+          <Input
+            rotulo="URL da Imagem Motivadora / Coletânea (opcional)"
+            placeholder="https://exemplo.com/imagem-coletanea.png"
+            value={imagemTema}
+            onChange={(e) => setImagemTema(e.target.value)}
+            maxLength={500}
+            dica="URL da imagem de apoio. No texto motivador, use a tag [IMAGEM] onde ela deve aparecer."
+          />
         </>
       )}
 

@@ -9,6 +9,7 @@ import { ultimaCorrecao } from '@/lib/correcoes';
 import { formatarDataHora } from '@/lib/formatar';
 import { statusParaAluno, statusParaGestao } from '@/lib/redacoes';
 import type { RedacaoDetalhada, VersaoComCorrecoes } from '@/types/correcoes';
+import { StatusRedacao } from '@/types/redacoes';
 import { ResultadoDaCorrecao } from './ResultadoDaCorrecao';
 import styles from './VersoesDaRedacao.module.scss';
 
@@ -20,10 +21,18 @@ interface Props {
   mensagem?: (versao: VersaoComCorrecoes) => string | null;
   /** Botões da versão (ex.: "Começar reescrita") */
   acoes?: (versao: VersaoComCorrecoes) => ReactNode;
+  /** Regra opcional de visibilidade da nota e feedback */
+  podeExibirCorrecao?: (versao: VersaoComCorrecoes) => boolean;
 }
 
 /** Histórico da redação: abas "Versão 1" / "Reescrita", cada uma com texto e correção. */
-export function VersoesDaRedacao({ redacao, visaoInterna = false, mensagem, acoes }: Props) {
+export function VersoesDaRedacao({
+  redacao,
+  visaoInterna = false,
+  mensagem,
+  acoes,
+  podeExibirCorrecao,
+}: Props) {
   const [indice, setIndice] = useState(redacao.versoes.length - 1);
   const versao = redacao.versoes[Math.min(indice, redacao.versoes.length - 1)];
   if (!versao) return null;
@@ -32,6 +41,11 @@ export function VersoesDaRedacao({ redacao, visaoInterna = false, mensagem, acoe
   const correcao = ultimaCorrecao(versao);
   const aviso = mensagem?.(versao);
   const botoes = acoes?.(versao);
+
+  const estaCorrigida =
+    versao.statusVersao === StatusRedacao.CORRIGIDA ||
+    versao.statusVersao === StatusRedacao.CONCLUIDA;
+  const exibirResultado = podeExibirCorrecao ? podeExibirCorrecao(versao) : visaoInterna || estaCorrigida;
 
   return (
     <div className={styles.versoes}>
@@ -64,7 +78,7 @@ export function VersoesDaRedacao({ redacao, visaoInterna = false, mensagem, acoe
         {aviso && <Alerta tom="info">{aviso}</Alerta>}
         {botoes && <div className={styles.acoes}>{botoes}</div>}
 
-        {correcao ? (
+        {correcao && exibirResultado ? (
           <ResultadoDaCorrecao texto={versao.conteudoTexto} correcao={correcao} visaoInterna={visaoInterna} />
         ) : (
           <Card titulo="Texto enviado">

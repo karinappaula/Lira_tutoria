@@ -1,5 +1,6 @@
 import { CalendarClock, ExternalLink, FileText, Paperclip } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge/Badge';
+import { TextoMotivador } from '@/components/redacao/TextoMotivador';
 import { formatarDataHora } from '@/lib/formatar';
 import { prazoEncerrado, urlSegura } from '@/lib/redacoes';
 import type { Redacao } from '@/types/redacoes';
@@ -28,11 +29,11 @@ export function PainelDoTema({ redacao }: { redacao: Redacao }) {
 
       <div className={styles.secao}>
         <h4 className={styles.subtituloSecao}>Texto Motivador</h4>
-        {tema?.textoMotivador ? (
-          <p className={styles.motivador}>{tema.textoMotivador}</p>
-        ) : (
-          <p className={styles.vazio}>Este tema não tem texto motivador.</p>
-        )}
+        <TextoMotivador
+          texto={tema?.textoMotivador}
+          imagemUrl={tema?.imagemUrl}
+          titulo={tema?.tituloTema}
+        />
       </div>
 
       {tarefa && (

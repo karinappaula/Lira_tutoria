@@ -1,0 +1,134 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.blocoMotivador {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+  width: 100%;
+  max-height: 420px;
+  overflow-y: auto;
+  border-radius: $raio-md;
+  border: 1px solid $cor-borda;
+  padding: 16px;
+  background: $cor-fundo;
+  box-sizing: border-box;
+
+  scrollbar-width: thin;
+  scrollbar-color: $cor-borda-forte transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: $cor-borda-forte;
+    border-radius: $raio-sm;
+  }
+}
+
+.blocoVazio {
+  max-height: none;
+  background: $cor-fundo;
+  border: 1px dashed $cor-borda;
+  border-radius: $raio-md;
+  padding: 16px;
+}
+
+.secaoParte {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+}
+
+.paragrafo {
+  color: $cor-texto;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin: 0;
+
+  @include celular {
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+}
+
+.vazio {
+  color: $cor-texto-suave;
+  font-size: 0.92rem;
+  font-style: italic;
+  margin: 0;
+}
+
+.containerImagem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin: $esp-2 0;
+}
+
+.linkImagem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $esp-1;
+  width: 100%;
+  max-width: 520px;
+  background: #ffffff;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-md;
+  overflow: hidden;
+  text-decoration: none;
+  box-shadow: $sombra-cartao;
+  transition: border-color 0.15s ease-in-out, transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+  &:hover {
+    border-color: $cor-primaria;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 107, 112, 0.12);
+
+    .legenda {
+      color: $cor-primaria;
+    }
+  }
+
+  &:focus-visible {
+    @include anel-de-foco;
+  }
+
+  @include celular {
+    max-width: 100%;
+  }
+}
+
+.imagem {
+  width: 100%;
+  max-height: 320px;
+  object-fit: contain;
+  background: #ffffff;
+  display: block;
+
+  @include celular {
+    max-height: 240px;
+  }
+}
+
+.legenda {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px $esp-3;
+  width: 100%;
+  background: $cor-fundo;
+  border-top: 1px solid $cor-borda;
+  color: $cor-texto-suave;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: color 0.15s ease-in-out;
+}

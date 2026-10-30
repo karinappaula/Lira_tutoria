@@ -8,13 +8,15 @@ import { useToast } from '@/components/ui/Toast/Toast';
 import { mensagemDeErro } from '@/lib/erros';
 import { redacoesService } from '@/services/redacoes';
 import type { RedacaoDetalhada, VersaoComCorrecoes } from '@/types/correcoes';
-import type { StatusVersao } from '@/types/redacoes';
+import { StatusRedacao, type StatusVersao } from '@/types/redacoes';
 
 const MENSAGEM: Partial<Record<StatusVersao, string>> = {
   ENVIADA: 'Seu texto foi enviado e está na fila de correção do seu tutor.',
   EM_CORRECAO: 'Sua redação está em revisão final. O resultado aparece aqui assim que for liberado.',
+  EM_REVISAO_FINAL: 'Sua redação está em revisão final. O resultado aparece aqui assim que for liberado.',
   AJUSTE_SOLICITADO: 'Sua redação está em revisão final. O resultado aparece aqui assim que for liberado.',
   AGUARDANDO_REESCRITA: 'Seu tutor pediu uma reescrita. Leia a correção abaixo e, quando estiver pronto, comece a reescrever.',
+  REESCRITA_SOLICITADA: 'Seu tutor pediu uma reescrita. Leia a correção abaixo e, quando estiver pronto, comece a reescrever.',
 };
 
 /** Redação já enviada: histórico das versões, correção e botão para começar a reescrita. */
@@ -38,9 +40,10 @@ export function LeituraRedacao({ redacao, aoAtualizar }: { redacao: RedacaoDetal
   return (
     <VersoesDaRedacao
       redacao={redacao}
+      podeExibirCorrecao={(v) => v.statusVersao === StatusRedacao.CORRIGIDA || v.statusVersao === StatusRedacao.CONCLUIDA}
       mensagem={(v: VersaoComCorrecoes) => MENSAGEM[v.statusVersao] ?? null}
       acoes={(v) =>
-        v.id === ultima?.id && v.statusVersao === 'AGUARDANDO_REESCRITA' ? (
+        v.id === ultima?.id && (v.statusVersao === 'AGUARDANDO_REESCRITA' || v.statusVersao === 'REESCRITA_SOLICITADA') ? (
           <Button icone={<PencilLine size={18} aria-hidden="true" />} carregando={criando} onClick={() => void comecarReescrita()}>
             Começar reescrita
           </Button>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Play } from 'lucide-react';
 import { Alerta } from '@/components/ui/Alerta/Alerta';
 import { Button } from '@/components/ui/Button/Button';
@@ -8,6 +8,7 @@ import { Input, Select } from '@/components/ui/Campos/Campos';
 import { Modal } from '@/components/ui/Modal/Modal';
 import { useToast } from '@/components/ui/Toast/Toast';
 import { mensagemDeErro } from '@/lib/erros';
+import { questoesService } from '@/services/questoes';
 import { simuladosService } from '@/services/simulados';
 import type { Assunto, CriarSimuladoPayload, SimuladoExecucao } from '@/types/simulados';
 import styles from './ModalConfigurarSimulado.module.scss';
@@ -29,11 +30,40 @@ export function ModalConfigurarSimulado({
   const [quantidade, setQuantidade] = useState<number>(10);
   const [vestibular, setVestibular] = useState<string>('TODOS');
   const [ano, setAno] = useState<string>('');
+  const [anosCadastrados, setAnosCadastrados] = useState<number[]>([]);
+  const [carregandoAnos, setCarregandoAnos] = useState<boolean>(false);
   const [grauDificuldade, setGrauDificuldade] = useState<string>('TODAS');
   const [idAssunto, setIdAssunto] = useState<string>('TODOS');
 
   const [gerando, setGerando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+
+  // Busca global de anos cadastrados (2024, 2025, etc.) via endpoint de anos
+  useEffect(() => {
+    if (!aberto) return;
+    let ativo = true;
+    setCarregandoAnos(true);
+    questoesService
+      .listarAnos()
+      .then((anos) => {
+        if (ativo && Array.isArray(anos)) {
+          const anosValidos = Array.from(new Set(anos))
+            .filter((a): a is number => typeof a === 'number' && !isNaN(a))
+            .sort((a, b) => b - a);
+          setAnosCadastrados(anosValidos);
+        }
+      })
+      .catch(() => {
+        // Mantém lista vazia caso haja falha temporária
+      })
+      .finally(() => {
+        if (ativo) setCarregandoAnos(false);
+      });
+
+    return () => {
+      ativo = false;
+    };
+  }, [aberto]);
 
   async function handleGerar(e: React.FormEvent) {
     e.preventDefault();
@@ -128,16 +158,19 @@ export function ModalConfigurarSimulado({
             <option value="UNICAMP">UNICAMP</option>
           </Select>
 
-          <Input
+          <Select
             rotulo="Ano da Prova (Opcional)"
-            type="number"
-            min={1990}
-            max={2030}
-            placeholder="Ex.: 2024"
             value={ano}
             onChange={(e) => setAno(e.target.value)}
-            disabled={gerando}
-          />
+            disabled={gerando || carregandoAnos}
+          >
+            <option value="">{carregandoAnos ? 'Carregando anos...' : 'Todos os Anos'}</option>
+            {anosCadastrados.map((anoCadastrado) => (
+              <option key={anoCadastrado} value={anoCadastrado}>
+                {anoCadastrado}
+              </option>
+            ))}
+          </Select>
         </div>
 
         <div className={styles.linhaCampos}>

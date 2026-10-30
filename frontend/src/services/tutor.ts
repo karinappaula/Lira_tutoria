@@ -7,7 +7,7 @@ export interface DadosDeTarefa {
   descricao?: string;
   prazoEntrega: string;
   idTema?: number;
-  novoTema?: { tituloTema: string; textoMotivador?: string };
+  novoTema?: { tituloTema: string; textoMotivador?: string; imagemUrl?: string };
 }
 
 export interface DadosDeAnexo {

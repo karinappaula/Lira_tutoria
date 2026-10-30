@@ -129,6 +129,7 @@ export const adminService = {
   criarTurma: (dados: NovaTurmaInput) => api.post<TurmaAdmin>('turmas', dados),
   atualizarTurma: (idTurma: number, dados: Partial<NovaTurmaInput>) => api.patch<TurmaAdmin>(`turmas/${idTurma}`, dados),
   arquivarTurma: (idTurma: number) => api.post<TurmaAdmin>(`turmas/${idTurma}/arquivar`),
+  desarquivarTurma: (idTurma: number) => api.post<TurmaAdmin>(`turmas/${idTurma}/desarquivar`),
 
   // Convites
   gerarConviteTutor: (idTurma: number, usosMaximos: number) =>
