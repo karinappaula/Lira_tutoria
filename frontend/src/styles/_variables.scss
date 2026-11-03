@@ -61,11 +61,11 @@ $esp-8: 64px;
 // Layout
 $largura-conteudo: 1440px;
 $gutter-pagina: 64px;
-$gutter-pagina-mobile: 16px;
+$gutter-pagina-mobile: 14px;
 
-// Pontos de quebra
-$bp-tablet: 900px;
-$bp-celular: 600px;
+// Pontos de quebra (inferior a 768px = celular/mobile; 768px a 1023px = tablet)
+$bp-tablet: 1023.98px;
+$bp-celular: 767.98px;
 
 // Foco acessível
 $anel-foco: 0 0 0 3px rgba(0, 107, 112, 0.35);

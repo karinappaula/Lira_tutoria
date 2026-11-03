@@ -60,7 +60,11 @@ export function HistoricoDoTutor() {
 
   return (
     <>
-      <PageHeader titulo="Histórico de correções" descricao="Histórico total de revisões realizadas por você para esta turma." />
+      <PageHeader
+        titulo="Histórico de correções"
+        descricao="Histórico total de revisões realizadas por você para esta turma."
+        aoRecarregar={recarregar}
+      />
       <div className={styles.barraFerramentas}>
         <div className={styles.filtro}>
           <Select rotulo="Mês" ocultarRotulo value={mes} onChange={(e) => setMes(e.target.value)}>

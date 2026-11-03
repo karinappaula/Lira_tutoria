@@ -363,34 +363,25 @@ export function ModalFormQuestao({
             Cancelar
           </Button>
 
-          {/* {abaAtiva === 'formulario' ? (
+          {abaAtiva === 'formulario' ? (
             <Button
-              type="button"
-              variante="secundario"
-              icone={<Eye size={15} aria-hidden="true" />}
-              onClick={() => setAbaAtiva('preview')}
+              variante="primario"
+              carregando={salvando}
+              disabled={fazendoUploadImagem}
+              onClick={(e) => void handleSalvar(e)}
             >
-              Visualizar Formatação
+              {questaoParaEditar ? 'Salvar Alterações' : 'Salvar Questão'}
             </Button>
           ) : (
             <Button
               type="button"
-              variante="secundario"
+              variante="primario"
               icone={<Edit3 size={15} aria-hidden="true" />}
               onClick={() => setAbaAtiva('formulario')}
             >
               Voltar para Edição
             </Button>
-          )} */}
-
-          <Button
-            variante="primario"
-            carregando={salvando}
-            disabled={fazendoUploadImagem}
-            onClick={(e) => void handleSalvar(e)}
-          >
-            {questaoParaEditar ? 'Salvar Alterações' : 'Salvar Questão'}
-          </Button>
+          )}
         </>
       }
     >
@@ -415,8 +406,7 @@ export function ModalFormQuestao({
           onClick={() => setAbaAtiva('preview')}
         >
           <Eye size={15} aria-hidden="true" />
-          <span>Visualizar Formatação</span>
-          <span className={styles.badgeLive}>Live</span>
+          <span>Visualização</span>
         </button>
       </div>
 

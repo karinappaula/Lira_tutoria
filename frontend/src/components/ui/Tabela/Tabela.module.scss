@@ -31,6 +31,7 @@
   color: $cor-texto;
   border-bottom: 1px solid $cor-borda;
   white-space: nowrap;
+  text-align: center;
 }
 
 .td {
@@ -44,6 +45,19 @@
 }
 
 .linha:hover .td {
+  background: #fafcfb;
+}
+
+.colunaFixaDireitaTh,
+.colunaFixaDireitaTd {
+  position: sticky;
+  right: 0;
+  background: $cor-superficie;
+  z-index: 2;
+  box-shadow: -4px 0 8px rgba(0, 0, 0, 0.04);
+}
+
+.linha:hover .colunaFixaDireitaTd {
   background: #fafcfb;
 }
 
@@ -76,6 +90,13 @@
   background: $cor-superficie;
   border-radius: $raio-lg;
   box-shadow: $sombra-cartao;
+  border: 1px solid $cor-borda;
+  width: 100%;
+  box-sizing: border-box;
+
+  @include celular {
+    padding: $esp-3;
+  }
 }
 
 .cartaoTitulo {

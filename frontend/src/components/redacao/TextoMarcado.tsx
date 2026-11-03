@@ -101,10 +101,11 @@ export function TextoMarcado({ texto, marcas, marcaAtiva, aoClicarMarca, aoSelec
         return (
           <span
             key={`m-${marca.chave}`}
+            id={`marca-trecho-${marca.chave}`}
             data-inicio={s.inicio}
             role="button"
             tabIndex={0}
-            aria-label={`Trecho marcado: ${info.valor}`}
+            aria-label={`Trecho marcado: ${info.valor}. ${marca.sugestao || ''}`}
             className={cx(styles.marca, styles[info.estilo], marcaAtiva === marca.chave && styles.ativa)}
             onClick={() => aoClicarMarca?.(marca)}
             onKeyDown={(e) => {
@@ -115,6 +116,14 @@ export function TextoMarcado({ texto, marcas, marcaAtiva, aoClicarMarca, aoSelec
             }}
           >
             {s.texto}
+            <span className={styles.balaoFlutuante} role="tooltip">
+              <strong className={styles.balaoTitulo}>{info.valor}</strong>
+              {marca.sugestao ? (
+                <span className={styles.balaoSugestao}>{marca.sugestao}</span>
+              ) : (
+                <span className={styles.balaoSemComentario}>Trecho marcado</span>
+              )}
+            </span>
           </span>
         );
       })}

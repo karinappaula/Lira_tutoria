@@ -2,7 +2,6 @@
 
 import { useId } from 'react';
 import { Alerta } from '@/components/ui/Alerta/Alerta';
-import { Badge } from '@/components/ui/Badge/Badge';
 import { cx } from '@/lib/cx';
 import { LIMITE_TEXTO, NIVEIS, type Competencia, type Nivel } from '@/lib/rubrica';
 import styles from './CompetenciaCard.module.scss';
@@ -15,20 +14,26 @@ interface Props {
   aoMudarComentario: (texto: string) => void;
   erroNivel?: string;
   erroComentario?: string;
-  /** Quantas marcações do texto servem de evidência para esta competência */
-  evidencias: number;
+  /** Quantas marcações do texto servem de evidência para esta competência (mantido por retrocompatibilidade) */
+  evidencias?: number;
 }
 
 /** Uma competência: escolha de nível pela rubrica + justificativa obrigatória. */
-export function CompetenciaCard({ competencia, nivel, aoEscolherNivel, comentario, aoMudarComentario, erroNivel, erroComentario, evidencias }: Props) {
+export function CompetenciaCard({
+  competencia,
+  nivel,
+  aoEscolherNivel,
+  comentario,
+  aoMudarComentario,
+  erroNivel,
+  erroComentario,
+}: Props) {
   const id = useId();
   const niveisDecrescentes = [...NIVEIS].reverse();
-  const alertaDeCoerencia =
-    nivel === 200 && evidencias >= 3
-      ? `Atenção: há ${evidencias} marcações ligadas a esta competência, mas a nota é 200. Confira se o nível está coerente.`
-      : nivel === 0
-        ? 'Nota zero: explique na justificativa o motivo (por exemplo, fuga total ao tema ou desrespeito aos direitos humanos).'
-        : null;
+  const alertaNotaZero =
+    nivel === 0
+      ? 'Nota zero: explique na justificativa o motivo (por exemplo, fuga total ao tema ou desrespeito aos direitos humanos).'
+      : null;
 
   return (
     <fieldset className={styles.cartao} aria-describedby={`${id}-ajuda`}>
@@ -54,12 +59,7 @@ export function CompetenciaCard({ competencia, nivel, aoEscolherNivel, comentari
         </p>
       )}
 
-      <div className={styles.evidencias}>
-        <Badge tom={evidencias > 0 ? 'sucesso' : 'neutro'}>
-          {evidencias === 0 ? 'Nenhuma marcação ligada' : `${evidencias} ${evidencias === 1 ? 'marcação ligada' : 'marcações ligadas'}`}
-        </Badge>
-      </div>
-      {alertaDeCoerencia && <Alerta tom="info">{alertaDeCoerencia}</Alerta>}
+      {alertaNotaZero && <Alerta tom="info">{alertaNotaZero}</Alerta>}
 
       <label htmlFor={`${id}-comentario`} className={styles.rotuloComentario}>
         Justificativa da nota (obrigatória)

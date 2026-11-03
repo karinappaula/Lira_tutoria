@@ -9,26 +9,46 @@ import {
   Notebook,
 } from 'lucide-react';
 import { useBuscar } from '@/hooks/useBuscar';
+import { adminService, EVENTO_CORRECOES_ADMIN_MUDOU } from '@/services/admin';
 import { comunicadosService, EVENTO_COMUNICADOS_MUDOU } from '@/services/comunicados';
 import { EVENTO_FILA_MUDOU, tutorService } from '@/services/tutor';
 import { AppShell, type ItemDeMenu } from './AppShell';
 
-const MENU_ADMIN: ItemDeMenu[] = [
-  { href: '/admin/turmas', rotulo: 'Turmas' },
-  { href: '/admin/tarefas', rotulo: 'Tarefas gerais' },
-  { href: '/admin/temas', rotulo: 'Banco de temas' },
-  { href: '/admin/correcoes', rotulo: 'Correções pendentes' },
-  { href: '/admin/historico', rotulo: 'Histórico geral' },
-  { href: '/admin/desempenho', rotulo: 'Desempenho por Turma' },
-  { href: '/admin/questoes', rotulo: 'Banco de Questões' },
-  { href: '/admin/comunicados', rotulo: 'Comunicados' },
-];
+export function ShellAdmin({ children }: { children: ReactNode }) {
+  const fila = useBuscar((signal) => adminService.correcoesPendentes(signal));
+  const { recarregar } = fila;
 
-export const ShellAdmin = ({ children }: { children: ReactNode }) => (
-  <AppShell variante="admin" menu={MENU_ADMIN}>
-    {children}
-  </AppShell>
-);
+  useEffect(() => {
+    window.addEventListener(EVENTO_CORRECOES_ADMIN_MUDOU, recarregar);
+    return () => window.removeEventListener(EVENTO_CORRECOES_ADMIN_MUDOU, recarregar);
+  }, [recarregar]);
+
+  const pendentes = fila.dados?.length ?? 0;
+
+  const menu = useMemo<ItemDeMenu[]>(
+    () => [
+      { href: '/admin/turmas', rotulo: 'Turmas' },
+      { href: '/admin/tarefas', rotulo: 'Tarefas gerais' },
+      { href: '/admin/temas', rotulo: 'Banco de temas' },
+      {
+        href: '/admin/correcoes',
+        rotulo: 'Correções pendentes',
+        contador: pendentes > 0 ? pendentes : undefined,
+      },
+      { href: '/admin/historico', rotulo: 'Histórico geral' },
+      { href: '/admin/desempenho', rotulo: 'Desempenho por Turma' },
+      { href: '/admin/questoes', rotulo: 'Banco de Questões' },
+      { href: '/admin/comunicados', rotulo: 'Comunicados' },
+    ],
+    [pendentes],
+  );
+
+  return (
+    <AppShell variante="admin" menu={menu}>
+      {children}
+    </AppShell>
+  );
+}
 
 export function ShellAluno({ children }: { children: ReactNode }) {
   const [naoLidos, setNaoLidos] = useState(0);

@@ -170,3 +170,11 @@ export const adminService = {
   adicionarAnexo: (idTarefa: number, dados: DadosDeAnexo) => api.post<AnexoCriado>(`tarefas/${idTarefa}/anexos`, dados),
   removerAnexo: (idTarefa: number, idAnexo: number) => api.delete<void>(`tarefas/${idTarefa}/anexos/${idAnexo}`),
 };
+
+export const EVENTO_CORRECOES_ADMIN_MUDOU = 'lira:correcoes-admin-mudou';
+
+export function avisarCorrecoesAdminMudou() {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent(EVENTO_CORRECOES_ADMIN_MUDOU));
+  }
+}

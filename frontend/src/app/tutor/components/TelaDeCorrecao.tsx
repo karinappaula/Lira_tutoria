@@ -16,6 +16,7 @@ import { Modal } from '@/components/ui/Modal/Modal';
 import { CarregandoPagina } from '@/components/ui/Spinner/Spinner';
 import { useToast } from '@/components/ui/Toast/Toast';
 import { useBuscar } from '@/hooks/useBuscar';
+import { cx } from '@/lib/cx';
 import { numero, sobrepoe, ultimaCorrecao, type MarcaVisual } from '@/lib/correcoes';
 import { ApiError, mensagemDeErro } from '@/lib/erros';
 import { tituloDaRedacao } from '@/lib/redacoes';
@@ -132,10 +133,29 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
     setErroMarca(null);
   }, []);
 
-  const marcasVisuais = useMemo<MarcaVisual[]>(() => marcas.map((m) => ({ chave: m.chave, inicio: m.inicio, fim: m.fim, tipoErro: m.tipoErro })), [marcas]);
-  const evidencias = (numeroDaCompetencia: number) => marcas.filter((m) => infoDoTipo(m.tipoErro).competencia === numeroDaCompetencia).length;
+  const marcasVisuais = useMemo<MarcaVisual[]>(
+    () => marcas.map((m) => ({ chave: m.chave, inicio: m.inicio, fim: m.fim, tipoErro: m.tipoErro, sugestao: m.sugestao })),
+    [marcas],
+  );
   const parcial = niveis.reduce<number>((total, n) => total + (n ?? 0), 0);
   const faltam = niveis.filter((n) => n === null).length;
+
+  const temNotasC1aC5 = niveis.every((n) => n !== null);
+  const temOrientacao =
+    parecer.trim().length > 0 ||
+    marcas.length > 0 ||
+    comentarios.some((c) => c.trim().length > 0);
+  const podeSolicitarReescrita = temNotasC1aC5 && temOrientacao;
+
+  function abrirModalReescrita() {
+    if (!podeSolicitarReescrita) {
+      setAvisoGeral('Para solicitar uma reescrita, preencha as notas das competências e insira ao menos um parecer ou comentário orientativo.');
+      topoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    setErroReescrita(null);
+    setConfirmandoReescrita(true);
+  }
 
   function adicionarMarca() {
     if (!selecao) return;
@@ -205,46 +225,41 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
   }
 
   async function solicitarReescritaPelaCorrecao() {
+    if (!podeSolicitarReescrita) {
+      setAvisoGeral('Para solicitar uma reescrita, preencha as notas das competências e insira ao menos um parecer ou comentário orientativo.');
+      setConfirmandoReescrita(false);
+      topoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
     setEnviandoReescrita(true);
     setErroReescrita(null);
     try {
-      // Se houver marcações, parecer ou comentários parciais, tenta persistir para orientar o aluno na V2
-      const temApontamentos =
-        marcas.length > 0 ||
-        parecer.trim().length > 0 ||
-        comentarios.some((c) => c.trim().length > 0) ||
-        niveis.some((n) => n !== null);
-
-      if (temApontamentos) {
-        try {
-          const n = niveis.map((x) => x ?? 0);
-          const c = comentarios.map((x) => x.trim());
-          await tutorService.corrigir({
-            idVersao: versao.id,
-            notaComp1: n[0] ?? 0,
-            notaComp2: n[1] ?? 0,
-            notaComp3: n[2] ?? 0,
-            notaComp4: n[3] ?? 0,
-            notaComp5: n[4] ?? 0,
-            comentarioComp1: c[0] ?? '',
-            comentarioComp2: c[1] ?? '',
-            comentarioComp3: c[2] ?? '',
-            comentarioComp4: c[3] ?? '',
-            comentarioComp5: c[4] ?? '',
-            ...(parecer.trim() ? { parecerGeral: parecer.trim() } : {}),
-            ...(ehAvaliativa && recado.trim() ? { recadoAdmin: recado.trim() } : {}),
-            anotacoes: marcas.map((m) => ({
-              posicaoInicio: m.inicio,
-              posicaoFinal: m.fim,
-              textoSelecionado: texto.slice(m.inicio, m.fim),
-              tipoErro: m.tipoErro,
-              ...(m.sugestao ? { sugestaoComentario: m.sugestao } : {}),
-            })),
-          });
-        } catch {
-          // Continua para a solicitação de reescrita caso o preenchimento não esteja 100% completo
-        }
-      }
+      const n = niveis.map((x) => x ?? 0);
+      const c = comentarios.map((x) => x.trim());
+      // Salva a avaliação com as notas e apontamentos antes de solicitar a reescrita
+      await tutorService.corrigir({
+        idVersao: versao.id,
+        notaComp1: n[0] ?? 0,
+        notaComp2: n[1] ?? 0,
+        notaComp3: n[2] ?? 0,
+        notaComp4: n[3] ?? 0,
+        notaComp5: n[4] ?? 0,
+        comentarioComp1: c[0] ?? '',
+        comentarioComp2: c[1] ?? '',
+        comentarioComp3: c[2] ?? '',
+        comentarioComp4: c[3] ?? '',
+        comentarioComp5: c[4] ?? '',
+        ...(parecer.trim() ? { parecerGeral: parecer.trim() } : {}),
+        ...(ehAvaliativa && recado.trim() ? { recadoAdmin: recado.trim() } : {}),
+        anotacoes: marcas.map((m) => ({
+          posicaoInicio: m.inicio,
+          posicaoFinal: m.fim,
+          textoSelecionado: texto.slice(m.inicio, m.fim),
+          tipoErro: m.tipoErro,
+          ...(m.sugestao ? { sugestaoComentario: m.sugestao } : {}),
+        })),
+      });
 
       await tutorService.solicitarReescrita(redacao.id);
       avisarFilaMudou();
@@ -286,7 +301,12 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
               texto={texto}
               marcas={marcasVisuais}
               marcaAtiva={marcaAtiva}
-              aoClicarMarca={(m) => setMarcaAtiva((a) => (a === m.chave ? null : Number(m.chave)))}
+              aoClicarMarca={(m) => {
+                const chave = Number(m.chave);
+                setMarcaAtiva((a) => (a === chave ? null : chave));
+                const el = document.getElementById(`marca-card-${chave}`);
+                el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+              }}
               aoSelecionar={aoSelecionar}
               selecaoPendente={selecao}
               rotulo="Texto da redação do aluno"
@@ -301,7 +321,6 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
                 {TIPOS_DE_ERRO.map((t) => (
                   <option key={t.valor} value={t.valor}>
                     {t.valor}
-                    {t.competencia ? ` (C${t.competencia})` : ''}
                   </option>
                 ))}
               </Select>
@@ -318,28 +337,63 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
               </div>
             </Card>
           )}
+        </div>
 
-          <Card titulo={`Marcações (${marcas.length})`}>
+        <aside className={styles.painelLateralMarcas} aria-label="Painel de marcações da redação">
+          <Card titulo={`Marcações (${marcas.length})`} className={styles.cartaoMarcas}>
             {marcas.length === 0 ? (
-              <p className={styles.instrucao}>Nenhuma marcação ainda. As marcações ajudam o aluno a entender cada nota.</p>
+              <p className={styles.instrucao}>Nenhuma marcação ainda. Selecione trechos no texto para apontar melhorias.</p>
             ) : (
-              <ul className={styles.listaMarcas}>
-                {marcas.map((m) => (
-                  <li key={m.chave} className={styles.itemMarca}>
-                    <div>
-                      <Badge tom="neutro">{infoDoTipo(m.tipoErro).valor}</Badge>
-                      <p className={styles.trecho}>“{texto.slice(m.inicio, m.fim)}”</p>
-                      {m.sugestao && <p className={styles.sugestaoTexto}>{m.sugestao}</p>}
-                    </div>
-                    <button type="button" className={styles.remover} aria-label={`Remover marcação: ${texto.slice(m.inicio, m.fim)}`} onClick={() => setMarcas((a) => a.filter((x) => x.chave !== m.chave))}>
-                      <Trash2 size={16} aria-hidden="true" />
-                    </button>
-                  </li>
-                ))}
-              </ul>
+              <div className={styles.containerListaMarcas}>
+                <ul className={styles.listaMarcas}>
+                  {marcas.map((m) => {
+                    const ativa = marcaAtiva === m.chave;
+                    return (
+                      <li
+                        key={m.chave}
+                        id={`marca-card-${m.chave}`}
+                        className={cx(styles.itemMarca, ativa && styles.itemMarcaAtivo)}
+                        onClick={() => {
+                          setMarcaAtiva(m.chave);
+                          const el = document.getElementById(`marca-trecho-${m.chave}`);
+                          el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            setMarcaAtiva(m.chave);
+                            const el = document.getElementById(`marca-trecho-${m.chave}`);
+                            el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                          }
+                        }}
+                      >
+                        <div className={styles.conteudoMarcaItem}>
+                          <Badge tom="neutro">{infoDoTipo(m.tipoErro).valor}</Badge>
+                          <p className={styles.trecho}>“{texto.slice(m.inicio, m.fim)}”</p>
+                          {m.sugestao && <p className={styles.sugestaoTexto}>{m.sugestao}</p>}
+                        </div>
+                        <button
+                          type="button"
+                          className={styles.remover}
+                          aria-label={`Remover marcação: ${texto.slice(m.inicio, m.fim)}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMarcas((a) => a.filter((x) => x.chave !== m.chave));
+                            if (marcaAtiva === m.chave) setMarcaAtiva(null);
+                          }}
+                        >
+                          <Trash2 size={16} aria-hidden="true" />
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
             )}
           </Card>
-        </div>
+        </aside>
 
         <div className={styles.fichaColuna}>
           {COMPETENCIAS.map((comp, i) => (
@@ -358,7 +412,6 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
               }}
               erroNivel={errosNivel[i]}
               erroComentario={errosComentario[i]}
-              evidencias={evidencias(comp.numero)}
             />
           ))}
 
@@ -390,11 +443,13 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
             <Button
               variante="secundario"
               icone={<RotateCcw size={16} aria-hidden="true" />}
-              onClick={() => {
-                setErroReescrita(null);
-                setConfirmandoReescrita(true);
-              }}
-              disabled={enviando || enviandoReescrita}
+              onClick={abrirModalReescrita}
+              disabled={enviando || enviandoReescrita || !podeSolicitarReescrita}
+              title={
+                !podeSolicitarReescrita
+                  ? 'Para solicitar uma reescrita, preencha as notas das competências e insira ao menos um parecer ou comentário orientativo.'
+                  : undefined
+              }
             >
               Solicitar reescrita
             </Button>

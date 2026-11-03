@@ -20,7 +20,7 @@ import { cx } from '@/lib/cx';
 import { mensagemDeErro } from '@/lib/erros';
 import { formatarDataHora } from '@/lib/formatar';
 import { COMPETENCIAS, descricaoDoNivel, infoDoTipo, TIPOS_DE_ERRO } from '@/lib/rubrica';
-import { adminService, type CorrecaoPendenteItem } from '@/services/admin';
+import { adminService, avisarCorrecoesAdminMudou, type CorrecaoPendenteItem } from '@/services/admin';
 import marcadoStyles from '@/components/redacao/TextoMarcado.module.scss';
 import styles from './ModalRevisaoCorrecao.module.scss';
 
@@ -61,6 +61,7 @@ export function ModalRevisaoCorrecao({ correcao, aberto, aoFechar, aoSucesso }: 
       inicio: a.posicaoInicio,
       fim: a.posicaoFinal,
       tipoErro: a.tipoErro,
+      sugestao: a.sugestaoComentario ?? undefined,
     }));
   }, [correcao?.anotacoes]);
 
@@ -126,6 +127,7 @@ export function ModalRevisaoCorrecao({ correcao, aberto, aoFechar, aoSucesso }: 
     try {
       await adminService.aprovarCorrecao(correcao!.id);
       toast.sucesso(`Correção da redação de ${alunoNome} aprovada com sucesso!`);
+      avisarCorrecoesAdminMudou();
       aoSucesso();
       fecharModal();
     } catch (e) {
@@ -145,6 +147,7 @@ export function ModalRevisaoCorrecao({ correcao, aberto, aoFechar, aoSucesso }: 
     try {
       await adminService.solicitarAjuste(correcao!.id, comentarioAjuste.trim());
       toast.sucesso(`Ajuste solicitado com sucesso ao tutor ${tutorNome}.`);
+      avisarCorrecoesAdminMudou();
       aoSucesso();
       fecharModal();
     } catch (e) {

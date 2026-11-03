@@ -104,6 +104,7 @@ export function ComunicadosAdmin() {
       <PageHeader
         titulo="Comunicados Institucionais"
         descricao="Emita comunicados institucionais aos tutores e acompanhe as taxas de leitura em tempo real."
+        aoRecarregar={recarregar}
         acao={
           <Button
             variante="primario"
@@ -122,7 +123,7 @@ export function ComunicadosAdmin() {
       ) : listaEnviados.length === 0 ? (
         <EmptyState
           titulo="Nenhum comunicado enviado"
-          descricao="Você ainda não disparou nenhum comunicado para a equipe de tutores. Clique em 'Novo Comunicado' para começar."
+          descricao="Você ainda não enviou nenhum comunicado para a equipe de tutores. Clique em 'Novo Comunicado' para começar."
         />
       ) : (
         <div className={styles.tabelaContainer}>
@@ -130,7 +131,7 @@ export function ComunicadosAdmin() {
             colunas={colunas}
             linhas={listaEnviados}
             chaveDaLinha={(c) => c.id}
-            descricao="Tabela de comunicados institucionais disparados"
+            descricao="Tabela de comunicados institucionais enviados"
           />
         </div>
       )}

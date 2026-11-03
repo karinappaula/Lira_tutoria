@@ -34,6 +34,7 @@ export interface MarcaVisual {
   inicio: number;
   fim: number;
   tipoErro: string;
+  sugestao?: string;
 }
 
 export interface Segmento {

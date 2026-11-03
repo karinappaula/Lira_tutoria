@@ -46,18 +46,24 @@
 
 .listaTarefas {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: $esp-4;
   margin: 0;
   padding: 0;
   list-style: none;
+  width: 100%;
+  box-sizing: border-box;
 
   @include celular {
     grid-template-columns: 1fr;
+    gap: $esp-3;
   }
 }
 
 .vazio {
   background: $cor-superficie;
   border-radius: $raio-lg;
+  border: 1px solid $cor-borda;
+  width: 100%;
+  box-sizing: border-box;
 }

@@ -74,7 +74,11 @@ export function FilaDeCorrecao() {
 
   return (
     <>
-      <PageHeader titulo="Fila de correção" descricao="Corrija os textos submetidos ou reavalie tarefas a pedido dos administradores." />
+      <PageHeader
+        titulo="Fila de correção"
+        descricao="Corrija os textos submetidos ou reavalie tarefas a pedido dos administradores."
+        aoRecarregar={recarregar}
+      />
       {carregando ? (
         <CarregandoPagina rotulo="Carregando a fila" />
       ) : erro ? (

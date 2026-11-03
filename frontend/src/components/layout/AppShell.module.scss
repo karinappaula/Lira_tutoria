@@ -18,14 +18,27 @@
 .cabecalhoInterno {
   @include container-pagina;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: $esp-4;
+  flex-direction: column;
+  justify-content: center;
   min-height: 104px;
   padding-block: $esp-3;
 
   @include celular {
-    min-height: 84px;
+    min-height: auto;
+    padding-block: $esp-2;
+    gap: 6px;
+  }
+}
+
+.barraPrincipal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-4;
+  width: 100%;
+
+  @include celular {
+    gap: $esp-2;
   }
 }
 
@@ -34,6 +47,122 @@
   align-items: center;
   gap: $esp-4;
   min-width: 0;
+
+  @include celular {
+    flex: 1;
+    min-width: 0;
+    gap: $esp-2;
+  }
+}
+
+.titulosUsuario {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.contextoDesktop {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: $cor-texto-suave;
+
+  @include celular {
+    display: none;
+  }
+}
+
+.contextoMobile {
+  display: none;
+
+  @include celular {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    width: 100%;
+    padding-top: 5px;
+    border-top: 1px solid $cor-borda;
+    font-size: 0.78rem;
+    color: $cor-texto-suave;
+  }
+}
+
+.contextoUsuario {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: $cor-texto-suave;
+
+  @include celular {
+    gap: 4px;
+    font-size: 0.78rem;
+  }
+}
+
+.badgePapel {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 8px;
+  border-radius: $raio-pilula;
+  background: $cor-primaria-suave;
+  color: $cor-primaria;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+
+  @include celular {
+    font-size: 0.72rem;
+    padding: 1px 6px;
+  }
+}
+
+.contextoItem {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 280px;
+
+  strong {
+    color: $cor-texto;
+  }
+
+  @include celular {
+    max-width: none;
+    font-size: 0.78rem;
+  }
+}
+
+.botaoHamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-md;
+  background: $cor-superficie;
+  color: $cor-texto;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    border-color: $cor-primaria;
+    color: $cor-primaria;
+    background: $cor-primaria-suave;
+  }
+
+  @include anel-de-foco;
+
+  @include celular {
+    display: inline-flex;
+  }
 }
 
 .pena {
@@ -42,7 +171,7 @@
   flex-shrink: 0;
 
   @include celular {
-    height: 46px;
+    height: 44px;
   }
 }
 
@@ -53,7 +182,7 @@
   @include truncar;
 
   @include celular {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
   }
 }
 
@@ -64,7 +193,7 @@
   @include truncar;
 
   @include celular {
-    font-size: 0.9rem;
+    font-size: 0.88rem;
   }
 }
 
@@ -73,6 +202,10 @@
   align-items: center;
   gap: $esp-3;
   flex-shrink: 0;
+
+  @include celular {
+    gap: $esp-2;
+  }
 }
 
 .botaoSino {
@@ -157,13 +290,22 @@
   align-items: center;
   gap: $esp-2;
   margin-block: 0;
-  padding-block: $esp-3;
+  padding-block: $esp-2;
   list-style: none;
   overflow-x: auto;
-  scrollbar-width: none; /* sem barra de rolagem visível */
-  -ms-overflow-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: $cor-primaria-suave transparent;
 
   &::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $cor-borda-forte;
+    border-radius: 4px;
+  }
+
+  @include celular {
     display: none;
   }
 }
@@ -171,14 +313,17 @@
 .aba {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: $esp-2;
-  padding: $esp-2 $esp-4;
+  height: 40px;
+  padding: 0 $esp-4;
   border-radius: $raio-md;
   color: $cor-texto;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   font-weight: 500;
   text-decoration: none;
   white-space: nowrap;
+  flex-shrink: 0;
   transition: all 0.15s ease;
 
   &:hover {
@@ -195,12 +340,150 @@
   font-weight: 600;
 }
 
+/* ---------- Menu Hambúrguer Retrátil (Mobile < 768px) ---------- */
+.menuDrawerOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(23, 41, 45, 0.5);
+  backdrop-filter: blur(2px);
+  z-index: 1000;
+  display: flex;
+  justify-content: flex-start;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.menuDrawer {
+  width: min(320px, 85vw);
+  height: 100%;
+  background: $cor-superficie;
+  box-shadow: 8px 0 24px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  animation: slideRight 0.25s ease-out;
+}
+
+.menuDrawerCabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $esp-4;
+  border-bottom: 1px solid $cor-borda;
+  background: $cor-fundo;
+}
+
+.identidadeDrawer {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+}
+
+.penaDrawer {
+  height: 38px;
+  width: auto;
+}
+
+.tituloMenuDrawer {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: $cor-texto;
+}
+
+.botaoFecharDrawer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-sm;
+  background: $cor-superficie;
+  color: $cor-texto;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: $cor-perigo-suave;
+    border-color: $cor-perigo;
+    color: $cor-perigo-texto;
+  }
+}
+
+.menuDrawerLista {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-1;
+  margin: 0;
+  padding: $esp-3;
+  list-style: none;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.itemDrawerLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-3;
+  padding: 12px 16px;
+  border-radius: $raio-md;
+  color: $cor-texto;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: $cor-primaria-suave;
+    color: $cor-primaria;
+  }
+}
+
+.itemDrawerAtivo {
+  background: $cor-primaria-suave;
+  color: $cor-primaria;
+  font-weight: 700;
+}
+
+.rotuloDrawer {
+  flex: 1;
+}
+
+.badgeContadorDrawer {
+  padding: 2px 8px;
+  border-radius: $raio-pilula;
+  background: $cor-primaria;
+  color: $cor-texto-invertido;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
 /* ---------- Conteúdo ---------- */
 .principal {
   @include container-pagina;
   padding-block: $esp-6;
+  min-height: calc(100vh - 220px);
+  width: 100%;
+  box-sizing: border-box;
 
   @include celular {
     padding-block: $esp-4;
+  }
+}
+
+@keyframes slideRight {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

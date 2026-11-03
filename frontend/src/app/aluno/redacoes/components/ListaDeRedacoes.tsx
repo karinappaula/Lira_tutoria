@@ -86,6 +86,10 @@ export function ListaDeRedacoes() {
       <PageHeader
         titulo="Minhas redações"
         descricao="Acompanhe todos os seus textos submetidos, rascunhos e correções do corretor."
+        aoRecarregar={() => {
+          redacoes.recarregar();
+          tarefas.recarregar();
+        }}
         acao={
           <Button icone={<Plus size={18} aria-hidden="true" />} onClick={() => setModalAberto(true)}>
             Nova redação

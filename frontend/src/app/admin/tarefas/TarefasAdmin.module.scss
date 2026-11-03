@@ -129,15 +129,44 @@
   color: $cor-texto-suave;
 }
 
+/* ---------- Tabela de Tarefas e Alinhamento ---------- */
+.tabelaContainer {
+  width: 100%;
+  overflow-x: auto;
+
+  th {
+    text-align: center !important;
+  }
+
+  th:last-child,
+  td:last-child {
+    position: sticky;
+    right: 0;
+    background: $cor-superficie;
+    z-index: 2;
+    box-shadow: -4px 0 8px -2px rgba(23, 41, 45, 0.08);
+  }
+
+  tr:hover td:last-child {
+    background: #fafcfb;
+  }
+}
+
 /* ---------- Célula de Título da Tarefa ---------- */
 .celulaTitulo {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  max-width: 280px;
 
   strong {
     font-size: 0.95rem;
     color: $cor-texto;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 100%;
+    display: block;
   }
 }
 
@@ -145,18 +174,18 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  max-width: 100%;
 }
 
 .previaDescricao {
   font-size: 0.82rem;
   color: $cor-texto-suave;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 440px;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 260px;
+  display: block;
 }
 
 /* ---------- Célula de Anexos ---------- */
@@ -172,10 +201,26 @@
   align-items: center;
   justify-content: flex-end;
   gap: $esp-2;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+
+  > button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    height: 32px;
+    padding: 0 12px;
+    margin: 0;
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
 
   @include tablet {
     gap: $esp-1;
+
+    > button {
+      padding: 0 8px;
+    }
   }
 
   @include celular {

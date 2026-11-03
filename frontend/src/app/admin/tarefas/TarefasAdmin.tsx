@@ -367,13 +367,13 @@ export function TarefasAdmin() {
   const colunas: Coluna<TarefaDoTutor>[] = [
     {
       chave: 'titulo',
-      titulo: 'Modelo de Atividade',
+      titulo: 'Atividade Geral',
       celula: (t) => (
         <div className={styles.celulaTitulo}>
           <div className={styles.tagsTitulo}>
             <strong>{t.tituloTarefa}</strong>
             <Badge tom={t.modalidade === 'GERAL' ? 'sucesso' : 'neutro'}>
-              {t.modalidade === 'GERAL' ? 'Geral (Modelo)' : 'Turma'}
+              {t.modalidade === 'GERAL' ? 'Geral' : 'Turma'}
             </Badge>
             {prazoEncerrado(t.prazoEntrega) && <Badge tom="perigo">Prazo expirado</Badge>}
           </div>
@@ -468,11 +468,11 @@ export function TarefasAdmin() {
   return (
     <>
       <PageHeader
-        titulo="Tarefas Gerais (Modelos)"
-        descricao="Cadastre modelos de tarefas de redação com anexos para que os tutores possam replicar aos seus grupos."
+        titulo="Tarefas Gerais"
+        descricao="Cadastre tarefas de redação com anexos para que os tutores possam replicar aos seus grupos."
         acao={
           <Button icone={<Plus size={18} aria-hidden="true" />} onClick={abrirCriacao}>
-            Novo modelo de tarefa
+            Nova tarefa geral
           </Button>
         }
       />
@@ -484,7 +484,7 @@ export function TarefasAdmin() {
             <FileText size={22} aria-hidden="true" />
           </div>
           <div className={styles.textosMetrica}>
-            <span className={styles.rotuloMetrica}>Modelos Gerais</span>
+            <span className={styles.rotuloMetrica}>Tarefas Gerais</span>
             <span className={styles.valorMetrica}>{totalModelos}</span>
             <span className={styles.subMetrica}>Disponíveis para os tutores</span>
           </div>
@@ -495,9 +495,9 @@ export function TarefasAdmin() {
             <Copy size={22} aria-hidden="true" />
           </div>
           <div className={styles.textosMetrica}>
-            <span className={styles.rotuloMetrica}>Modelos em Uso</span>
+            <span className={styles.rotuloMetrica}>Tarefas em Uso</span>
             <span className={styles.valorMetrica}>{modelosReplicados}</span>
-            <span className={styles.subMetrica}>Já aplicados por tutores</span>
+            <span className={styles.subMetrica}>Já aplicadas por tutores</span>
           </div>
         </div>
 
@@ -544,7 +544,7 @@ export function TarefasAdmin() {
               value={filtroModalidade}
               onChange={(e) => setFiltroModalidade(e.target.value as 'GERAL' | 'TODAS')}
             >
-              <option value="GERAL">Modelos Gerais da Administração ({totalModelos})</option>
+              <option value="GERAL">Tarefas Gerais da Administração ({totalModelos})</option>
               <option value="TODAS">Todas as Tarefas ({tarefas?.length ?? 0})</option>
             </Select>
           </div>
@@ -553,39 +553,41 @@ export function TarefasAdmin() {
         <div className={styles.contadores}>
           {!carregando && !erro && (
             <span className={styles.contagem}>
-              {listaFiltrada.length} {listaFiltrada.length === 1 ? 'modelo encontrado' : 'modelos encontrados'}
+              {listaFiltrada.length} {listaFiltrada.length === 1 ? 'tarefa encontrada' : 'tarefas encontradas'}
             </span>
           )}
         </div>
       </div>
 
       {carregando ? (
-        <CarregandoPagina rotulo="Carregando modelos de tarefas..." />
+        <CarregandoPagina rotulo="Carregando tarefas..." />
       ) : erro ? (
         <ErrorState mensagem={erro.message} conexao={erro.ehErroDeConexao} aoTentarNovamente={recarregar} />
       ) : listaFiltrada.length === 0 ? (
         <EmptyState
-          titulo={busca ? 'Nenhuma atividade encontrada' : 'Nenhum modelo de tarefa cadastrado'}
+          titulo={busca ? 'Nenhuma atividade encontrada' : 'Nenhuma tarefa cadastrada'}
           descricao={
             busca
               ? 'Tente ajustar os termos de busca.'
-              : 'Clique em "Novo modelo de tarefa" para disponibilizar atividades para os tutores.'
+              : 'Clique em "Nova tarefa geral" para disponibilizar atividades para os tutores.'
           }
         />
       ) : (
-        <Tabela
-          colunas={colunas}
-          linhas={listaFiltrada}
-          chaveDaLinha={(t) => t.id}
-          descricao="Lista de modelos de tarefas gerais para tutores"
-        />
+        <div className={styles.tabelaContainer}>
+          <Tabela
+            colunas={colunas}
+            linhas={listaFiltrada}
+            chaveDaLinha={(t) => t.id}
+            descricao="Lista de tarefas gerais para tutores"
+          />
+        </div>
       )}
 
       {/* Modal Criar / Editar Tarefa Geral */}
       <Modal
         aberto={janela?.tipo === 'novo' || janela?.tipo === 'editar'}
         aoFechar={fecharJanela}
-        titulo={janela?.tipo === 'novo' ? 'Novo Modelo de Tarefa Geral' : 'Editar Modelo de Tarefa'}
+        titulo={janela?.tipo === 'novo' ? 'Nova Tarefa Geral' : 'Editar Tarefa'}
       >
         <form className={styles.formulario} onSubmit={salvarTarefa} noValidate>
           {erroGeral && <Alerta tom="erro">{erroGeral}</Alerta>}
@@ -898,7 +900,7 @@ export function TarefasAdmin() {
       <Modal
         aberto={janela?.tipo === 'detalhes'}
         aoFechar={fecharJanela}
-        titulo={janela?.tipo === 'detalhes' ? janela.tarefa.tituloTarefa : 'Detalhes do Modelo'}
+        titulo={janela?.tipo === 'detalhes' ? janela.tarefa.tituloTarefa : 'Detalhes da Tarefa'}
       >
         {janela?.tipo === 'detalhes' && (
           <div className={styles.detalhesTarefa}>
@@ -906,7 +908,7 @@ export function TarefasAdmin() {
               <div className={styles.itemInfo}>
                 <span>Modalidade:</span>
                 <Badge tom={janela.tarefa.modalidade === 'GERAL' ? 'sucesso' : 'neutro'}>
-                  {janela.tarefa.modalidade === 'GERAL' ? 'Atividade Geral (Modelo)' : 'Tarefa Avaliativa'}
+                  {janela.tarefa.modalidade === 'GERAL' ? 'Geral' : 'Tarefa Avaliativa'}
                 </Badge>
               </div>
 
@@ -985,7 +987,7 @@ export function TarefasAdmin() {
                 icone={<Edit2 size={16} />}
                 onClick={() => janela?.tipo === 'detalhes' && abrirEdicao(janela.tarefa)}
               >
-                Editar modelo
+                Editar tarefa
               </Button>
               <Button onClick={fecharJanela}>Fechar</Button>
             </div>
@@ -997,7 +999,7 @@ export function TarefasAdmin() {
       <Modal
         aberto={janela?.tipo === 'excluir'}
         aoFechar={fecharJanela}
-        titulo="Excluir Modelo de Atividade?"
+        titulo="Excluir Atividade Geral?"
         rodape={
           <>
             <Button variante="secundario" disabled={excluindo} onClick={fecharJanela}>
@@ -1017,13 +1019,13 @@ export function TarefasAdmin() {
           <div className={styles.formulario}>
             {erroGeral && <Alerta tom="erro">{erroGeral}</Alerta>}
             <p>
-              Você está prestes a excluir o modelo de tarefa <strong>{janela.tarefa.tituloTarefa}</strong>.
+              Você está prestes a excluir a tarefa geral <strong>{janela.tarefa.tituloTarefa}</strong>.
             </p>
             {(janela.tarefa._count?.tarefasAplicadas ?? 0) > 0 && (
               <Alerta tom="alerta">
                 Esta atividade geral já foi aplicada por{' '}
                 <strong>{janela.tarefa._count?.tarefasAplicadas} tutor(es)</strong> às suas turmas. O sistema bloqueia a
-                exclusão de modelos já replicados.
+                exclusão de tarefas já replicadas.
               </Alerta>
             )}
             <p>Esta ação é irreversível.</p>

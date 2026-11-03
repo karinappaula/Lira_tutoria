@@ -12,11 +12,23 @@ export interface UsuarioBasico {
   email: string;
 }
 
+export interface TutoradoContexto {
+  nome: string;
+  papel: PapelUsuario;
+}
+
+export interface ContextoUsuarioSessao {
+  turma?: string;
+  tutor?: string;
+  tutorados?: TutoradoContexto[];
+}
+
 /** Resposta de GET /auth/me */
 export interface Sessao {
   usuario: UsuarioBasico;
   papelAtivo: PapelUsuario;
   papeisDisponiveis: PapelUsuario[];
+  contexto?: ContextoUsuarioSessao;
 }
 
 /** Erro padrão do backend: { erro, codigo, detalhes? } */

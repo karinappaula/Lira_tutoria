@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import { Check, CloudOff, ExternalLink, FileText, Loader2, Paperclip, Send, Trash2 } from 'lucide-react';
+import { BookOpen, Check, CloudOff, ExternalLink, FileText, Loader2, Paperclip, Send, Trash2, X } from 'lucide-react';
 import { Alerta } from '@/components/ui/Alerta/Alerta';
 import { Button } from '@/components/ui/Button/Button';
 import { Card } from '@/components/ui/Card/Card';
@@ -46,7 +46,7 @@ export function EditorRedacao({ redacao }: { redacao: RedacaoDetalhada }) {
   const ehReescrita = versao?.numeroVersao === 2;
   const versaoUm = redacao.versoes.find((v) => v.numeroVersao === 1);
   const correcaoV1 = versaoUm ? ultimaCorrecao(versaoUm) : undefined;
-  const [abaLateral, setAbaLateral] = useState<'tema' | 'correcao'>(ehReescrita && versaoUm ? 'correcao' : 'tema');
+  const [gaveta, setGaveta] = useState<'correcao' | 'tema' | null>(null);
 
   const prazoVencido = !ehReescrita && redacao.tarefa ? prazoEncerrado(redacao.tarefa.prazoEntrega) : false;
   const palavras = useMemo(() => contarPalavras(texto), [texto]);
@@ -151,7 +151,31 @@ export function EditorRedacao({ redacao }: { redacao: RedacaoDetalhada }) {
               {indicador.icone}
               <span>{indicador.texto}</span>
             </p>
+
             <div className={styles.atalhos}>
+              {/* Botões de Consulta Sob Demanda */}
+              <Button
+                type="button"
+                variante="secundario"
+                tamanho="sm"
+                icone={<BookOpen size={15} aria-hidden="true" />}
+                onClick={() => setGaveta('tema')}
+              >
+                Ver Tema e Apoio
+              </Button>
+
+              {ehReescrita && versaoUm && (
+                <Button
+                  type="button"
+                  variante="secundario"
+                  tamanho="sm"
+                  icone={<FileText size={15} aria-hidden="true" />}
+                  onClick={() => setGaveta('correcao')}
+                >
+                  Ver Correção da Versão 1
+                </Button>
+              )}
+
               {urlAnexo && (
                 <a
                   href={urlAnexo}
@@ -181,10 +205,11 @@ export function EditorRedacao({ redacao }: { redacao: RedacaoDetalhada }) {
             </div>
           )}
           {ehReescrita && (
-            <div className={styles.espaco}>
-              <Alerta tom="alerta">
-                Reescrita em andamento: Seu tutor avaliou a versão anterior. Consulte a correção no painel lateral para reescrever seu texto.
-              </Alerta>
+            <div className={styles.bannerReescrita} role="alert">
+              <span className={styles.iconeAlertaReescrita} aria-hidden="true">⚠️</span>
+              <p>
+                <strong>Atenção:</strong> A sua nota final nesta atividade será a nota atribuída a esta Reescrita.
+              </p>
             </div>
           )}
 
@@ -212,8 +237,12 @@ export function EditorRedacao({ redacao }: { redacao: RedacaoDetalhada }) {
             onChange={(e) => alterar(e.target.value)}
             placeholder="Escreva sua redação aqui. O texto é salvo automaticamente."
             disabled={bloqueado}
-            spellCheck
-            lang="pt-BR"
+            spellCheck={false}
+            autoCorrect="off"
+            autoCapitalize="none"
+            onPaste={(e) => e.preventDefault()}
+            onCopy={(e) => e.preventDefault()}
+            onCut={(e) => e.preventDefault()}
           />
 
           {/* Avisos dinâmicos de limite de linhas */}
@@ -277,58 +306,52 @@ export function EditorRedacao({ redacao }: { redacao: RedacaoDetalhada }) {
             </div>
           </div>
         </section>
+      </div>
 
-        <aside className={styles.lateral} aria-label="Tema e apoio da redação">
-          {ehReescrita && versaoUm ? (
-            <>
-              <div className={styles.abasLateral} role="tablist">
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={abaLateral === 'correcao'}
-                  className={`${styles.abaBotao} ${abaLateral === 'correcao' ? styles.abaAtiva : ''}`}
-                  onClick={() => setAbaLateral('correcao')}
-                >
-                  Correção da Versão 1
-                </button>
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={abaLateral === 'tema'}
-                  className={`${styles.abaBotao} ${abaLateral === 'tema' ? styles.abaAtiva : ''}`}
-                  onClick={() => setAbaLateral('tema')}
-                >
-                  Tema e Apoio
-                </button>
+      {/* Gaveta Retrátil (Drawer) para Consulta Sob Demanda */}
+      {gaveta && (
+        <div className={styles.drawerOverlay} onClick={() => setGaveta(null)}>
+          <aside
+            className={styles.drawer}
+            role="dialog"
+            aria-label={gaveta === 'correcao' ? 'Correção da Versão 1' : 'Tema e Textos Motivadores'}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <header className={styles.drawerCabecalho}>
+              <div className={styles.drawerTituloWrapper}>
+                <h3>{gaveta === 'correcao' ? 'Correção da Versão 1' : 'Tema e Textos Motivadores'}</h3>
               </div>
+              <button
+                type="button"
+                className={styles.drawerFechar}
+                onClick={() => setGaveta(null)}
+                aria-label="Fechar e voltar para a escrita"
+              >
+                <X size={20} aria-hidden="true" />
+              </button>
+            </header>
 
-              {abaLateral === 'correcao' ? (
-                <div className={styles.painelCorrecaoLateral}>
-                  {correcaoV1 ? (
-                    <ResultadoDaCorrecao texto={versaoUm.conteudoTexto} correcao={correcaoV1} coluna />
-                  ) : (
-                    <div className={styles.versaoUmSemCorrecao}>
-                      <p className={styles.semCorrecao}>
-                        Nenhuma correção detalhada encontrada para a versão 1.
-                      </p>
-                      <Card titulo="Texto da Versão 1">
-                        <p className={styles.textoVersaoUm}>{versaoUm.conteudoTexto}</p>
-                      </Card>
-                    </div>
-                  )}
-                </div>
+            <div className={styles.drawerCorpo}>
+              {gaveta === 'correcao' ? (
+                correcaoV1 ? (
+                  <ResultadoDaCorrecao texto={versaoUm!.conteudoTexto} correcao={correcaoV1} coluna />
+                ) : (
+                  <div className={styles.versaoUmSemCorrecao}>
+                    <p className={styles.semCorrecao}>
+                      Nenhuma correção detalhada encontrada para a versão 1.
+                    </p>
+                    <Card titulo="Texto da Versão 1">
+                      <p className={styles.textoVersaoUm}>{versaoUm?.conteudoTexto}</p>
+                    </Card>
+                  </div>
+                )
               ) : (
                 <PainelDoTema redacao={redacao} />
               )}
-            </>
-          ) : (
-            <>
-              <h2 className={styles.lateralTitulo}>Tema e Apoio</h2>
-              <PainelDoTema redacao={redacao} />
-            </>
-          )}
-        </aside>
-      </div>
+            </div>
+          </aside>
+        </div>
+      )}
 
       <Modal
         aberto={janela === 'enviar'}

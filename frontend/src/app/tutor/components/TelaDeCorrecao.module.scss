@@ -124,10 +124,16 @@
   font-weight: 500;
 }
 
+.containerListaMarcas {
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
 .listaMarcas {
   display: flex;
   flex-direction: column;
-  gap: $esp-3;
+  gap: $esp-2;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -138,13 +144,30 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: $esp-3;
-  padding-bottom: $esp-3;
-  border-bottom: 1px solid $cor-borda;
+  padding: $esp-2 $esp-3;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-sm;
+  background: $cor-superficie;
+  cursor: pointer;
+  transition: all 0.15s ease;
 
-  &:last-child {
-    padding-bottom: 0;
-    border-bottom: 0;
+  &:hover {
+    background: $cor-fundo;
+    border-color: $cor-borda-forte;
   }
+}
+
+.itemMarcaAtivo {
+  background: $cor-primaria-suave !important;
+  border-color: $cor-primaria !important;
+  box-shadow: 0 0 0 1px $cor-primaria;
+}
+
+.conteudoMarcaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
 .sugestaoTexto {

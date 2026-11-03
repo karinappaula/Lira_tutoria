@@ -10,16 +10,70 @@
 
   @include celular {
     flex-direction: column;
+    align-items: stretch;
+    gap: $esp-3;
+    margin-bottom: $esp-4;
   }
+}
+
+.titulosWrapper {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  width: 100%;
+}
+
+.linhaTitulo {
+  display: flex;
+  align-items: center;
+  gap: $esp-3;
+  flex-wrap: wrap;
 }
 
 .titulo {
   font-size: 2.1rem;
   font-weight: 700;
   line-height: 1.2;
+  word-break: break-word;
 
   @include celular {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
+  }
+}
+
+.botaoRefresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-md;
+  background: $cor-superficie;
+  color: $cor-texto-suave;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+
+  &:hover {
+    color: $cor-primaria;
+    border-color: $cor-primaria;
+    background: $cor-primaria-suave;
+  }
+
+  @include anel-de-foco;
+}
+
+.girando {
+  animation: girar 0.6s linear infinite;
+}
+
+@keyframes girar {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 
@@ -27,4 +81,24 @@
   margin-top: $esp-1;
   color: $cor-texto-suave;
   font-size: 1.05rem;
+
+  @include celular {
+    font-size: 0.95rem;
+  }
+}
+
+.acao {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+
+  @include celular {
+    width: 100%;
+
+    > * {
+      width: 100%;
+    }
+  }
 }

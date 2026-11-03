@@ -6,6 +6,8 @@
   line-height: 2;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+  padding-top: 64px;
+  padding-inline: 8px;
 }
 
 .selecionavel {
@@ -15,12 +17,15 @@
 
 /* Cada tipo tem cor E estilo de sublinhado, para não depender só da cor */
 .marca {
-  padding: 1px 2px;
-  border-radius: 3px;
+  position: relative;
+  display: inline;
+  padding: 1px 3px;
+  border-radius: 4px;
   cursor: pointer;
   text-decoration-line: underline;
   text-decoration-thickness: 2px;
   text-underline-offset: 4px;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
 
   &:focus-visible {
     outline: 3px solid rgba(0, 107, 112, 0.5);
@@ -29,6 +34,73 @@
 
 .ativa {
   box-shadow: 0 0 0 2px $cor-texto;
+}
+
+.balaoFlutuante {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  transform: translateY(0);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 140px;
+  max-width: min(300px, 85vw);
+  word-break: break-word;
+  padding: 8px 12px;
+  background: #17292d;
+  color: #ffffff;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+  white-space: normal;
+  text-align: left;
+  text-decoration: none;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 16px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #17292d transparent transparent transparent;
+  }
+}
+
+.balaoTitulo {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #55c2c7;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.balaoSugestao {
+  color: #f3f7f6;
+  font-weight: 400;
+  word-break: break-word;
+}
+
+.balaoSemComentario {
+  color: #9cb2b4;
+  font-style: italic;
+  font-size: 0.76rem;
+}
+
+.marca:hover .balaoFlutuante,
+.marca:focus-visible .balaoFlutuante,
+.marca.ativa .balaoFlutuante {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(-2px);
 }
 
 .pendente {

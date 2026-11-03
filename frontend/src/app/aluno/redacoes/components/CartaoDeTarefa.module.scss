@@ -1,14 +1,23 @@
 @use 'variables' as *;
+@use 'mixins' as *;
 
 .cartao {
   display: flex;
   flex-direction: column;
-  gap: $esp-2;
+  gap: $esp-3;
   height: 100%;
+  width: 100%;
+  box-sizing: border-box;
   padding: $esp-4;
   background: $cor-superficie;
   border-radius: $raio-lg;
   box-shadow: $sombra-cartao;
+  border: 1px solid $cor-borda;
+
+  @include celular {
+    padding: $esp-3;
+    gap: $esp-2;
+  }
 
   > :last-child {
     margin-top: auto;
@@ -20,17 +29,26 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: $esp-3;
+  flex-wrap: wrap;
 }
 
 .titulo {
   font-size: 1.05rem;
   font-weight: 700;
   overflow-wrap: anywhere;
+  word-break: break-word;
+
+  @include celular {
+    font-size: 0.98rem;
+  }
 }
 
 .tema {
   font-weight: 500;
   color: $cor-primaria;
+  font-size: 0.92rem;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .descricao {
@@ -38,6 +56,7 @@
   font-size: 0.92rem;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+  word-break: break-word;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -50,6 +69,11 @@
   gap: $esp-2;
   font-size: 0.88rem;
   color: $cor-texto-suave;
+  flex-wrap: wrap;
+
+  @include celular {
+    font-size: 0.82rem;
+  }
 }
 
 .anexos {
@@ -73,4 +97,6 @@
   font-weight: 500;
   text-decoration: none;
   overflow-wrap: anywhere;
+  word-break: break-word;
+  max-width: 100%;
 }

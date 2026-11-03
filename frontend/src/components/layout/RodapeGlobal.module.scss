@@ -1,0 +1,47 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.rodapeGlobal {
+  background: $cor-superficie;
+  border-top: 1px solid $cor-borda;
+  margin-top: auto;
+  padding-block: $esp-4;
+  width: 100%;
+}
+
+.rodapeInterno {
+  @include container-pagina;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $esp-3;
+  flex-wrap: wrap;
+
+  @include celular {
+    flex-direction: column;
+    text-align: center;
+    gap: $esp-2;
+  }
+}
+
+.rodapeTexto {
+  font-size: 0.85rem;
+  color: $cor-texto-suave;
+
+  strong {
+    color: $cor-primaria;
+  }
+}
+
+.rodapeLinks {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  font-size: 0.82rem;
+  color: $cor-texto-suave;
+
+  @include celular {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}

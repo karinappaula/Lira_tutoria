@@ -49,14 +49,3 @@
   }
 }
 
-.rodape {
-  padding: $esp-5 $esp-8;
-  background: $cor-rodape;
-  color: $cor-rodape-texto;
-  font-size: 0.9rem;
-
-  @include celular {
-    padding: $esp-4;
-    text-align: center;
-  }
-}

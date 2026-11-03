@@ -41,21 +41,47 @@ export function Tabela<T>({ colunas, linhas, chaveDaLinha, descricao }: Props<T>
           <caption className={styles.legenda}>{descricao}</caption>
           <thead>
             <tr>
-              {colunas.map((c) => (
-                <th key={c.chave} scope="col" className={cx(styles.th, styles[c.alinhamento ?? 'esquerda'])}>
-                  {c.titulo}
-                </th>
-              ))}
+              {colunas.map((c, i) => {
+                const ehAcoes =
+                  c.noCartao === 'acoes' ||
+                  c.chave === 'acoes' ||
+                  (i === colunas.length - 1 && c.chave.toLowerCase().includes('acao'));
+                return (
+                  <th
+                    key={c.chave}
+                    scope="col"
+                    className={cx(
+                      styles.th,
+                      ehAcoes && styles.colunaFixaDireitaTh
+                    )}
+                  >
+                    {c.titulo}
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>
             {linhas.map((linha) => (
               <tr key={chaveDaLinha(linha)} className={styles.linha}>
-                {colunas.map((c) => (
-                  <td key={c.chave} className={cx(styles.td, styles[c.alinhamento ?? 'esquerda'])}>
-                    {c.celula(linha)}
-                  </td>
-                ))}
+                {colunas.map((c, i) => {
+                  const ehAcoes =
+                    c.noCartao === 'acoes' ||
+                    c.chave === 'acoes' ||
+                    (i === colunas.length - 1 && c.chave.toLowerCase().includes('acao'));
+                  return (
+                    <td
+                      key={c.chave}
+                      className={cx(
+                        styles.td,
+                        styles[c.alinhamento ?? 'esquerda'],
+                        ehAcoes && styles.colunaFixaDireitaTd
+                      )}
+                    >
+                      {c.celula(linha)}
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>

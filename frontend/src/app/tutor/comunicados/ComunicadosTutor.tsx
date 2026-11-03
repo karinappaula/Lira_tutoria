@@ -268,7 +268,7 @@ export function ComunicadosTutor() {
       ) : listaEnviados.length === 0 ? (
         <EmptyState
           titulo="Nenhum comunicado enviado ainda"
-          descricao="Você ainda não disparou avisos para os seus tutorados. Clique em 'Novo Comunicado' para emitir uma mensagem."
+          descricao="Você ainda não enviou avisos para os seus tutorados. Clique em 'Novo Comunicado' para emitir uma mensagem."
         />
       ) : (
         <div className={styles.tabelaContainer}>

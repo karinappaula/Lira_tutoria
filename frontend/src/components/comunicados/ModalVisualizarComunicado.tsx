@@ -68,7 +68,7 @@ export function ModalVisualizarComunicado({ aberto, aoFechar, comunicado, aoMarc
             {ehEnviado ? (
               <Badge tom="sucesso">
                 <Send size={12} className={styles.iconeBadge} aria-hidden="true" />
-                Disparado
+                Enviado
               </Badge>
             ) : 'lido' in comunicado && comunicado.lido ? (
               <Badge tom="neutro">Lido</Badge>

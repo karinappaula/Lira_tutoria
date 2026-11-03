@@ -232,7 +232,9 @@ export function CadastroForm() {
       {ehContaExistente && !bloqueioGeral && (
         <AuthAviso>
           <Alerta tom="info">
-            Identificamos que você já possui cadastro no LIRA {contaExistente?.nome ? `(${contaExistente.nome})` : ''}.
+            {contaExistente?.nome
+              ? `${contaExistente.nome}, identificamos que você já possui cadastro no LIRA.`
+              : 'Identificamos que você já possui cadastro no LIRA.'}{' '}
             Digite sua senha atual para autorizar o vínculo deste novo perfil.
           </Alerta>
         </AuthAviso>

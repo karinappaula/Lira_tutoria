@@ -2,6 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  devIndicators: false,
   sassOptions: {
     // permite: @use 'variables' as *;  e  @use 'mixins' as *;
     includePaths: ['./src/styles'],

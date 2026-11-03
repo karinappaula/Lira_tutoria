@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
+import { RodapeGlobal } from './RodapeGlobal';
 import styles from './AuthShell.module.scss';
 
-/** Moldura das telas de entrada: faixa com logo, cartão central e rodapé escuro (como no protótipo). */
+/** Moldura das telas de entrada: faixa com logo, cartão central e rodapé global padronizado. */
 export function AuthShell({ children }: { children: ReactNode }) {
   return (
     <div className={styles.moldura}>
@@ -11,9 +12,7 @@ export function AuthShell({ children }: { children: ReactNode }) {
       <main className={styles.centro} id="conteudo">
         {children}
       </main>
-      <footer className={styles.rodape}>
-        <p>© LIRA. Todos os direitos reservados.</p>
-      </footer>
+      <RodapeGlobal />
     </div>
   );
 }

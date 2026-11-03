@@ -30,7 +30,14 @@ export function ResultadoDaCorrecao({ texto, correcao, visaoInterna = false, col
   const status = statusDaCorrecaoRotulo(correcao.statusAprovacao);
 
   const marcas = useMemo<MarcaVisual[]>(
-    () => correcao.anotacoes.map((a) => ({ chave: a.id, inicio: a.posicaoInicio, fim: a.posicaoFinal, tipoErro: a.tipoErro })),
+    () =>
+      correcao.anotacoes.map((a) => ({
+        chave: a.id,
+        inicio: a.posicaoInicio,
+        fim: a.posicaoFinal,
+        tipoErro: a.tipoErro,
+        sugestao: a.sugestaoComentario ?? undefined,
+      })),
     [correcao.anotacoes],
   );
   const anotacaoAtiva = correcao.anotacoes.find((a) => a.id === ativa);
@@ -89,7 +96,6 @@ export function ResultadoDaCorrecao({ texto, correcao, visaoInterna = false, col
             <div className={styles.detalheMarca} role="status">
               <p className={styles.detalheTipo}>
                 {infoDoTipo(anotacaoAtiva.tipoErro).valor}
-                {infoDoTipo(anotacaoAtiva.tipoErro).competencia && <span> · Competência {infoDoTipo(anotacaoAtiva.tipoErro).competencia}</span>}
               </p>
               <p className={styles.detalheTrecho}>“{anotacaoAtiva.textoSelecionado}”</p>
               <p>{anotacaoAtiva.sugestaoComentario || 'Sem sugestão escrita para este trecho.'}</p>

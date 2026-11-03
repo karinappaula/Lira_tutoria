@@ -79,7 +79,7 @@ export function ModalNovoComunicado({ aberto, aoFechar, aoSucesso, papel, turmas
             carregando={enviando}
             onClick={(e) => void handleSubmit(e)}
           >
-            Disparar Comunicado
+            Enviar comunicado
           </Button>
         </>
       }
