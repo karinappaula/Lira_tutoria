@@ -387,7 +387,20 @@ export async function criarReescrita(idUsuarioAluno: number, idRedacao: number) 
 export async function solicitarReescrita(idUsuarioTutor: number, idRedacao: number) {
   const redacao = await prisma.redacao.findUnique({
     where: { id: idRedacao },
-    include: redacaoInclude,
+    include: {
+      ...redacaoInclude,
+      versoes: {
+        orderBy: { numeroVersao: "asc" as const },
+        include: {
+          correcoes: {
+            orderBy: { numeroAjuste: "asc" as const },
+            include: {
+              anotacoes: true,
+            },
+          },
+        },
+      },
+    },
   });
   if (!redacao) {
     throw new ErroNegocio("Redação não encontrada.", 404, "REDACAO_NAO_ENCONTRADA");
@@ -408,6 +421,35 @@ export async function solicitarReescrita(idUsuarioTutor: number, idRedacao: numb
       "A reescrita só pode ser solicitada para a primeira versão da redação.",
       409,
       "REESCRITA_INDISPONIVEL"
+    );
+  }
+
+  // Validação de Avaliação Mínima: 5 notas C1-C5 e ao menos um parecer ou marcação/comentário
+  const ultimaCorrecao = versaoUm.correcoes && versaoUm.correcoes.length > 0
+    ? versaoUm.correcoes[versaoUm.correcoes.length - 1]
+    : null;
+
+  const tem5Notas =
+    ultimaCorrecao !== null &&
+    ultimaCorrecao.notaComp1 !== null &&
+    ultimaCorrecao.notaComp2 !== null &&
+    ultimaCorrecao.notaComp3 !== null &&
+    ultimaCorrecao.notaComp4 !== null &&
+    ultimaCorrecao.notaComp5 !== null;
+
+  const temOrientacao =
+    ultimaCorrecao !== null &&
+    (
+      Boolean(ultimaCorrecao.parecerGeral && ultimaCorrecao.parecerGeral.trim().length > 0) ||
+      Boolean(ultimaCorrecao.anotacoes && ultimaCorrecao.anotacoes.length > 0) ||
+      [ultimaCorrecao.comentarioComp1, ultimaCorrecao.comentarioComp2, ultimaCorrecao.comentarioComp3, ultimaCorrecao.comentarioComp4, ultimaCorrecao.comentarioComp5].some((c) => Boolean(c && c.trim().length > 0))
+    );
+
+  if (!tem5Notas || !temOrientacao) {
+    throw new ErroNegocio(
+      "Para solicitar uma reescrita, preencha as notas das competências e insira ao menos um parecer ou comentário orientativo.",
+      400,
+      "REESCRITA_AVALIACAO_INCOMPLETA"
     );
   }
 

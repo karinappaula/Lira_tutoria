@@ -50,10 +50,22 @@ export interface LoginComSelecaoPendente {
 
 export type ResultadoLogin = LoginComSessao | LoginComSelecaoPendente;
 
+export interface TutoradoContexto {
+  nome: string;
+  papel: PapelAtivo;
+}
+
+export interface ContextoUsuario {
+  turma?: string;
+  tutor?: string;
+  tutorados?: TutoradoContexto[];
+}
+
 export interface SessaoAtual {
   usuario: UsuarioLogado;
   papelAtivo: PapelAtivo;
   papeisDisponiveis: PapelAtivo[];
+  contexto?: ContextoUsuario;
 }
 
 // ---------- Helpers ----------
@@ -109,6 +121,49 @@ export async function obterSessaoAtual(
     );
   }
 
+  let contexto: ContextoUsuario | undefined = undefined;
+
+  if (papelAtivo === "ALUNO") {
+    const aluno = await prisma.aluno.findUnique({
+      where: { idUsuario },
+      include: {
+        tutor: {
+          include: {
+            usuario: { select: { nome: true } },
+            turma: { select: { nome: true } },
+          },
+        },
+      },
+    });
+    if (aluno) {
+      contexto = {
+        turma: aluno.tutor?.turma?.nome,
+        tutor: aluno.tutor?.usuario?.nome,
+      };
+    }
+  } else if (papelAtivo === "TUTOR") {
+    const tutor = await prisma.tutor.findUnique({
+      where: { idUsuario },
+      include: {
+        turma: { select: { nome: true } },
+        alunos: {
+          include: {
+            usuario: { select: { nome: true } },
+          },
+        },
+      },
+    });
+    if (tutor) {
+      contexto = {
+        turma: tutor.turma?.nome,
+        tutorados: tutor.alunos.map((a) => ({
+          nome: a.usuario.nome,
+          papel: 'ALUNO' as PapelAtivo,
+        })),
+      };
+    }
+  }
+
   return {
     usuario: {
       id: usuario.id,
@@ -117,6 +172,7 @@ export async function obterSessaoAtual(
     },
     papelAtivo,
     papeisDisponiveis,
+    contexto,
   };
 }
 
