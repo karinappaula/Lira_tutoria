@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import {
   BarChart3,
   Bell,
@@ -15,12 +16,22 @@ import { EVENTO_FILA_MUDOU, tutorService } from '@/services/tutor';
 import { AppShell, type ItemDeMenu } from './AppShell';
 
 export function ShellAdmin({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
   const fila = useBuscar((signal) => adminService.correcoesPendentes(signal));
   const { recarregar } = fila;
 
   useEffect(() => {
     window.addEventListener(EVENTO_CORRECOES_ADMIN_MUDOU, recarregar);
     return () => window.removeEventListener(EVENTO_CORRECOES_ADMIN_MUDOU, recarregar);
+  }, [recarregar]);
+
+  useEffect(() => {
+    recarregar();
+  }, [pathname, recarregar]);
+
+  useEffect(() => {
+    window.addEventListener('focus', recarregar);
+    return () => window.removeEventListener('focus', recarregar);
   }, [recarregar]);
 
   const pendentes = fila.dados?.length ?? 0;
@@ -56,6 +67,7 @@ export function ShellAluno({ children }: { children: ReactNode }) {
   useEffect(() => {
     let ativo = true;
     function carregar() {
+      if (document.visibilityState !== 'visible') return;
       comunicadosService
         .contarNaoLidos()
         .then((res) => {
@@ -66,9 +78,13 @@ export function ShellAluno({ children }: { children: ReactNode }) {
 
     carregar();
     window.addEventListener(EVENTO_COMUNICADOS_MUDOU, carregar);
+    window.addEventListener('focus', carregar);
+    const intervalo = window.setInterval(carregar, 30_000);
     return () => {
       ativo = false;
       window.removeEventListener(EVENTO_COMUNICADOS_MUDOU, carregar);
+      window.removeEventListener('focus', carregar);
+      window.clearInterval(intervalo);
     };
   }, []);
 
@@ -96,6 +112,7 @@ export function ShellAluno({ children }: { children: ReactNode }) {
 }
 
 export function ShellTutor({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
   const fila = useBuscar((signal) => tutorService.fila(signal));
   const { recarregar } = fila;
   const [naoLidos, setNaoLidos] = useState(0);
@@ -106,8 +123,18 @@ export function ShellTutor({ children }: { children: ReactNode }) {
   }, [recarregar]);
 
   useEffect(() => {
+    recarregar();
+  }, [pathname, recarregar]);
+
+  useEffect(() => {
+    window.addEventListener('focus', recarregar);
+    return () => window.removeEventListener('focus', recarregar);
+  }, [recarregar]);
+
+  useEffect(() => {
     let ativo = true;
     function carregar() {
+      if (document.visibilityState !== 'visible') return;
       comunicadosService
         .contarNaoLidos()
         .then((res) => {
@@ -118,9 +145,13 @@ export function ShellTutor({ children }: { children: ReactNode }) {
 
     carregar();
     window.addEventListener(EVENTO_COMUNICADOS_MUDOU, carregar);
+    window.addEventListener('focus', carregar);
+    const intervalo = window.setInterval(carregar, 30_000);
     return () => {
       ativo = false;
       window.removeEventListener(EVENTO_COMUNICADOS_MUDOU, carregar);
+      window.removeEventListener('focus', carregar);
+      window.clearInterval(intervalo);
     };
   }, []);
 

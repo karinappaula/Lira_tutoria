@@ -88,6 +88,7 @@ export interface CorrecaoPendenteItem {
   parecerGeral: string | null;
   recadoAdmin: string | null;
   comentarioAjusteAdmin: string | null;
+  solicitarReescrita?: boolean;
   statusAprovacao: 'PENDENTE_APROVACAO' | 'APROVADA' | 'AJUSTE_SOLICITADO' | 'LIBERADA';
   dataCorrecao: string;
   versao: {
@@ -150,8 +151,8 @@ export const adminService = {
     api.get<CorrecaoPendenteItem[]>('correcoes/pendentes', undefined, signal),
   obterCorrecao: (idCorrecao: number, signal?: AbortSignal) =>
     api.get<CorrecaoPendenteItem>(`correcoes/${idCorrecao}`, undefined, signal),
-  aprovarCorrecao: (idCorrecao: number) =>
-    api.post<CorrecaoPendenteItem>(`correcoes/${idCorrecao}/aprovar`),
+  aprovarCorrecao: (idCorrecao: number, aprovarReescrita?: boolean) =>
+    api.post<CorrecaoPendenteItem>(`correcoes/${idCorrecao}/aprovar`, { aprovarReescrita }),
   solicitarAjuste: (idCorrecao: number, comentarioAjuste: string) =>
     api.post<CorrecaoPendenteItem>(`correcoes/${idCorrecao}/solicitar-ajuste`, { comentarioAjuste }),
 

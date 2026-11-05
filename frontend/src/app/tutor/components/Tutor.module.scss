@@ -21,6 +21,13 @@
   text-align: center;
 }
 
+.linhaTituloFila {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  flex-wrap: wrap;
+}
+
 .dupla {
   display: flex;
   flex-direction: column;

@@ -365,6 +365,38 @@
   }
 }
 
+.checkboxReescrita {
+  display: inline-flex;
+  align-items: center;
+  gap: $esp-2;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: $cor-texto;
+  padding: $esp-2 $esp-3;
+  border-radius: $raio-sm;
+  background-color: rgba($cor-primaria, 0.06);
+  border: 1px solid rgba($cor-primaria, 0.25);
+  transition: background-color $transicao-padrao;
+
+  input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: $cor-primaria;
+  }
+
+  &:hover {
+    background-color: rgba($cor-primaria, 0.12);
+  }
+
+  @include celular {
+    width: 100%;
+    padding: $esp-2;
+  }
+}
+
 .resumo {
   display: flex;
   flex-direction: column;

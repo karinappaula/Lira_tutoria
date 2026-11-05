@@ -39,6 +39,7 @@ export interface CorrecaoDaVersao {
   /** Só o Tutor e a Administração recebem estes dois campos */
   recadoAdmin?: string | null;
   comentarioAjusteAdmin?: string | null;
+  solicitarReescrita?: boolean;
 }
 
 export interface VersaoComCorrecoes extends VersaoRedacao {
@@ -83,6 +84,7 @@ export interface NovaCorrecao {
   comentarioComp5: string;
   parecerGeral?: string;
   recadoAdmin?: string;
+  solicitarReescrita?: boolean;
   anotacoes: Array<{
     posicaoInicio: number;
     posicaoFinal: number;

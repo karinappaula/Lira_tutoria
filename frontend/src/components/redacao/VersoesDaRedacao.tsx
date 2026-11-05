@@ -76,6 +76,7 @@ export function VersoesDaRedacao({
         </header>
 
         {aviso && <Alerta tom="info">{aviso}</Alerta>}
+
         {botoes && <div className={styles.acoes}>{botoes}</div>}
 
         {correcao && exibirResultado ? (

@@ -18,6 +18,7 @@ import { CarregandoPagina } from '@/components/ui/Spinner/Spinner';
 import { Tabela, type Coluna } from '@/components/ui/Tabela/Tabela';
 import { useToast } from '@/components/ui/Toast/Toast';
 import { useBuscar } from '@/hooks/useBuscar';
+import { cx } from '@/lib/cx';
 import { formatarDataHora, formatarTempoSegundos } from '@/lib/formatar';
 import { questoesService } from '@/services/questoes';
 import { simuladosService } from '@/services/simulados';
@@ -119,11 +120,21 @@ export function SimuladosAluno() {
     return comNota > 0 ? Math.round(soma / comNota) : 0;
   }, [finalizados]);
 
+  // Numeração relativa do próprio aluno (#1, #2, #3...) conforme a lista recebida.
+  const mapaNumeroSequencial = useMemo(() => {
+    const mapa = new Map<number, number>();
+    (simulados ?? []).forEach((s, idx) => {
+      mapa.set(s.id, idx + 1);
+    });
+    return mapa;
+  }, [simulados]);
+
   // Se o aluno está com a tela de prova aberta, renderiza a execução
   if (simuladoEmExecucao) {
     return (
       <ExecucaoSimulado
         simuladoInicial={simuladoEmExecucao}
+        numeroSequencial={mapaNumeroSequencial.get(simuladoEmExecucao.id)}
         aoVoltar={() => {
           setSimuladoEmExecucao(null);
           recarregar();
@@ -142,19 +153,22 @@ export function SimuladosAluno() {
     {
       chave: 'simulado',
       titulo: 'Simulado',
-      celula: (s) => (
-        <div className={styles.celulaIdentificacao}>
-          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-            <strong style={{ fontSize: '0.96rem', color: '#17292d' }}>Simulado #{s.id}</strong>
-            <Badge tom={s.tipoSimulado === 'CADERNO_ERROS' ? 'alerta' : 'sucesso'}>
-              {s.tipoSimulado === 'CADERNO_ERROS' ? 'Revisão de Erros' : 'Personalizado'}
-            </Badge>
+      celula: (s) => {
+        const numSeq = mapaNumeroSequencial.get(s.id) ?? s.id;
+        return (
+          <div className={styles.celulaIdentificacao}>
+            <div className={styles.linhaTituloSimulado}>
+              <strong className={styles.numeroSimulado}>Simulado #{numSeq}</strong>
+              <Badge tom={s.tipoSimulado === 'CADERNO_ERROS' ? 'alerta' : 'sucesso'}>
+                {s.tipoSimulado === 'CADERNO_ERROS' ? 'Revisão de Erros' : 'Personalizado'}
+              </Badge>
+            </div>
+            <span className={styles.dataInicioSimulado}>
+              Iniciado em {formatarDataHora(s.dataInicio)}
+            </span>
           </div>
-          <span style={{ fontSize: '0.8rem', color: '#6b7d80' }}>
-            Iniciado em {formatarDataHora(s.dataInicio)}
-          </span>
-        </div>
-      ),
+        );
+      },
     },
     {
       chave: 'questoes',
@@ -167,7 +181,7 @@ export function SimuladosAluno() {
       titulo: 'Tempo Gasto',
       alinhamento: 'centro',
       celula: (s) => (
-        <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>
+        <span className={styles.celulaTempo}>
           {formatarTempoSegundos(s.tempoGastoSeg ?? s.tempoAcumuladoSeg)}
         </span>
       ),
@@ -178,17 +192,17 @@ export function SimuladosAluno() {
       alinhamento: 'centro',
       celula: (s) => {
         if (s.statusSimulado !== 'FINALIZADO' || s.pontuacaoTotal === null || s.pontuacaoTotal === undefined) {
-          return <span style={{ color: '#6b7d80' }}>—</span>;
+          return <span className={styles.vazioPontuacao}>—</span>;
         }
         const total = s._count?.questoes ?? 1;
         const nota = Number(s.pontuacaoTotal);
         const percent = Math.round((nota / total) * 100);
         return (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <strong style={{ fontSize: '0.94rem', color: '#006b70' }}>
+          <div className={styles.celulaPontuacao}>
+            <strong className={styles.pontuacaoDestaque}>
               {nota} de {total}
             </strong>
-            <span style={{ fontSize: '0.78rem', color: '#6b7d80' }}>({percent}%)</span>
+            <span className={styles.pontuacaoPercentual}>({percent}%)</span>
           </div>
         );
       },
@@ -270,7 +284,7 @@ export function SimuladosAluno() {
         </div>
 
         <div className={styles.cartaoMetrica}>
-          <div className={styles.iconeMetrica} style={{ background: '#e5f3f1', color: '#006b70' }}>
+          <div className={cx(styles.iconeMetrica, styles.iconeMetricaConcluidos)}>
             <CheckCircle2 size={22} aria-hidden="true" />
           </div>
           <div className={styles.textosMetrica}>
@@ -280,7 +294,7 @@ export function SimuladosAluno() {
         </div>
 
         <div className={styles.cartaoMetrica}>
-          <div className={styles.iconeMetrica} style={{ background: '#fff3c9', color: '#8a5a00' }}>
+          <div className={cx(styles.iconeMetrica, styles.iconeMetricaAndamento)}>
             <Clock size={22} aria-hidden="true" />
           </div>
           <div className={styles.textosMetrica}>
@@ -290,7 +304,7 @@ export function SimuladosAluno() {
         </div>
 
         <div className={styles.cartaoMetrica}>
-          <div className={styles.iconeMetrica} style={{ background: '#eaf0ef', color: '#17292d' }}>
+          <div className={cx(styles.iconeMetrica, styles.iconeMetricaMedia)}>
             <Award size={22} aria-hidden="true" />
           </div>
           <div className={styles.textosMetrica}>
@@ -346,6 +360,7 @@ export function SimuladosAluno() {
         aberto={modalResultadoAberto}
         aoFechar={() => setModalResultadoAberto(false)}
         resultado={resultadoAtual}
+        numeroSequencial={resultadoAtual ? (mapaNumeroSequencial.get(resultadoAtual.idSimulado) ?? resultadoAtual.idSimulado) : undefined}
       />
     </>
   );

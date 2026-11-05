@@ -165,6 +165,14 @@
   color: $cor-texto-suave;
 }
 
+.metaTema {
+  display: flex;
+  align-items: center;
+  gap: $esp-2;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
 .notaLinha {
   font-size: 1.05rem;
   font-weight: 700;

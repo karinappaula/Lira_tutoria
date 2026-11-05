@@ -29,6 +29,7 @@ import styles from './ExecucaoSimulado.module.scss';
 
 interface Props {
   simuladoInicial: SimuladoExecucao;
+  numeroSequencial?: number;
   aoVoltar: () => void;
   aoFinalizar: (resultado: ResultadoSimulado) => void;
 }
@@ -46,7 +47,7 @@ function tomDificuldade(dif: string): TomDoBadge {
   }
 }
 
-export function ExecucaoSimulado({ simuladoInicial, aoVoltar, aoFinalizar }: Props) {
+export function ExecucaoSimulado({ simuladoInicial, numeroSequencial, aoVoltar, aoFinalizar }: Props) {
   const toast = useToast();
 
   const [simulado, setSimulado] = useState<SimuladoExecucao>(simuladoInicial);
@@ -214,7 +215,7 @@ export function ExecucaoSimulado({ simuladoInicial, aoVoltar, aoFinalizar }: Pro
             Sair
           </Button>
           <span className={styles.tituloSimulado}>
-            Simulado #{simulado.id} {simulado.tipoSimulado === 'CADERNO_ERROS' ? '(Revisão)' : ''}
+            Simulado #{numeroSequencial ?? simulado.id} {simulado.tipoSimulado === 'CADERNO_ERROS' ? '(Revisão)' : ''}
           </span>
         </div>
 

@@ -25,6 +25,29 @@
   flex-wrap: wrap;
 }
 
+.cardAvisoReescrita {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-1;
+  padding: $esp-3 $esp-4;
+  background-color: #fffbeb;
+  border: 1px solid #fde68a;
+  border-left: 4px solid #f59e0b;
+  border-radius: $raio-sm;
+  color: #92400e;
+  font-size: 0.92rem;
+  line-height: 1.5;
+
+  strong {
+    color: #78350f;
+    font-size: 0.94rem;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
 .tutorMeta {
   font-size: 0.88rem;
   color: $cor-texto-suave;

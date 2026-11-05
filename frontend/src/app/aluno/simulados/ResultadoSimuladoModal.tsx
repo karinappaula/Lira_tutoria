@@ -24,9 +24,10 @@ interface Props {
   aberto: boolean;
   aoFechar: () => void;
   resultado: ResultadoSimulado | null;
+  numeroSequencial?: number;
 }
 
-export function ResultadoSimuladoModal({ aberto, aoFechar, resultado }: Props) {
+export function ResultadoSimuladoModal({ aberto, aoFechar, resultado, numeroSequencial }: Props) {
   if (!resultado) return null;
 
   const { resumo, desempenhoPorAssunto, itens, tempoGastoSeg, idSimulado, tipoSimulado } = resultado;
@@ -39,7 +40,7 @@ export function ResultadoSimuladoModal({ aberto, aoFechar, resultado }: Props) {
     <Modal
       aberto={aberto}
       aoFechar={aoFechar}
-      titulo={`Resultado do Simulado #${idSimulado} ${tipoSimulado === 'CADERNO_ERROS' ? '(Revisão de Erros)' : ''}`}
+      titulo={`Resultado do Simulado #${numeroSequencial ?? idSimulado} ${tipoSimulado === 'CADERNO_ERROS' ? '(Revisão de Erros)' : ''}`}
       tamanho="xl"
       rodape={
         <div style={{ display: 'flex', gap: '8px', width: '100%', justifyContent: 'space-between', flexWrap: 'wrap' }}>

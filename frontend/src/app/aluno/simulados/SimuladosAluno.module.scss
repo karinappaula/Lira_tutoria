@@ -72,6 +72,63 @@
   gap: $esp-1;
 }
 
+.linhaTituloSimulado {
+  display: flex;
+  gap: $esp-2;
+  align-items: center;
+}
+
+.numeroSimulado {
+  font-size: 0.96rem;
+  color: $cor-texto;
+}
+
+.dataInicioSimulado {
+  font-size: 0.8rem;
+  color: $cor-texto-suave;
+}
+
+.celulaTempo {
+  font-family: monospace;
+  font-weight: 600;
+}
+
+.celulaPontuacao {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pontuacaoDestaque {
+  font-size: 0.94rem;
+  color: $cor-primaria;
+  font-weight: 700;
+}
+
+.pontuacaoPercentual {
+  font-size: 0.78rem;
+  color: $cor-texto-suave;
+}
+
+.vazioPontuacao {
+  color: $cor-texto-suave;
+}
+
+.iconeMetricaConcluidos {
+  background: #e5f3f1;
+  color: #006b70;
+}
+
+.iconeMetricaAndamento {
+  background: #fff3c9;
+  color: #8a5a00;
+}
+
+.iconeMetricaMedia {
+  background: #eaf0ef;
+  color: #17292d;
+}
+
 .grupoAcoes {
   display: flex;
   align-items: center;

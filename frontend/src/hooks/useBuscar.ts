@@ -17,6 +17,7 @@ export function useBuscar<T>(buscar: (signal: AbortSignal) => Promise<T>, chave:
   const [estado, setEstado] = useState<Estado<T>>({ dados: null, carregando: true, erro: null });
   const [tentativa, setTentativa] = useState(0);
   const buscarRef = useRef(buscar);
+  const ultimaRevalidacaoRef = useRef(0);
   buscarRef.current = buscar;
 
   useEffect(() => {
@@ -33,5 +34,33 @@ export function useBuscar<T>(buscar: (signal: AbortSignal) => Promise<T>, chave:
   }, [chave, tentativa]);
 
   const recarregar = useCallback(() => setTentativa((n) => n + 1), []);
+
+  useEffect(() => {
+    function revalidarComProtecao() {
+      if (document.visibilityState !== 'visible') return;
+      const agora = Date.now();
+      if (agora - ultimaRevalidacaoRef.current < 1_000) return;
+      ultimaRevalidacaoRef.current = agora;
+      recarregar();
+    }
+
+    function atualizarAoRetornar() {
+      if (document.visibilityState === 'visible') revalidarComProtecao();
+    }
+
+    window.addEventListener('focus', atualizarAoRetornar);
+    document.addEventListener('visibilitychange', atualizarAoRetornar);
+    window.addEventListener('online', revalidarComProtecao);
+
+    const intervalo = window.setInterval(revalidarComProtecao, 30_000);
+
+    return () => {
+      window.removeEventListener('focus', atualizarAoRetornar);
+      document.removeEventListener('visibilitychange', atualizarAoRetornar);
+      window.removeEventListener('online', revalidarComProtecao);
+      window.clearInterval(intervalo);
+    };
+  }, [recarregar]);
+
   return { ...estado, recarregar };
 }

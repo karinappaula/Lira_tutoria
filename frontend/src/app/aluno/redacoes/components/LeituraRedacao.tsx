@@ -40,7 +40,19 @@ export function LeituraRedacao({ redacao, aoAtualizar }: { redacao: RedacaoDetal
   return (
     <VersoesDaRedacao
       redacao={redacao}
-      podeExibirCorrecao={(v) => v.statusVersao === StatusRedacao.CORRIGIDA || v.statusVersao === StatusRedacao.CONCLUIDA}
+      podeExibirCorrecao={(v) =>
+        v.statusVersao === StatusRedacao.CORRIGIDA ||
+        v.statusVersao === StatusRedacao.CONCLUIDA ||
+        v.statusVersao === 'REESCRITA_SOLICITADA' ||
+        v.statusVersao === 'AGUARDANDO_REESCRITA' ||
+        (v.numeroVersao === 1 &&
+          redacao.versoes.some(
+            (item) =>
+              item.statusVersao === 'REESCRITA_SOLICITADA' ||
+              item.statusVersao === 'AGUARDANDO_REESCRITA' ||
+              item.numeroVersao === 2
+          ))
+      }
       mensagem={(v: VersaoComCorrecoes) => MENSAGEM[v.statusVersao] ?? null}
       acoes={(v) =>
         v.id === ultima?.id && (v.statusVersao === 'AGUARDANDO_REESCRITA' || v.statusVersao === 'REESCRITA_SOLICITADA') ? (

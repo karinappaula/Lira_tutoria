@@ -54,6 +54,7 @@ function SinoComunicados() {
 
     let ativo = true;
     function carregar() {
+      if (document.visibilityState !== 'visible') return;
       comunicadosService
         .contarNaoLidos()
         .then((res) => {
@@ -64,9 +65,13 @@ function SinoComunicados() {
 
     carregar();
     window.addEventListener(EVENTO_COMUNICADOS_MUDOU, carregar);
+    window.addEventListener('focus', carregar);
+    const intervalo = window.setInterval(carregar, 30_000);
     return () => {
       ativo = false;
       window.removeEventListener(EVENTO_COMUNICADOS_MUDOU, carregar);
+      window.removeEventListener('focus', carregar);
+      window.clearInterval(intervalo);
     };
   }, [papel]);
 

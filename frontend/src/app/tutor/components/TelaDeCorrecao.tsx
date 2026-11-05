@@ -96,6 +96,7 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
   );
   const [parecer, setParecer] = useState(anterior?.parecerGeral ?? '');
   const [recado, setRecado] = useState(anterior?.recadoAdmin ?? '');
+  const [recomendarReescrita, setRecomendarReescrita] = useState(false);
 
   const [marcas, setMarcas] = useState<MarcaEditavel[]>(() =>
     (anterior?.anotacoes ?? []).map((a) => ({
@@ -212,6 +213,7 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
       comentarioComp5: c[4] ?? '',
       ...(parecer.trim() ? { parecerGeral: parecer.trim() } : {}),
       ...(ehAvaliativa && recado.trim() ? { recadoAdmin: recado.trim() } : {}),
+      solicitarReescrita: ehAvaliativa ? recomendarReescrita : false,
       anotacoes: marcas.map((m) => ({
         posicaoInicio: m.inicio,
         posicaoFinal: m.fim,
@@ -223,7 +225,15 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
     try {
       await tutorService.corrigir(dados);
       avisarFilaMudou();
-      toast.sucesso(ehAvaliativa ? 'Correção enviada para a revisão da Administração.' : 'Correção liberada para o aluno.');
+      if (ehAvaliativa) {
+        if (recomendarReescrita) {
+          toast.sucesso('Correção e recomendação de reescrita enviadas para aprovação da Administração!');
+        } else {
+          toast.sucesso('Correção enviada para aprovação da Administração!');
+        }
+      } else {
+        toast.sucesso('Correção liberada para o aluno.');
+      }
       router.replace('/tutor/fila');
     } catch (e) {
       setErroEnvio(e instanceof ApiError ? e.message : mensagemDeErro(e));
@@ -415,28 +425,53 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
           {faltam > 0 && <span> · faltam {faltam} {faltam === 1 ? 'competência' : 'competências'}</span>}
         </p>
         <div className={styles.botoesBarraFixa}>
-          {versao.numeroVersao === 1 && (
-            <Button
-              variante="secundario"
-              icone={<RotateCcw size={16} aria-hidden="true" />}
-              onClick={abrirModalReescrita}
-              disabled={enviando || enviandoReescrita}
-              title={
-                !podeSolicitarReescrita
-                  ? 'Para solicitar uma reescrita, preencha as notas das 5 competências e insira ao menos um parecer ou comentário orientativo.'
-                  : undefined
-              }
-            >
-              Solicitar reescrita
-            </Button>
+          {ehAvaliativa ? (
+            <>
+              {versao.numeroVersao === 1 && (
+                <label className={styles.checkboxReescrita}>
+                  <input
+                    type="checkbox"
+                    checked={recomendarReescrita}
+                    onChange={(e) => setRecomendarReescrita(e.target.checked)}
+                    disabled={enviando}
+                  />
+                  <span>Recomendar que o aluno faça uma Reescrita</span>
+                </label>
+              )}
+              <Button
+                icone={<Send size={16} aria-hidden="true" />}
+                onClick={() => validar() && setConfirmando(true)}
+                disabled={enviando}
+              >
+                Enviar Correção
+              </Button>
+            </>
+          ) : (
+            <>
+              {versao.numeroVersao === 1 && (
+                <Button
+                  variante="secundario"
+                  icone={<RotateCcw size={16} aria-hidden="true" />}
+                  onClick={abrirModalReescrita}
+                  disabled={enviando || enviandoReescrita}
+                  title={
+                    !podeSolicitarReescrita
+                      ? 'Para solicitar uma reescrita, preencha as notas das 5 competências e insira ao menos um parecer ou comentário orientativo.'
+                      : undefined
+                  }
+                >
+                  Solicitar Reescrita
+                </Button>
+              )}
+              <Button
+                icone={<Send size={16} aria-hidden="true" />}
+                onClick={() => validar() && setConfirmando(true)}
+                disabled={enviando || enviandoReescrita}
+              >
+                Enviar Correção
+              </Button>
+            </>
           )}
-          <Button
-            icone={<Send size={16} aria-hidden="true" />}
-            onClick={() => validar() && setConfirmando(true)}
-            disabled={enviando || enviandoReescrita}
-          >
-            Enviar correção
-          </Button>
         </div>
       </div>
 
@@ -471,7 +506,13 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
           <p className={styles.total}>
             Nota final: <strong>{parcial}/1000</strong>
           </p>
-          <p>{ehAvaliativa ? 'Ela seguirá para a revisão da Administração.' : 'Ela será liberada para o aluno imediatamente.'}</p>
+          <p>
+            {ehAvaliativa
+              ? recomendarReescrita
+                ? 'Ela seguirá para a revisão da Administração com recomendação de reescrita.'
+                : 'Ela seguirá para a revisão da Administração.'
+              : 'Ela será liberada para o aluno imediatamente.'}
+          </p>
         </div>
       </Modal>
 

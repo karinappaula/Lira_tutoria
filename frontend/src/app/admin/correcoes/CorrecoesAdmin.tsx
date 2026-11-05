@@ -111,10 +111,15 @@ export function CorrecoesAdmin() {
         return (
           <div className={styles.colunaTema} title={titulo}>
             <span className={styles.tituloTema}>{titulo}</span>
-            <span className={styles.versaoTema}>
-              Versão {c.versao.numeroVersao}
-              {c.numeroAjuste > 0 ? ` · Reenvio #${c.numeroAjuste}` : ''}
-            </span>
+            <div className={styles.metaTema}>
+              <span className={styles.versaoTema}>
+                Versão {c.versao.numeroVersao}
+                {c.numeroAjuste > 0 ? ` · Reenvio #${c.numeroAjuste}` : ''}
+              </span>
+              {c.solicitarReescrita && (
+                <Badge tom="alerta">Reescrita Solicitada</Badge>
+              )}
+            </div>
           </div>
         );
       },

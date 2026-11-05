@@ -121,12 +121,16 @@ export function ModalRevisaoCorrecao({ correcao, aberto, aoFechar, aoSucesso }: 
     },
   ];
 
-  async function executarAprovacao() {
+  async function executarAprovacao(aprovarReescrita: boolean) {
     setProcessando(true);
     setErro(null);
     try {
-      await adminService.aprovarCorrecao(correcao!.id);
-      toast.sucesso(`Correção da redação de ${alunoNome} aprovada com sucesso!`);
+      await adminService.aprovarCorrecao(correcao!.id, aprovarReescrita);
+      toast.sucesso(
+        aprovarReescrita
+          ? `Correção e reescrita de ${alunoNome} aprovadas com sucesso!`
+          : `Correção da redação de ${alunoNome} aprovada com sucesso (concluída na V1)!`
+      );
       avisarCorrecoesAdminMudou();
       aoSucesso();
       fecharModal();
@@ -191,15 +195,25 @@ export function ModalRevisaoCorrecao({ correcao, aberto, aoFechar, aoSucesso }: 
                   onClick={() => setModoAjuste(true)}
                   disabled={processando}
                 >
-                  Solicitar ajuste
+                  Solicitar ajuste ao Tutor
+                </Button>
+                <Button
+                  variante="secundario"
+                  icone={<CheckCircle2 size={16} aria-hidden="true" />}
+                  carregando={processando}
+                  onClick={() => void executarAprovacao(false)}
+                  disabled={processando}
+                >
+                  Aprovar apenas correção
                 </Button>
                 <Button
                   variante="primario"
-                  icone={<CheckCircle2 size={16} aria-hidden="true" />}
+                  icone={<RotateCcw size={16} aria-hidden="true" />}
                   carregando={processando}
-                  onClick={() => void executarAprovacao()}
+                  onClick={() => void executarAprovacao(true)}
+                  disabled={processando}
                 >
-                  Aprovar correção
+                  Aprovar Correção + Reescrita
                 </Button>
               </>
             )}
@@ -216,6 +230,9 @@ export function ModalRevisaoCorrecao({ correcao, aberto, aoFechar, aoSucesso }: 
             <Badge tom="neutro">{turmaNome}</Badge>
             <Badge tom="sucesso">Versão {numeroVersao}</Badge>
             <Badge tom="alerta">Pendente de Revisão</Badge>
+            {correcao.solicitarReescrita && (
+              <Badge tom="alerta">Reescrita Solicitada</Badge>
+            )}
             {correcao.numeroAjuste > 0 && (
               <Badge tom="alerta">Reenvio #{correcao.numeroAjuste}</Badge>
             )}
@@ -224,6 +241,14 @@ export function ModalRevisaoCorrecao({ correcao, aberto, aoFechar, aoSucesso }: 
             Tutor avaliador: <strong>{tutorNome}</strong> · Enviada em {formatarDataHora(correcao.dataCorrecao)}
           </span>
         </div>
+
+        {/* Card de Solicitação de Reescrita do Tutor */}
+        {correcao.solicitarReescrita && (
+          <div className={styles.cardAvisoReescrita} role="status">
+            <strong>Solicitação de Reescrita do Tutor:</strong>
+            <p>O tutor recomenda que o aluno envie uma Reescrita.</p>
+          </div>
+        )}
 
         {/* Caixa de Solicitação de Ajuste (quando ativada) */}
         {modoAjuste && (

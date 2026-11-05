@@ -31,13 +31,6 @@ export interface DadosDeCadastro {
   senha: string;
 }
 
-export interface VerificacaoEmailResultado {
-  existe: boolean;
-  nome?: string;
-  status?: string;
-  papeisExistentes?: string[];
-}
-
 export interface DetalhesConvitePublico {
   codigo: string;
   papel: 'TUTOR' | 'ALUNO';
@@ -61,9 +54,6 @@ export const authService = {
   /** Consulta detalhes públicos e lotação de um convite */
   detalhesConvite: (codigo: string) =>
     chamar<DetalhesConvitePublico>(`/api/auth/convite/${encodeURIComponent(codigo)}`),
-
-  /** Verifica se um e-mail já existe no LIRA para alterar o formulário dinamicamente */
-  verificarEmail: (email: string) => chamar<VerificacaoEmailResultado>('/api/auth/verificar-email', json({ email })),
 
   /** Cadastro por convite. Não entra automaticamente: o usuário vai para o login. */
   cadastrar: (dados: DadosDeCadastro) => chamar<{ ok: true }>('/api/auth/cadastro', json(dados)),
