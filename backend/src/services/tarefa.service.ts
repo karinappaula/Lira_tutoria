@@ -76,18 +76,18 @@ function exigirTurmaAtiva(turma: { status: string }) {
   }
 }
 
-// Tema de tarefa: oficial (qualquer um) ou criado pelo próprio Tutor.
+// Tema de tarefa: oficial ou criado pelo próprio Tutor.
 // Tema de aluno e tema de outro Tutor nunca servem.
 async function validarTema(idTema: number | undefined, idUsuario: number, papelAtivo: PapelAtivo) {
   if (idTema === undefined) return;
   const tema = await prisma.tema.findUnique({ where: { id: idTema } });
   const permitido =
     !!tema &&
-    (tema.origem === "ADMIN" ||
-      tema.origem === "TUTOR" ||
+    (papelAtivo === "ADMINISTRADOR" ||
+      tema.origem === "ADMIN" ||
       tema.origem === "OFICIAL" ||
       tema.idCriador === null ||
-      tema.idCriador === idUsuario);
+      (tema.origem === "TUTOR" && tema.idCriador === idUsuario));
   if (!permitido) {
     throw new ErroNegocio("Tema não encontrado.", 404, "TEMA_NAO_ENCONTRADO");
   }

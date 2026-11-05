@@ -16,7 +16,7 @@ const contagens = { _count: { select: { tarefas: true, redacoes: true } } } as c
 
 // Quem enxerga cada tema:
 // - Administrador: todos os temas cadastrados no acervo;
-// - Tutor: todos os temas criados por Tutores e Admins (e temas oficiais do acervo);
+// - Tutor: temas oficiais e os próprios temas;
 // - Aluno: temas oficiais/admin, temas do seu tutor e temas criados pelo próprio aluno.
 async function filtroDeVisibilidade(idUsuario: number, papelAtivo: PapelAtivo): Promise<Prisma.TemaWhereInput> {
   if (papelAtivo === "ADMINISTRADOR") return {};
@@ -24,10 +24,9 @@ async function filtroDeVisibilidade(idUsuario: number, papelAtivo: PapelAtivo): 
     return {
       OR: [
         { origem: "ADMIN" },
-        { origem: "TUTOR" },
         { origem: "OFICIAL" },
         { idCriador: null },
-        { idCriador: idUsuario },
+        { origem: "TUTOR", idCriador: idUsuario },
       ],
     };
   }
