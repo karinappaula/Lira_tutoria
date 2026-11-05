@@ -49,8 +49,12 @@ export function TemasTutor() {
 
   const ehMeuTema = (tema: Tema) => {
     if (tema.origem !== 'TUTOR') return false;
-    if (tema.idCriador === null) return true;
     return idUsuarioLogado !== null && tema.idCriador === idUsuarioLogado;
+  };
+
+  const ehTemaOficial = (tema: Tema) => {
+    const origem = (tema.origem ?? 'ADMIN').toUpperCase();
+    return origem === 'ADMIN' || origem === 'OFICIAL';
   };
 
   const listaFiltrada = useMemo(() => {
@@ -65,7 +69,7 @@ export function TemasTutor() {
 
       const meu = ehMeuTema(t);
       if (filtroOrigem === 'meus') return meu;
-      if (filtroOrigem === 'oficiais') return !meu;
+      if (filtroOrigem === 'oficiais') return ehTemaOficial(t);
       return true;
     });
   }, [temas, busca, filtroOrigem, idUsuarioLogado]);
@@ -73,7 +77,7 @@ export function TemasTutor() {
   // Métricas
   const totalTemas = temas?.length ?? 0;
   const meusTemasTotal = (temas ?? []).filter(ehMeuTema).length;
-  const oficiaisTotal = totalTemas - meusTemasTotal;
+  const oficiaisTotal = (temas ?? []).filter(ehTemaOficial).length;
 
   function abrirCriacao() {
     setTitulo('');
