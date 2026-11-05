@@ -335,15 +335,6 @@ async function anexarAluno(
     );
   }
 
-  const tutorExistente = await tx.tutor.findUnique({ where: { idUsuario } });
-  if (tutorExistente) {
-    throw new ErroNegocio(
-      "Contas com perfil de Tutor não podem ser vinculadas como aluno.",
-      400,
-      "PERFIL_INCOMPATIVEL"
-    );
-  }
-
   const alunoExistente = await tx.aluno.findUnique({ where: { idUsuario } });
   if (alunoExistente) {
     throw new ErroNegocio(
@@ -369,7 +360,9 @@ async function anexarAluno(
 
 export async function participarComoAluno(idUsuario: number, codigo: string) {
   return prisma.$transaction(async (tx) => {
-    const convite = await tx.convite.findUnique({ where: { codigo } });
+    const codigoNormalizado = codigo.trim().toUpperCase();
+    await tx.$queryRaw`SELECT codigo FROM CONVITE WHERE codigo = ${codigoNormalizado} FOR UPDATE`;
+    const convite = await tx.convite.findUnique({ where: { codigo: codigoNormalizado } });
     if (!convite) {
       throw new ErroNegocio("Convite não encontrado.", 404, "CONVITE_NAO_ENCONTRADO");
     }
@@ -383,14 +376,15 @@ export async function participarComoAluno(idUsuario: number, codigo: string) {
         "TUTOR_AUTO_CADASTRO"
       );
     }
-    const ehTutor = await tx.tutor.findUnique({ where: { idUsuario } });
-    if (ehTutor) {
+    const ehAdministrador = await tx.administrador.findUnique({ where: { idUsuario } });
+    if (ehAdministrador) {
       throw new ErroNegocio(
-        "Contas com perfil de Tutor não podem utilizar convites de aluno.",
+        "Contas de Administrador não podem ser vinculadas como aluno.",
         400,
-        "PERFIL_INCOMPATIVEL"
+        "PERFIL_ADMINISTRADOR"
       );
     }
+    await tx.$queryRaw`SELECT id_usuario FROM TUTOR WHERE id_usuario = ${convite.idTutor} FOR UPDATE`;
     if (convite.expiraEm < new Date()) {
       throw new ErroNegocio("Este convite expirou.", 400, "CONVITE_EXPIRADO");
     }
@@ -408,7 +402,7 @@ export async function participarComoAluno(idUsuario: number, codigo: string) {
     const agoraUsado = novosUsos >= MAX_TUTORADOS_POR_TUTOR;
 
     await tx.convite.update({
-      where: { codigo },
+      where: { codigo: convite.codigo },
       data: {
         usos: novosUsos,
         usado: agoraUsado,

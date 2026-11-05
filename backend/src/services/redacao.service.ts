@@ -408,6 +408,13 @@ export async function solicitarReescrita(idUsuarioTutor: number, idRedacao: numb
   if (redacao.aluno.tutor.idUsuario !== idUsuarioTutor) {
     throw new ErroNegocio("Você não possui acesso a esta redação.", 403, "SEM_PERMISSAO");
   }
+  if (redacao.tipoFluxo === "AVALIATIVA") {
+    throw new ErroNegocio(
+      "Para redações avaliativas, a recomendação de reescrita deve ser enviada com a correção para aprovação da Administração.",
+      400,
+      "REESCRITA_AVALIATIVA_REQUER_APROVACAO"
+    );
+  }
   if (redacao.versoes.some((item) => item.numeroVersao === 2)) {
     throw new ErroNegocio(
       "Esta redação já possui a única reescrita permitida.",

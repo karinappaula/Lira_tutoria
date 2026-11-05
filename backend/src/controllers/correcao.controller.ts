@@ -66,6 +66,7 @@ function inputCorrecao(req: Request) {
     comentarioComp5: textoOpcional(body, "comentarioComp5"),
     parecerGeral: textoOpcional(body, "parecerGeral"),
     recadoAdmin: textoOpcional(body, "recadoAdmin"),
+    solicitarReescrita: Boolean(body.solicitarReescrita),
     anotacoes: anotacoes as AnotacaoInput[] | undefined,
   };
 }
@@ -94,7 +95,9 @@ export async function getCorrecao(req: Request, res: Response, next: NextFunctio
 export async function postAprovarCorrecao(req: Request, res: Response, next: NextFunction) {
   try {
     const auth = (req as RequestAutenticada).autenticacao;
-    res.status(200).json(await aprovarCorrecao(auth.idUsuario, id(req, "idCorrecao")));
+    const body = corpo(req);
+    const aprovarReescrita = Boolean(body.aprovarReescrita);
+    res.status(200).json(await aprovarCorrecao(auth.idUsuario, id(req, "idCorrecao"), aprovarReescrita));
   } catch (erro) { next(erro); }
 }
 

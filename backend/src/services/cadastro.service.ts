@@ -32,6 +32,7 @@ export async function cadastrarViaConvite(
 
   return prisma.$transaction(async (tx) => {
     // 1. Buscar e validar convite
+    await tx.$queryRaw`SELECT codigo FROM CONVITE WHERE codigo = ${codigoNormalizado} FOR UPDATE`;
     const convite = await tx.convite.findUnique({ where: { codigo: codigoNormalizado } });
 
     if (!convite) {
@@ -53,6 +54,7 @@ export async function cadastrarViaConvite(
           "CONVITE_INVALIDO"
         );
       }
+      await tx.$queryRaw`SELECT id_usuario FROM TUTOR WHERE id_usuario = ${convite.idTutor} FOR UPDATE`;
       // Regra de limite de 10 vagas validada via contagem de alunos ativos vinculados ao idTutor
       const alunosAtivos = await tx.aluno.count({
         where: { idTutor: convite.idTutor, usuario: { status: "ATIVO" } },
@@ -65,6 +67,7 @@ export async function cadastrarViaConvite(
         );
       }
     } else {
+      await tx.$queryRaw`SELECT id_turma FROM TURMA WHERE id_turma = ${convite.idTurma} FOR UPDATE`;
       if (convite.usado || convite.usos >= convite.usosMaximos) {
         throw new ErroNegocio("Este convite já atingiu o limite máximo de utilizações.", 409, "CONVITE_USADO");
       }
@@ -74,21 +77,21 @@ export async function cadastrarViaConvite(
     let usuario = await tx.usuario.findUnique({ where: { email: emailNormalizado } });
     const contaJaExistia = !!usuario;
 
-    // Impedir que um Tutor tente se cadastrar como aluno (próprio link ou perfil de tutor)
+    if (usuario && await tx.administrador.findUnique({ where: { idUsuario: usuario.id } })) {
+      throw new ErroNegocio(
+        "Contas de Administrador não podem receber perfis de Tutor ou Aluno.",
+        400,
+        "PERFIL_ADMINISTRADOR"
+      );
+    }
+
+    // O único bloqueio de Tutor como Aluno é usar o próprio convite.
     if (convite.papel === "ALUNO" && usuario) {
       if (usuario.id === convite.idTutor) {
         throw new ErroNegocio(
           "Você é o tutor responsável por este convite e não pode se cadastrar como seu próprio aluno.",
           400,
           "TUTOR_AUTO_CADASTRO"
-        );
-      }
-      const perfilTutor = await tx.tutor.findUnique({ where: { idUsuario: usuario.id } });
-      if (perfilTutor) {
-        throw new ErroNegocio(
-          "Contas com perfil de Tutor não podem utilizar convites de aluno.",
-          400,
-          "PERFIL_INCOMPATIVEL"
         );
       }
     }
@@ -233,15 +236,6 @@ async function anexarPapelAluno(
       "Você é o tutor responsável por este convite e não pode se cadastrar como seu próprio aluno.",
       400,
       "TUTOR_AUTO_CADASTRO"
-    );
-  }
-
-  const tutorExistente = await tx.tutor.findUnique({ where: { idUsuario } });
-  if (tutorExistente) {
-    throw new ErroNegocio(
-      "Contas com perfil de Tutor não podem ser vinculadas como aluno.",
-      400,
-      "PERFIL_INCOMPATIVEL"
     );
   }
 

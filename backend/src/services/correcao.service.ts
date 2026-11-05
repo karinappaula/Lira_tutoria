@@ -3,6 +3,20 @@ import { ErroNegocio } from "../errors/erros";
 import { registrarAuditoria } from "./auditoria.service";
 import type { PapelAtivo } from "./token.service";
 
+export const TAG_REESCRITA = "[RECOMENDAR_REESCRITA]";
+
+export function enriquecerCorrecaoComReescrita<T extends { recadoAdmin?: string | null }>(correcao: T) {
+  const solicitarReescrita = Boolean(correcao.recadoAdmin?.includes(TAG_REESCRITA));
+  const recadoLimpo = correcao.recadoAdmin
+    ? correcao.recadoAdmin.replace(TAG_REESCRITA, "").trim() || null
+    : null;
+  return {
+    ...correcao,
+    solicitarReescrita,
+    recadoAdmin: recadoLimpo,
+  };
+}
+
 // Status da correção (coluna CORRECAO.status_aprovacao).
 // LIBERADA = correção de redação de TREINO: vai direto ao aluno (RN02).
 export const STATUS_CORRECAO = {
@@ -42,6 +56,7 @@ export interface CriarCorrecaoInput {
   comentarioComp5?: string;
   parecerGeral?: string;
   recadoAdmin?: string;
+  solicitarReescrita?: boolean;
   anotacoes?: AnotacaoInput[];
 }
 
@@ -180,6 +195,11 @@ export async function criarCorrecao(idUsuarioTutor: number, input: CriarCorrecao
   const statusAprovacao = ehTreino ? STATUS_CORRECAO.LIBERADA : STATUS_CORRECAO.PENDENTE;
   const statusVersao = ehTreino ? "CORRIGIDA" : "EM_REVISAO_FINAL";
 
+  let recadoFinal = ehTreino ? undefined : recadoAdmin;
+  if (!ehTreino && input.solicitarReescrita) {
+    recadoFinal = recadoFinal ? `${TAG_REESCRITA}\n${recadoFinal}` : TAG_REESCRITA;
+  }
+
   const numeroAjuste = (versao.correcoes[0]?.numeroAjuste ?? -1) + 1;
   return prisma.$transaction(async (tx) => {
     const correcao = await tx.correcao.create({
@@ -200,7 +220,7 @@ export async function criarCorrecao(idUsuarioTutor: number, input: CriarCorrecao
         comentarioComp5: comentarios[4],
         parecerGeral,
         // O recado só faz sentido quando existe aprovação da Administração.
-        recadoAdmin: ehTreino ? undefined : recadoAdmin,
+        recadoAdmin: recadoFinal,
         statusAprovacao,
         anotacoes: {
           create: (input.anotacoes ?? []).map((anotacao) => ({
@@ -228,18 +248,19 @@ export async function criarCorrecao(idUsuarioTutor: number, input: CriarCorrecao
       },
       tx
     );
-    return correcao;
+    return enriquecerCorrecaoComReescrita(correcao);
   });
 }
 
 export async function listarCorrecoesPendentes(idUsuario: number, administrador: boolean) {
-  return prisma.correcao.findMany({
+  const lista = await prisma.correcao.findMany({
     where: administrador
       ? { statusAprovacao: STATUS_CORRECAO.PENDENTE }
       : { idTutor: idUsuario, statusAprovacao: STATUS_CORRECAO.PENDENTE },
     orderBy: { dataCorrecao: "asc" },
     include: correcaoInclude,
   });
+  return lista.map((c) => enriquecerCorrecaoComReescrita(c));
 }
 
 async function obterCorrecao(idCorrecao: number) {
@@ -253,14 +274,18 @@ async function obterCorrecao(idCorrecao: number) {
   return correcao;
 }
 
-export async function aprovarCorrecao(idUsuarioAdmin: number, idCorrecao: number) {
+export async function aprovarCorrecao(
+  idUsuarioAdmin: number,
+  idCorrecao: number,
+  aprovarReescrita: boolean = false
+) {
   const correcao = await obterCorrecao(idCorrecao);
   if (correcao.statusAprovacao !== STATUS_CORRECAO.PENDENTE) {
     throw new ErroNegocio("Esta correção não está pendente de aprovação.", 409, "STATUS_INVALIDO");
   }
 
-  // Aprovar libera o RESULTADO ao aluno. A reescrita NÃO é liberada aqui:
-  // quem decide pedir a reescrita é o Tutor (RF07), depois da liberação.
+  const statusVersao = aprovarReescrita ? "REESCRITA_SOLICITADA" : "CORRIGIDA";
+
   return prisma.$transaction(async (tx) => {
     const aprovada = await tx.correcao.update({
       where: { id: idCorrecao },
@@ -269,18 +294,18 @@ export async function aprovarCorrecao(idUsuarioAdmin: number, idCorrecao: number
     });
     await tx.versaoRedacao.update({
       where: { id: correcao.idVersao },
-      data: { statusVersao: "CORRIGIDA" },
+      data: { statusVersao },
     });
     await registrarAuditoria(
       {
         idUsuario: idUsuarioAdmin,
-        acao: "CORRECAO_APROVADA",
+        acao: aprovarReescrita ? "CORRECAO_E_REESCRITA_APROVADA" : "CORRECAO_APROVADA",
         entidade: "CORRECAO",
         idRegistro: idCorrecao,
       },
       tx
     );
-    return aprovada;
+    return enriquecerCorrecaoComReescrita(aprovada);
   });
 }
 
@@ -350,10 +375,10 @@ export async function buscarCorrecaoVisivel(
 ) {
   const correcao = await obterCorrecao(idCorrecao);
 
-  if (papel === "ADMINISTRADOR") return correcao;
+  if (papel === "ADMINISTRADOR") return enriquecerCorrecaoComReescrita(correcao);
 
   if (papel === "TUTOR") {
-    if (correcao.idTutor === idUsuario) return correcao;
+    if (correcao.idTutor === idUsuario) return enriquecerCorrecaoComReescrita(correcao);
   }
 
   if (
