@@ -109,9 +109,11 @@ async function main() {
   await importarQuestoes(autor.id);
 }
 
-main()
-  .catch((erro) => {
-    console.error("Erro ao importar questões:", erro);
-    process.exitCode = 1;
-  })
-  .finally(() => prisma.$disconnect());
+if (require.main === module) {
+  main()
+    .catch((erro) => {
+      console.error("Erro ao importar questões:", erro);
+      process.exitCode = 1;
+    })
+    .finally(() => prisma.$disconnect());
+}

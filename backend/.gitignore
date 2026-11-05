@@ -1,5 +1,6 @@
 node_modules
 dist
+coverage
 .env
 firebase-service-account.json
 prisma/questoes-export.json
