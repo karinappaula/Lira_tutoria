@@ -51,6 +51,7 @@ export function ListaDeRedacoes() {
     {
       chave: 'redacao',
       titulo: 'Redação',
+      alinhamento: 'esquerda',
       celula: (r) => (
         <div className={styles.titulo}>
           <strong>{tituloDaRedacao(r)}</strong>
@@ -63,6 +64,7 @@ export function ListaDeRedacoes() {
     {
       chave: 'status',
       titulo: 'Status',
+      alinhamento: 'centro',
       celula: (r) => {
         const s = statusParaAluno(ultimaVersao(r));
         return <Badge tom={s.tom}>{s.rotulo}</Badge>;
@@ -71,7 +73,7 @@ export function ListaDeRedacoes() {
     {
       chave: 'acao',
       titulo: 'Ação',
-      alinhamento: 'direita',
+      alinhamento: 'centro',
       noCartao: 'acoes',
       celula: (r) => (
         <Link href={`/aluno/redacoes/${r.id}`} className={styles.acao}>

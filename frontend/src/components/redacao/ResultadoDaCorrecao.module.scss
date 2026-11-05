@@ -90,37 +90,6 @@
   cursor: default;
 }
 
-.detalheMarca {
-  margin-top: $esp-4;
-  padding: $esp-4;
-  border-left: 4px solid $cor-primaria;
-  border-radius: $raio-md;
-  background: $cor-fundo;
-  display: flex;
-  flex-direction: column;
-  gap: $esp-2;
-}
-
-.detalheTipo {
-  font-weight: 700;
-
-  span {
-    color: $cor-texto-suave;
-    font-weight: 500;
-  }
-}
-
-.detalheTrecho {
-  font-style: italic;
-  overflow-wrap: anywhere;
-}
-
-.dica {
-  margin-top: $esp-3;
-  color: $cor-texto-suave;
-  font-size: 0.88rem;
-}
-
 .competencias {
   display: flex;
   flex-direction: column;

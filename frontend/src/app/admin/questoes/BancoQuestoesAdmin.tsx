@@ -216,8 +216,9 @@ export function BancoQuestoesAdmin() {
     {
       chave: 'assuntos',
       titulo: 'Assuntos',
+      alinhamento: 'esquerda',
       celula: (q) => (
-        <div className={styles.tagsQuestao}>
+        <div className={`${styles.tagsQuestao} ${styles.celulaAssuntos}`}>
           {q.assuntos && q.assuntos.length > 0 ? (
             q.assuntos.map((v, i) => {
               const nome = 'assunto' in v && v.assunto ? v.assunto.nomeAssunto : ('nomeAssunto' in v ? String(v.nomeAssunto) : '');
@@ -272,7 +273,7 @@ export function BancoQuestoesAdmin() {
     {
       chave: 'acoes',
       titulo: 'Ações',
-      alinhamento: 'direita',
+      alinhamento: 'centro',
       noCartao: 'acoes',
       celula: (q) => (
         <div className={styles.grupoAcoes}>
@@ -323,6 +324,11 @@ export function BancoQuestoesAdmin() {
       <PageHeader
         titulo="Banco de Questões"
         descricao="Gestão do acervo de questões de vestibulares com suporte a alternativas e tópicos temáticos."
+        aoRecarregar={() => {
+          void buscarQuestoes();
+          recarregarAssuntos();
+          void carregarAnos();
+        }}
         acao={
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             <Button

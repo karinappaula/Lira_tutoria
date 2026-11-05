@@ -168,7 +168,7 @@ export function TurmasAdmin() {
     {
       chave: 'acoes',
       titulo: 'Ações',
-      alinhamento: 'direita',
+      alinhamento: 'centro',
       noCartao: 'acoes',
       celula: (t) => (
         <div className={styles.acoesLinha}>
@@ -220,6 +220,7 @@ export function TurmasAdmin() {
       <PageHeader
         titulo="Gestão de Turmas"
         descricao="Gerencie turmas, capacidade de tutores, remanejamentos e emissão de convites parametrizados."
+        aoRecarregar={recarregar}
         acao={
           <Button
             icone={<Plus size={18} aria-hidden="true" />}

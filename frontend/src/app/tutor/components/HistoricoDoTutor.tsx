@@ -39,16 +39,16 @@ export function HistoricoDoTutor() {
   const itens = dados ?? [];
 
   const colunas: Coluna<ItemDoHistorico>[] = [
-    { chave: 'aluno', titulo: 'Aluno', celula: (i) => <strong>{i.aluno.nome}</strong> },
-    { chave: 'turma', titulo: 'Turma', celula: (i) => i.turma?.nome ?? '—' },
-    { chave: 'data', titulo: 'Data', celula: (i) => formatarData(i.data) },
+    { chave: 'aluno', titulo: 'Aluno', alinhamento: 'esquerda', celula: (i) => <strong>{i.aluno.nome}</strong> },
+    { chave: 'turma', titulo: 'Turma', alinhamento: 'centro', celula: (i) => i.turma?.nome ?? '—' },
+    { chave: 'data', titulo: 'Data', alinhamento: 'centro', celula: (i) => formatarData(i.data) },
     { chave: 'nota', titulo: 'Nota final', alinhamento: 'centro', celula: (i) => <strong>{i.notaTotal ?? '—'}/1000</strong> },
-    { chave: 'status', titulo: 'Status', celula: (i) => <Badge tom={TOM[i.statusAprovacao]}>{i.statusRotulo}</Badge> },
+    { chave: 'status', titulo: 'Status', alinhamento: 'centro', celula: (i) => <Badge tom={TOM[i.statusAprovacao]}>{i.statusRotulo}</Badge> },
     { chave: 'ajustes', titulo: 'Ajustes', alinhamento: 'centro', celula: (i) => i.ajustes },
     {
       chave: 'acao',
       titulo: 'Ação',
-      alinhamento: 'direita',
+      alinhamento: 'centro',
       noCartao: 'acoes',
       celula: (i) => (
         <Link href={`/tutor/redacoes/${i.idRedacao}`} className={styles.acaoLink}>

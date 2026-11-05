@@ -32,6 +32,11 @@ interface Props {
   children: ReactNode;
 }
 
+function formatarTituloAba(rotulo: string): string {
+  if (!rotulo) return '';
+  return rotulo.charAt(0).toUpperCase() + rotulo.slice(1).toLowerCase();
+}
+
 function SinoComunicados() {
   const { estado } = useSessao();
   const [naoLidos, setNaoLidos] = useState(0);
@@ -84,31 +89,20 @@ function Cabecalho({
   variante,
   menuAberto,
   aoAlternarMenu,
+  aoSair,
+  saindo,
 }: {
   variante: 'padrao' | 'admin';
   menuAberto: boolean;
   aoAlternarMenu: () => void;
+  aoSair: () => void;
+  saindo: boolean;
 }) {
   const { estado } = useSessao();
-  const router = useRouter();
-  const toast = useToast();
-  const [saindo, setSaindo] = useState(false);
 
   const nome = estado.situacao === 'ok' ? primeiroNome(estado.sessao.usuario.nome) : '';
   const papel = estado.situacao === 'ok' ? ROTULO_PAPEL[estado.sessao.papelAtivo] : '';
   const contexto = estado.situacao === 'ok' ? estado.sessao.contexto : undefined;
-
-  async function sair() {
-    setSaindo(true);
-    limparBackupsDeRascunho(); // nenhuma cópia de redação fica no navegador depois de sair
-    try {
-      await authService.logout();
-    } catch {
-      toast.erro('Não foi possível encerrar a sessão no servidor, mas você será desconectado.');
-    }
-    router.replace('/login');
-    router.refresh();
-  }
 
   const elementosContexto = (
     <>
@@ -132,17 +126,6 @@ function Cabecalho({
       <div className={styles.cabecalhoInterno}>
         <div className={styles.barraPrincipal}>
           <div className={styles.identidade}>
-            {/* Botão Hambúrguer Mobile (< 768px) */}
-            <button
-              type="button"
-              className={styles.botaoHamburger}
-              onClick={aoAlternarMenu}
-              aria-label={menuAberto ? 'Fechar menu de navegação' : 'Abrir menu de navegação'}
-              aria-expanded={menuAberto}
-            >
-              {menuAberto ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
-            </button>
-
             <img src="/pena-lira.png" alt="LIRA" className={styles.pena} width={40} height={60} />
             <div className={styles.titulosUsuario}>
               {variante === 'admin' ? (
@@ -158,14 +141,28 @@ function Cabecalho({
           <div className={styles.acoes}>
             {variante !== 'admin' && <SinoComunicados />}
 
-            <Button
-              variante="secundario"
-              icone={<LogOut size={16} aria-hidden="true" />}
-              onClick={sair}
-              carregando={saindo}
+            {/* Botão Sair avulso: visível apenas no Desktop/Tablet (>= 768px), oculto no mobile */}
+            <div className={styles.botaoSairSuperior}>
+              <Button
+                variante="secundario"
+                icone={<LogOut size={16} aria-hidden="true" />}
+                onClick={aoSair}
+                carregando={saindo}
+              >
+                Sair
+              </Button>
+            </div>
+
+            {/* Botão Hambúrguer Mobile (< 768px): reposicionado para o lado direito da barra superior, alinhado ao lado do sino */}
+            <button
+              type="button"
+              className={styles.botaoHamburger}
+              onClick={aoAlternarMenu}
+              aria-label={menuAberto ? 'Fechar menu de navegação' : 'Abrir menu de navegação'}
+              aria-expanded={menuAberto}
             >
-              Sair
-            </Button>
+              {menuAberto ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
+            </button>
           </div>
         </div>
 
@@ -181,7 +178,14 @@ function Navegacao({
   menu,
   menuAberto,
   aoFecharMenu,
-}: Pick<Props, 'variante' | 'menu'> & { menuAberto: boolean; aoFecharMenu: () => void }) {
+  aoSair,
+  saindo,
+}: Pick<Props, 'variante' | 'menu'> & {
+  menuAberto: boolean;
+  aoFecharMenu: () => void;
+  aoSair: () => void;
+  saindo: boolean;
+}) {
   const caminho = usePathname();
 
   return (
@@ -192,6 +196,7 @@ function Navegacao({
           {menu.map((item) => {
             const ativo = caminho === item.href || caminho.startsWith(`${item.href}/`);
             const Icone = item.icone;
+            const rotuloFormatado = formatarTituloAba(item.rotulo);
             return (
               <li key={item.href}>
                 <Link
@@ -200,7 +205,7 @@ function Navegacao({
                   aria-current={ativo ? 'page' : undefined}
                 >
                   {Icone && <Icone size={16} aria-hidden="true" />}
-                  <span>{item.contador !== undefined ? `${item.rotulo} (${item.contador})` : item.rotulo}</span>
+                  <span>{item.contador !== undefined ? `${rotuloFormatado} (${item.contador})` : rotuloFormatado}</span>
                 </Link>
               </li>
             );
@@ -219,7 +224,7 @@ function Navegacao({
             <header className={styles.menuDrawerCabecalho}>
               <div className={styles.identidadeDrawer}>
                 <img src="/pena-lira.png" alt="LIRA" className={styles.penaDrawer} width={28} height={42} />
-                <span className={styles.tituloMenuDrawer}>Navegação</span>
+                <span className={styles.tituloMenuDrawer}>LIRA</span>
               </div>
               <button
                 type="button"
@@ -235,6 +240,7 @@ function Navegacao({
               {menu.map((item) => {
                 const ativo = caminho === item.href || caminho.startsWith(`${item.href}/`);
                 const Icone = item.icone;
+                const rotuloFormatado = formatarTituloAba(item.rotulo);
                 return (
                   <li key={item.href}>
                     <Link
@@ -244,7 +250,7 @@ function Navegacao({
                       aria-current={ativo ? 'page' : undefined}
                     >
                       {Icone && <Icone size={18} aria-hidden="true" />}
-                      <span className={styles.rotuloDrawer}>{item.rotulo}</span>
+                      <span className={styles.rotuloDrawer}>{rotuloFormatado}</span>
                       {item.contador !== undefined && (
                         <span className={styles.badgeContadorDrawer}>{item.contador}</span>
                       )}
@@ -253,6 +259,22 @@ function Navegacao({
                 );
               })}
             </ul>
+
+            {/* Botão Sair dentro do Drawer do Menu Hambúrguer */}
+            <div className={styles.menuDrawerRodape}>
+              <Button
+                variante="secundario"
+                icone={<LogOut size={16} aria-hidden="true" />}
+                onClick={() => {
+                  aoFecharMenu();
+                  aoSair();
+                }}
+                carregando={saindo}
+                larguraTotal
+              >
+                Sair
+              </Button>
+            </div>
           </nav>
         </div>
       )}
@@ -269,29 +291,56 @@ function Conteudo({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
-/** Estrutura das áreas logadas: cabeçalho com contexto, navegação com hambúrguer mobile, conteúdo e rodapé global. */
-export function AppShell({ variante, menu, children }: Props) {
+function ShellComSessao({ variante, menu, children }: Props) {
   const [menuAberto, setMenuAberto] = useState(false);
+  const router = useRouter();
+  const toast = useToast();
+  const [saindo, setSaindo] = useState(false);
+
+  async function sair() {
+    setSaindo(true);
+    limparBackupsDeRascunho(); // nenhuma cópia de redação fica no navegador depois de sair
+    try {
+      await authService.logout();
+    } catch {
+      toast.erro('Não foi possível encerrar a sessão no servidor, mas você será desconectado.');
+    }
+    router.replace('/login');
+    router.refresh();
+  }
 
   return (
+    <div className={styles.pagina}>
+      <Cabecalho
+        variante={variante}
+        menuAberto={menuAberto}
+        aoAlternarMenu={() => setMenuAberto((aberto) => !aberto)}
+        aoSair={sair}
+        saindo={saindo}
+      />
+      <Navegacao
+        variante={variante}
+        menu={menu}
+        menuAberto={menuAberto}
+        aoFecharMenu={() => setMenuAberto(false)}
+        aoSair={sair}
+        saindo={saindo}
+      />
+      <main className={styles.principal} id="conteudo">
+        <Conteudo>{children}</Conteudo>
+      </main>
+      <RodapeGlobal />
+    </div>
+  );
+}
+
+/** Estrutura das áreas logadas: cabeçalho com contexto, navegação com hambúrguer mobile, conteúdo e rodapé global. */
+export function AppShell({ variante, menu, children }: Props) {
+  return (
     <SessaoProvider>
-      <div className={styles.pagina}>
-        <Cabecalho
-          variante={variante}
-          menuAberto={menuAberto}
-          aoAlternarMenu={() => setMenuAberto((aberto) => !aberto)}
-        />
-        <Navegacao
-          variante={variante}
-          menu={menu}
-          menuAberto={menuAberto}
-          aoFecharMenu={() => setMenuAberto(false)}
-        />
-        <main className={styles.principal} id="conteudo">
-          <Conteudo>{children}</Conteudo>
-        </main>
-        <RodapeGlobal />
-      </div>
+      <ShellComSessao variante={variante} menu={menu}>
+        {children}
+      </ShellComSessao>
     </SessaoProvider>
   );
 }

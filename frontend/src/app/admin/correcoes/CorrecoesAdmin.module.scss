@@ -186,14 +186,21 @@
 .acoesLinha {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
+  width: 100%;
+
+  > button {
+    width: 104px;
+    min-height: 32px;
+    justify-content: center;
+  }
 
   @include celular {
-    justify-content: flex-start;
+    justify-content: stretch;
     width: 100%;
     margin-top: $esp-2;
 
-    button {
+    > button {
       width: 100%;
     }
   }
@@ -204,4 +211,76 @@
   background: $cor-superficie;
   border-radius: $raio-lg;
   box-shadow: $sombra-cartao;
+}
+
+.tabelaContainer {
+  width: 100%;
+  overflow-x: auto;
+
+  table {
+    min-width: 1160px;
+    table-layout: fixed;
+  }
+
+  th,
+  td {
+    padding: 12px 14px;
+    vertical-align: middle;
+  }
+
+  /* 1. Aluno */
+  th:nth-child(1),
+  td:nth-child(1) {
+    width: 22%;
+    min-width: 200px;
+    text-align: left;
+  }
+
+  /* 2. Turma */
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 12%;
+    min-width: 110px;
+    text-align: center;
+  }
+
+  /* 3. Tutor Avaliador */
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 16%;
+    min-width: 140px;
+    text-align: left;
+  }
+
+  /* 4. Tema / Atividade */
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 24%;
+    min-width: 200px;
+    text-align: left;
+  }
+
+  /* 5. Nota Sugerida */
+  th:nth-child(5),
+  td:nth-child(5) {
+    width: 11%;
+    min-width: 100px;
+    text-align: center;
+  }
+
+  /* 6. Data da Correção */
+  th:nth-child(6),
+  td:nth-child(6) {
+    width: 15%;
+    min-width: 140px;
+    text-align: center;
+  }
+
+  /* 7. Ação */
+  th:nth-child(7),
+  td:nth-child(7) {
+    width: 110px;
+    min-width: 100px;
+    text-align: center;
+  }
 }

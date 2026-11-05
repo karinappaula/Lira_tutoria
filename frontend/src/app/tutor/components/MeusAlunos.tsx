@@ -142,6 +142,7 @@ export function MeusAlunos() {
       <PageHeader
         titulo="Visão Geral da Turma"
         descricao="Acompanhe a lista de alunos vinculados e seu status atual."
+        aoRecarregar={recarregar}
         acao={
           <Button
             icone={<UserPlus size={18} aria-hidden="true" />}

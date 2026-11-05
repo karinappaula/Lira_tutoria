@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Alerta } from '@/components/ui/Alerta/Alerta';
 import { Badge } from '@/components/ui/Badge/Badge';
 import { Card } from '@/components/ui/Card/Card';
@@ -24,7 +24,6 @@ interface Props {
 
 /** Nota final, competências com o significado de cada nível, comentários e o texto marcado. */
 export function ResultadoDaCorrecao({ texto, correcao, visaoInterna = false, coluna = false }: Props) {
-  const [ativa, setAtiva] = useState<number | null>(null);
   const competencias = competenciasDe(correcao);
   const final = notaFinal(correcao);
   const status = statusDaCorrecaoRotulo(correcao.statusAprovacao);
@@ -40,7 +39,6 @@ export function ResultadoDaCorrecao({ texto, correcao, visaoInterna = false, col
       })),
     [correcao.anotacoes],
   );
-  const anotacaoAtiva = correcao.anotacoes.find((a) => a.id === ativa);
   const tiposPresentes = TIPOS_DE_ERRO.filter((t) => correcao.anotacoes.some((a) => infoDoTipo(a.tipoErro).estilo === t.estilo));
 
   return (
@@ -88,21 +86,8 @@ export function ResultadoDaCorrecao({ texto, correcao, visaoInterna = false, col
           <TextoMarcado
             texto={texto}
             marcas={marcas}
-            marcaAtiva={ativa}
-            aoClicarMarca={(m) => setAtiva((atual) => (atual === m.chave ? null : Number(m.chave)))}
             rotulo="Texto da redação com marcações da correção"
           />
-          {anotacaoAtiva ? (
-            <div className={styles.detalheMarca} role="status">
-              <p className={styles.detalheTipo}>
-                {infoDoTipo(anotacaoAtiva.tipoErro).valor}
-              </p>
-              <p className={styles.detalheTrecho}>“{anotacaoAtiva.textoSelecionado}”</p>
-              <p>{anotacaoAtiva.sugestaoComentario || 'Sem sugestão escrita para este trecho.'}</p>
-            </div>
-          ) : (
-            correcao.anotacoes.length > 0 && <p className={styles.dica}>Toque ou clique em um trecho marcado para ver a explicação.</p>
-          )}
         </Card>
 
         <div className={styles.competencias}>

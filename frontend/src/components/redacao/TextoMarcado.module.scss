@@ -8,6 +8,7 @@
   overflow-wrap: anywhere;
   padding-top: 64px;
   padding-inline: 8px;
+  overflow: visible;
 }
 
 .selecionavel {
@@ -32,6 +33,10 @@
   }
 }
 
+.marcaSemClique {
+  cursor: text;
+}
+
 .ativa {
   box-shadow: 0 0 0 2px $cor-texto;
 }
@@ -41,7 +46,7 @@
   bottom: calc(100% + 6px);
   left: 0;
   transform: translateY(0);
-  z-index: 100;
+  z-index: 200;
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -63,6 +68,16 @@
   text-align: left;
   text-decoration: none;
 
+  &::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 12px;
+    background: transparent;
+  }
+
   &::after {
     content: '';
     position: absolute;
@@ -71,6 +86,29 @@
     border-width: 5px;
     border-style: solid;
     border-color: #17292d transparent transparent transparent;
+  }
+}
+
+.balaoBotaoExcluir {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  align-self: flex-start;
+  margin-top: 5px;
+  padding: 3px 8px;
+  border: 1px solid rgba(240, 76, 85, 0.4);
+  border-radius: $raio-sm;
+  background: rgba(240, 76, 85, 0.15);
+  color: #ff8b94;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: $cor-perigo;
+    color: #ffffff;
+    border-color: $cor-perigo;
   }
 }
 

@@ -36,7 +36,7 @@ export function DetalheRedacao({ id }: { id: number }) {
   const emEdicao = versao?.statusVersao === 'RASCUNHO';
   const descricao = [
     rotuloDoFluxo(dados.tipoFluxo),
-    versao?.numeroVersao === 2 ? 'Reescrita (versão 2)' : null,
+    versao?.numeroVersao === 2 ? 'Reescrita' : null,
     dados.tarefa ? `Tarefa: ${dados.tarefa.tituloTarefa}` : null,
   ]
     .filter(Boolean)

@@ -139,6 +139,7 @@ export function HistoricoAdmin() {
     {
       chave: 'turma',
       titulo: 'Turma',
+      alinhamento: 'centro',
       celula: (i) => (
         <Badge tom="neutro">{i.turma?.nome ?? 'Sem turma'}</Badge>
       ),
@@ -184,7 +185,7 @@ export function HistoricoAdmin() {
       titulo: 'Status',
       alinhamento: 'centro',
       celula: (i) => (
-        <Badge tom={TOM_STATUS[i.statusAprovacao] ?? 'neutro'}>
+        <Badge className={styles.statusBadge} tom={TOM_STATUS[i.statusAprovacao] ?? 'neutro'}>
           {i.statusRotulo}
         </Badge>
       ),
@@ -192,7 +193,7 @@ export function HistoricoAdmin() {
     {
       chave: 'acoes',
       titulo: 'Ação',
-      alinhamento: 'direita',
+      alinhamento: 'centro',
       noCartao: 'acoes',
       celula: (i) => (
         <div className={styles.acoesLinha}>
@@ -216,6 +217,7 @@ export function HistoricoAdmin() {
       <PageHeader
         titulo="Histórico Geral de Correções"
         descricao="Auditoria, consulta e acompanhamento de todas as redações corrigidas no sistema."
+        aoRecarregar={recarregar}
       />
 
       {/* Cartões de Indicadores Rápidos */}
@@ -369,12 +371,14 @@ export function HistoricoAdmin() {
           />
         </div>
       ) : (
-        <Tabela
-          colunas={colunas}
-          linhas={itens}
-          chaveDaLinha={(i) => i.idCorrecao}
-          descricao="Histórico geral de correções de redações no sistema"
-        />
+        <div className={styles.tabelaHistorico}>
+          <Tabela
+            colunas={colunas}
+            linhas={itens}
+            chaveDaLinha={(i) => i.idCorrecao}
+            descricao="Histórico geral de correções de redações no sistema"
+          />
+        </div>
       )}
 
       {/* Modal de Detalhes da Correção */}

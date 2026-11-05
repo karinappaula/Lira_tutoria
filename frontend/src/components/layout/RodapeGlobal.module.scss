@@ -2,8 +2,8 @@
 @use 'mixins' as *;
 
 .rodapeGlobal {
-  background: $cor-superficie;
-  border-top: 1px solid $cor-borda;
+  background: #6e9693;
+  border-top: 1px solid rgba(23, 41, 45, 0.12);
   margin-top: auto;
   padding-block: $esp-4;
   width: 100%;
@@ -26,10 +26,10 @@
 
 .rodapeTexto {
   font-size: 0.85rem;
-  color: $cor-texto-suave;
+  color: $cor-texto-invertido;
 
   strong {
-    color: $cor-primaria;
+    color: $cor-texto-invertido;
   }
 }
 
@@ -38,7 +38,7 @@
   align-items: center;
   gap: $esp-2;
   font-size: 0.82rem;
-  color: $cor-texto-suave;
+  color: $cor-texto-invertido;
 
   @include celular {
     flex-wrap: wrap;

@@ -88,6 +88,7 @@ export function CorrecoesAdmin() {
     {
       chave: 'turma',
       titulo: 'Turma',
+      alinhamento: 'centro',
       celula: (c) => (
         <Badge tom="neutro">
           {c.versao.redacao.aluno.tutor?.turma?.nome ?? 'Sem turma'}
@@ -141,7 +142,7 @@ export function CorrecoesAdmin() {
     {
       chave: 'acoes',
       titulo: 'Ação',
-      alinhamento: 'direita',
+      alinhamento: 'centro',
       noCartao: 'acoes',
       celula: (c) => (
         <div className={styles.acoesLinha}>
@@ -163,6 +164,7 @@ export function CorrecoesAdmin() {
       <PageHeader
         titulo="Fila de Revisão de Correções"
         descricao="Auditoria de qualidade pedagógica das redações avaliativas antes da liberação das notas aos alunos."
+        aoRecarregar={recarregar}
       />
 
       {/* Cartões de Indicadores da Fila */}
@@ -267,12 +269,14 @@ export function CorrecoesAdmin() {
           />
         </div>
       ) : (
-        <Tabela
-          colunas={colunas}
-          linhas={correcoesFiltradas}
-          chaveDaLinha={(c) => c.id}
-          descricao="Lista de correções de redação pendentes de aprovação administrativa"
-        />
+        <div className={styles.tabelaContainer}>
+          <Tabela
+            colunas={colunas}
+            linhas={correcoesFiltradas}
+            chaveDaLinha={(c) => c.id}
+            descricao="Lista de correções de redação pendentes de aprovação administrativa"
+          />
+        </div>
       )}
 
       {/* Modal de Revisão Lado a Lado */}

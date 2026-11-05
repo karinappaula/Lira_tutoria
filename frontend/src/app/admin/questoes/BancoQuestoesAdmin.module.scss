@@ -106,7 +106,58 @@
   border-radius: $raio-lg;
   border: 1px solid $cor-borda;
   box-shadow: $sombra-cartao;
-  overflow: hidden;
+  overflow-x: auto;
+
+  table {
+    min-width: 1120px;
+    table-layout: fixed;
+  }
+
+  th,
+  td {
+    padding: 12px 14px;
+    vertical-align: middle;
+  }
+
+  /* 1. Questão e Enunciado */
+  th:nth-child(1),
+  td:nth-child(1) {
+    width: 42%;
+    min-width: 360px;
+    text-align: left;
+  }
+
+  /* 2. Assuntos */
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 22%;
+    min-width: 180px;
+    text-align: left;
+  }
+
+  /* 3. Imagem */
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 90px;
+    min-width: 80px;
+    text-align: center;
+  }
+
+  /* 4. Status */
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 110px;
+    min-width: 100px;
+    text-align: center;
+  }
+
+  /* 5. Ações */
+  th:nth-child(5),
+  td:nth-child(5) {
+    width: 330px;
+    min-width: 310px;
+    text-align: center;
+  }
 }
 
 .celulaQuestao {
@@ -122,6 +173,10 @@
   flex-wrap: wrap;
   gap: $esp-1;
   align-items: center;
+}
+
+.celulaAssuntos {
+  justify-content: flex-start;
 }
 
 .enunciadoTrecho {
@@ -140,10 +195,12 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  justify-content: flex-end;
+  justify-content: center;
+  width: 100%;
   white-space: nowrap;
 
   > button {
+    width: 88px;
     height: 32px;
     min-height: 32px;
     padding: 0 10px;

@@ -61,7 +61,7 @@ export function EstatisticasAluno() {
       <PageHeader
         titulo="Minhas Estatísticas"
         descricao="Acompanhe sua evolução pedagógica, notas por competência do ENEM e taxa de acertos em simulados."
-        
+        aoRecarregar={recarregar}
       />
 
       {/* Grade de KPIs */}

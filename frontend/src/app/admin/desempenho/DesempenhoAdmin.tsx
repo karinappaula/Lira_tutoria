@@ -267,6 +267,10 @@ export function DesempenhoAdmin() {
       <PageHeader
         titulo="Indicadores Institucionais"
         descricao="Acompanhe o rendimento pedagógico consolidado por turmas, competências do ENEM e desempenho comparativo entre tutores."
+        aoRecarregar={() => {
+          recarregarTurmas();
+          recarregarTutores();
+        }}
       />
 
       {/* Grade de KPIs Institucionais */}

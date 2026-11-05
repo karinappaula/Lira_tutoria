@@ -414,6 +414,7 @@ export function CadernoErrosAluno() {
       <PageHeader
         titulo="Caderno de Erros"
         descricao="Revise as questões que você errou em simulados anteriores. Teste seus conhecimentos diretamente no card ou gere um Simulado de Revisão cronometrado."
+        aoRecarregar={recarregar}
         acao={
           totalErros > 0 ? (
             <Button

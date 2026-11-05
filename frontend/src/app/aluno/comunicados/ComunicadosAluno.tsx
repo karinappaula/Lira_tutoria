@@ -44,6 +44,7 @@ export function ComunicadosAluno() {
       <PageHeader
         titulo="Comunicados e Avisos"
         descricao="Consulte avisos pedagógicos, recados gerais e comunicados enviados diretamente pelo seu tutor."
+        aoRecarregar={recarregar}
       />
 
       {/* Barra de Filtros */}

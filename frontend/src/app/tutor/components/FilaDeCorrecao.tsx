@@ -24,6 +24,7 @@ export function FilaDeCorrecao() {
     {
       chave: 'redacao',
       titulo: 'Redação',
+      alinhamento: 'esquerda',
       celula: (i) => (
         <div className={styles.dupla}>
           <strong>{titulo(i)}</strong>
@@ -34,6 +35,7 @@ export function FilaDeCorrecao() {
     {
       chave: 'solicitacao',
       titulo: 'Pedido',
+      alinhamento: 'centro',
       celula: (i) => <Badge tom="perigo">{`${(i.correcoes[0]?.numeroAjuste ?? 0) + 1}ª solicitação`}</Badge>,
     },
     {
@@ -44,7 +46,7 @@ export function FilaDeCorrecao() {
     {
       chave: 'acao',
       titulo: 'Ação',
-      alinhamento: 'direita',
+      alinhamento: 'centro',
       noCartao: 'acoes',
       celula: (i) => <LinkBotao href={`/tutor/fila/${i.idRedacao}`}>Corrigir novamente</LinkBotao>,
     },
@@ -54,6 +56,7 @@ export function FilaDeCorrecao() {
     {
       chave: 'redacao',
       titulo: 'Redação',
+      alinhamento: 'esquerda',
       celula: (i) => (
         <div className={styles.dupla}>
           <strong>{titulo(i)}</strong>
@@ -61,12 +64,12 @@ export function FilaDeCorrecao() {
         </div>
       ),
     },
-    { chave: 'tipo', titulo: 'Tipo', celula: (i) => (i.redacao.tipoFluxo === 'TREINO' ? 'Treino' : 'Avaliativa') },
-    { chave: 'envio', titulo: 'Enviada em', celula: (i) => (i.dataEnvio ? formatarDataHora(i.dataEnvio) : '—') },
+    { chave: 'tipo', titulo: 'Tipo', alinhamento: 'centro', celula: (i) => (i.redacao.tipoFluxo === 'TREINO' ? 'Treino' : 'Avaliativa') },
+    { chave: 'envio', titulo: 'Enviada em', alinhamento: 'centro', celula: (i) => (i.dataEnvio ? formatarDataHora(i.dataEnvio) : '—') },
     {
       chave: 'acao',
       titulo: 'Ação',
-      alinhamento: 'direita',
+      alinhamento: 'centro',
       noCartao: 'acoes',
       celula: (i) => <LinkBotao href={`/tutor/fila/${i.idRedacao}`}>Corrigir</LinkBotao>,
     },

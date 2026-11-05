@@ -12,29 +12,29 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 138px;
+  height: 104px;
   background: linear-gradient(180deg, #9cbdba 0%, $cor-auth-faixa 100%);
   border-bottom: 1px solid rgba(23, 41, 45, 0.12);
 
   @media (min-width: 768px) {
-    height: 160px;
+    height: 104px;
   }
 
   @include celular {
-    height: 104px;
+    height: 72px;
   }
 }
 
 .logo {
-  height: 118px;
+  height: 80px;
   width: auto;
 
   @media (min-width: 768px) {
-    height: 140px;
+    height: 80px;
   }
 
   @include celular {
-    height: 88px;
+    height: 52px;
   }
 }
 
@@ -48,4 +48,3 @@
     padding: $esp-5 $esp-4;
   }
 }
-

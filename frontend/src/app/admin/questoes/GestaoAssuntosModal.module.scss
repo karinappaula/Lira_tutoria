@@ -1,6 +1,42 @@
 @use 'variables' as *;
 @use 'mixins' as *;
 
+.caixaAlerta {
+  margin-bottom: $esp-4;
+}
+
+.textoVazio {
+  text-align: center;
+  color: $cor-texto-suave;
+  padding: $esp-5;
+}
+
+.modalConfirmacaoCorpo {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-2;
+  padding-block: $esp-2;
+}
+
+.textoConfirmacao {
+  font-size: 0.95rem;
+  color: $cor-texto;
+  line-height: 1.5;
+
+  strong {
+    color: $cor-primaria;
+  }
+}
+
+.avisoQuestoesVinculadas {
+  font-size: 0.85rem;
+  color: $cor-alerta-texto;
+  background: $cor-alerta-suave;
+  padding: $esp-2 $esp-3;
+  border-radius: $raio-sm;
+  border: 1px solid rgba(181, 120, 0, 0.25);
+}
+
 .formularioNovo {
   display: flex;
   gap: $esp-3;

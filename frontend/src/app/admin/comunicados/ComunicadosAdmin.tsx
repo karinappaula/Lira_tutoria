@@ -82,7 +82,7 @@ export function ComunicadosAdmin() {
     {
       chave: 'acoes',
       titulo: 'Ações',
-      alinhamento: 'direita',
+      alinhamento: 'centro',
       noCartao: 'acoes',
       celula: (c) => (
         <div className={styles.grupoAcoes}>

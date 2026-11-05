@@ -164,6 +164,7 @@ export function TemasTutor() {
     {
       chave: 'titulo',
       titulo: 'Título do Tema',
+      alinhamento: 'esquerda',
       celula: (t) => (
         <div className={styles.celulaTitulo}>
           <strong>{t.tituloTema}</strong>
@@ -174,6 +175,7 @@ export function TemasTutor() {
     {
       chave: 'origem',
       titulo: 'Origem',
+      alinhamento: 'centro',
       celula: (t) => {
         const meu = ehMeuTema(t);
         return (
@@ -198,7 +200,7 @@ export function TemasTutor() {
     {
       chave: 'acoes',
       titulo: 'Ações',
-      alinhamento: 'direita',
+      alinhamento: 'centro',
       noCartao: 'acoes',
       celula: (t) => {
         const meu = ehMeuTema(t);
@@ -246,6 +248,7 @@ export function TemasTutor() {
       <PageHeader
         titulo="Banco de Temas"
         descricao="Consulte os temas oficiais e cadastre propostas personalizadas para as tarefas do seu grupo."
+        aoRecarregar={recarregar}
         acao={
           <Button icone={<Plus size={18} aria-hidden="true" />} onClick={abrirCriacao}>
             Novo tema

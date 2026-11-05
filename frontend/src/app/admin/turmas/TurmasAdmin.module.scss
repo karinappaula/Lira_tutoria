@@ -330,15 +330,27 @@
 
 .acoesLinha {
   display: flex;
+  width: 100%;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
+  flex-direction: column;
   gap: $esp-2;
-  flex-wrap: wrap;
+
+  > button {
+    box-sizing: border-box;
+    width: 128px;
+    min-height: 32px;
+    justify-content: center;
+  }
 
   @include celular {
-    justify-content: flex-start;
+    align-items: stretch;
     width: 100%;
     margin-top: $esp-2;
+
+    > button {
+      width: 100%;
+    }
   }
 }
 

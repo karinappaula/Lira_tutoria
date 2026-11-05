@@ -62,7 +62,7 @@ export function VersoesDaRedacao({
               className={cx(styles.aba, i === indice && styles.abaAtiva)}
               onClick={() => setIndice(i)}
             >
-              {v.numeroVersao === 1 ? 'Versão 1' : 'Reescrita (versão 2)'}
+              {v.numeroVersao === 1 ? 'Versão 1' : 'Reescrita'}
             </button>
           ))}
         </div>
@@ -70,7 +70,7 @@ export function VersoesDaRedacao({
 
       <section id={`painel-versao-${versao.id}`} role="tabpanel" aria-labelledby={`aba-versao-${versao.id}`} className={styles.painel}>
         <header className={styles.cabecalho}>
-          <h2 className={styles.titulo}>{versao.numeroVersao === 1 ? 'Versão 1' : 'Reescrita (versão 2)'}</h2>
+          <h2 className={styles.titulo}>{versao.numeroVersao === 1 ? 'Versão 1' : 'Reescrita'}</h2>
           <Badge tom={status.tom}>{status.rotulo}</Badge>
           {versao.dataEnvio && <span className={styles.data}>Enviada em {formatarDataHora(versao.dataEnvio)}</span>}
         </header>

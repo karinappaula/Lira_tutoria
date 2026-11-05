@@ -184,6 +184,10 @@ export function ComunicadosTutor() {
       <PageHeader
         titulo="Central de Comunicados"
         descricao="Consulte avisos recebidos da administração e envie comunicados diretos aos seus tutorados."
+        aoRecarregar={() => {
+          void recarregarRecebidos();
+          void recarregarEnviados();
+        }}
         acao={
           <Button
             variante="primario"

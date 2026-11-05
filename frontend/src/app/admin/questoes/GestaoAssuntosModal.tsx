@@ -32,6 +32,7 @@ export function GestaoAssuntosModal({ aberto, aoFechar, assuntos, aoAtualizar }:
 
   // Exclusão
   const [idExcluindo, setIdExcluindo] = useState<number | null>(null);
+  const [assuntoParaExcluir, setAssuntoParaExcluir] = useState<Assunto | null>(null);
 
   async function handleCriar(e: React.FormEvent) {
     e.preventDefault();
@@ -81,23 +82,22 @@ export function GestaoAssuntosModal({ aberto, aoFechar, assuntos, aoAtualizar }:
     }
   }
 
-  async function handleExcluir(assunto: Assunto) {
-    const qtd = assunto._count?.questoes ?? 0;
-    const confirmacao = window.confirm(
-      qtd > 0
-        ? `Atenção: O assunto "${assunto.nomeAssunto}" está associado a ${qtd} questão(ões). Deseja realmente excluí-lo?`
-        : `Deseja realmente excluir o assunto "${assunto.nomeAssunto}"?`,
-    );
-    if (!confirmacao) return;
+  function solicitarExclusao(assunto: Assunto) {
+    setAssuntoParaExcluir(assunto);
+  }
 
-    setIdExcluindo(assunto.id);
+  async function confirmarExclusao() {
+    if (!assuntoParaExcluir) return;
+    const id = assuntoParaExcluir.id;
+    setIdExcluindo(id);
     setErro(null);
     try {
-      await questoesService.excluirAssunto(assunto.id);
-      toast.sucesso('Assunto removido!');
+      await questoesService.excluirAssunto(id);
+      toast.sucesso('Assunto excluído com sucesso');
+      setAssuntoParaExcluir(null);
       aoAtualizar();
     } catch (err) {
-      setErro(mensagemDeErro(err));
+      toast.erro(mensagemDeErro(err));
     } finally {
       setIdExcluindo(null);
     }
@@ -117,7 +117,7 @@ export function GestaoAssuntosModal({ aberto, aoFechar, assuntos, aoAtualizar }:
     >
       <div>
         {erro && (
-          <div style={{ marginBottom: '16px' }}>
+          <div className={styles.caixaAlerta}>
             <Alerta tom="erro">{erro}</Alerta>
           </div>
         )}
@@ -145,13 +145,12 @@ export function GestaoAssuntosModal({ aberto, aoFechar, assuntos, aoAtualizar }:
 
         <div className={styles.listaAssuntos}>
           {assuntos.length === 0 ? (
-            <p style={{ textAlign: 'center', color: '#6b7d80', padding: '24px' }}>
+            <p className={styles.textoVazio}>
               Nenhum assunto cadastrado ainda. Use o formulário acima para criar o primeiro.
             </p>
           ) : (
             assuntos.map((assunto) => {
               const estaEditando = idEditando === assunto.id;
-              const estaExcluindo = idExcluindo === assunto.id;
 
               return (
                 <div key={assunto.id} className={styles.itemAssunto}>
@@ -206,8 +205,7 @@ export function GestaoAssuntosModal({ aberto, aoFechar, assuntos, aoAtualizar }:
                           tamanho="sm"
                           variante="perigo"
                           icone={<Trash2 size={14} aria-hidden="true" />}
-                          carregando={estaExcluindo}
-                          onClick={() => void handleExcluir(assunto)}
+                          onClick={() => solicitarExclusao(assunto)}
                         >
                           Excluir
                         </Button>
@@ -220,6 +218,43 @@ export function GestaoAssuntosModal({ aberto, aoFechar, assuntos, aoAtualizar }:
           )}
         </div>
       </div>
+
+      {/* Modal Customizado de Confirmação de Exclusão */}
+      <Modal
+        aberto={Boolean(assuntoParaExcluir)}
+        aoFechar={() => setAssuntoParaExcluir(null)}
+        titulo="Confirmar Exclusão"
+        tamanho="sm"
+        rodape={
+          <>
+            <Button
+              variante="secundario"
+              disabled={idExcluindo !== null}
+              onClick={() => setAssuntoParaExcluir(null)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variante="perigo"
+              carregando={idExcluindo !== null}
+              onClick={() => void confirmarExclusao()}
+            >
+              Confirmar Exclusão
+            </Button>
+          </>
+        }
+      >
+        <div className={styles.modalConfirmacaoCorpo}>
+          <p className={styles.textoConfirmacao}>
+            Deseja realmente excluir o assunto <strong>{assuntoParaExcluir?.nomeAssunto}</strong>?
+          </p>
+          {assuntoParaExcluir && (assuntoParaExcluir._count?.questoes ?? 0) > 0 && (
+            <p className={styles.avisoQuestoesVinculadas}>
+              Atenção: Este assunto está associado a {assuntoParaExcluir._count?.questoes} questão(ões).
+            </p>
+          )}
+        </div>
+      </Modal>
     </Modal>
   );
 }

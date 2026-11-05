@@ -210,7 +210,7 @@ export function SimuladosAluno() {
     {
       chave: 'acoes',
       titulo: 'Ações',
-      alinhamento: 'direita',
+      alinhamento: 'centro',
       noCartao: 'acoes',
       celula: (s) => (
         <div className={styles.grupoAcoes}>
@@ -245,6 +245,7 @@ export function SimuladosAluno() {
       <PageHeader
         titulo="Meus Simulados"
         descricao="Pratique com questões de vestibulares oficiais em tempo real, acompanhe o cronômetro e consulte gabaritos comentados."
+        aoRecarregar={recarregar}
         acao={
           <Button
             variante="primario"

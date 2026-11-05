@@ -189,6 +189,7 @@ export function TemasAdmin() {
     {
       chave: 'origem',
       titulo: 'Origem',
+      alinhamento: 'centro',
       celula: (t) => {
         const o = (t.origem || 'ADMIN').toUpperCase();
         return <Badge tom={obterTomOrigem(o)}>{o}</Badge>;
@@ -209,7 +210,7 @@ export function TemasAdmin() {
     {
       chave: 'acoes',
       titulo: 'Ações',
-      alinhamento: 'direita',
+      alinhamento: 'centro',
       noCartao: 'acoes',
       celula: (t) => (
         <div className={styles.grupoAcoes}>
@@ -250,6 +251,7 @@ export function TemasAdmin() {
       <PageHeader
         titulo="Banco de Temas"
         descricao="Cadastre e gerencie temas oficiais e monitore temas criados por tutores e alunos."
+        aoRecarregar={recarregar}
         acao={
           <Button icone={<Plus size={18} aria-hidden="true" />} onClick={abrirCriacao}>
             Novo tema

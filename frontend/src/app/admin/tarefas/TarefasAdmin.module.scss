@@ -133,9 +133,48 @@
 .tabelaContainer {
   width: 100%;
   overflow-x: auto;
+  border-radius: $raio-lg;
 
-  th {
-    text-align: center !important;
+  table {
+    min-width: 1180px;
+    table-layout: auto;
+  }
+
+  th,
+  td {
+    padding: 12px 14px;
+    vertical-align: middle;
+    box-sizing: border-box;
+  }
+
+  th:first-child,
+  td:first-child {
+    min-width: 240px;
+    text-align: left;
+  }
+
+  th:nth-child(2),
+  td:nth-child(2) {
+    min-width: 200px;
+    text-align: left;
+  }
+
+  th:nth-child(3),
+  td:nth-child(3) {
+    min-width: 150px;
+    text-align: center;
+  }
+
+  th:nth-child(4),
+  td:nth-child(4) {
+    min-width: 170px;
+    text-align: center;
+  }
+
+  th:nth-child(5),
+  td:nth-child(5) {
+    min-width: 90px;
+    text-align: center;
   }
 
   th:last-child,
@@ -145,6 +184,11 @@
     background: $cor-superficie;
     z-index: 2;
     box-shadow: -4px 0 8px -2px rgba(23, 41, 45, 0.08);
+    min-width: 440px;
+    width: 440px;
+    padding: 10px 14px;
+    text-align: center;
+    white-space: nowrap;
   }
 
   tr:hover td:last-child {
@@ -192,34 +236,42 @@
 .celulaAnexos {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
 }
 
 /* ---------- Grupo de Ações da Tabela ---------- */
 .grupoAcoes {
-  display: inline-flex;
+  display: flex;
+  width: 100%;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   gap: $esp-2;
   flex-wrap: nowrap;
+  white-space: nowrap;
 
   > button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 5px;
-    height: 32px;
-    padding: 0 12px;
+    gap: 6px;
+    min-width: 92px;
+    min-height: 34px;
+    height: 34px;
+    padding: 0 10px;
     margin: 0;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     white-space: nowrap;
+    flex-shrink: 0;
   }
 
   @include tablet {
     gap: $esp-1;
 
     > button {
+      min-width: 86px;
       padding: 0 8px;
+      font-size: 0.76rem;
     }
   }
 

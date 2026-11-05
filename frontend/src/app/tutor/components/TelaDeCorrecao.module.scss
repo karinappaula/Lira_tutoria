@@ -32,10 +32,14 @@
 
 .layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  grid-template-columns: minmax(0, 53fr) minmax(0, 47fr);
   gap: $esp-5;
   align-items: start;
   padding-bottom: 96px;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: minmax(0, 53fr) minmax(0, 47fr);
+  }
 
   @include tablet {
     grid-template-columns: minmax(0, 1fr);
@@ -53,22 +57,110 @@
 .textoColuna {
   position: sticky;
   top: $esp-4;
-  max-height: calc(100dvh - #{$esp-6});
-  overflow-y: auto;
-  padding-right: 4px;
+  overflow: visible;
 
   @include tablet {
     position: static;
-    max-height: none;
     overflow: visible;
     padding-right: 0;
   }
+}
+
+.containerTextoAluno {
+  overflow: visible;
+  position: relative;
+}
+
+.secaoMarcacoesIntegrada {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-3;
+  margin-top: $esp-4;
+  padding-top: $esp-4;
+  border-top: 1px solid $cor-borda;
+}
+
+.subtituloMarcacoes {
+  margin: 0;
+  color: $cor-texto;
+  font-size: 1rem;
+  font-weight: 700;
 }
 
 .instrucao {
   margin-bottom: $esp-3;
   color: $cor-texto-suave;
   font-size: 0.9rem;
+}
+
+/* Mini-modal / Popover inline para cadastro de marcação */
+.miniModalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $esp-3;
+  background: rgba(23, 41, 45, 0.45);
+  backdrop-filter: blur(2px);
+}
+
+.miniModal {
+  width: min(460px, 94vw);
+  overflow: hidden;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-lg;
+  background: $cor-superficie;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+}
+
+.miniModalCabecalho,
+.miniModalRodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $esp-3 $esp-4;
+  background: $cor-fundo;
+}
+
+.miniModalCabecalho {
+  border-bottom: 1px solid $cor-borda;
+}
+
+.miniModalRodape {
+  justify-content: flex-end;
+  gap: $esp-3;
+  border-top: 1px solid $cor-borda;
+}
+
+.miniModalTitulo {
+  margin: 0;
+  color: $cor-texto;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.miniModalBotaoFechar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: $raio-sm;
+  background: transparent;
+  color: $cor-texto-suave;
+  cursor: pointer;
+}
+
+.miniModalCorpo {
+  display: flex;
+  max-height: 70vh;
+  flex-direction: column;
+  gap: $esp-3;
+  overflow-y: auto;
+  padding: $esp-4;
 }
 
 .painelMarca {
@@ -168,6 +260,13 @@
   flex-direction: column;
   gap: 2px;
   min-width: 0;
+  flex: 1;
+}
+
+.acoesMarcaItem {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .sugestaoTexto {

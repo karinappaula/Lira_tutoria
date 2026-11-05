@@ -154,26 +154,33 @@
 
 /* ---------- Grupo de Ações da Tabela ---------- */
 .grupoAcoes {
-  display: inline-flex;
+  display: flex;
+  width: 100%;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
+  flex-direction: column;
   gap: $esp-2;
-  flex-wrap: wrap;
+
+  > button {
+    box-sizing: border-box;
+    width: 112px;
+    min-height: 32px;
+    justify-content: center;
+
+    > svg {
+      flex-shrink: 0;
+    }
+  }
 
   @include tablet {
     gap: $esp-1;
   }
 
   @include celular {
-    display: flex;
-    width: 100%;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: $esp-2;
+    align-items: stretch;
 
-    > * {
-      flex: 1 1 calc(50% - #{$esp-1});
-      min-width: 90px;
+    > button {
+      width: 100%;
     }
   }
 }

@@ -129,6 +129,91 @@
   color: $cor-texto-suave;
 }
 
+.tabelaHistorico {
+  width: 100%;
+  overflow-x: auto;
+
+  table {
+    min-width: 1360px;
+  }
+
+  th,
+  td {
+    padding: 12px 12px;
+    vertical-align: middle;
+  }
+
+  /* 1. Data da Correção - amplo espaçamento à direita em relação à coluna Aluno */
+  th:nth-child(1),
+  td:nth-child(1) {
+    width: 190px;
+    min-width: 180px;
+    padding-right: 28px;
+    text-align: left;
+  }
+
+  /* 2. Aluno - bom respiro à esquerda */
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 200px;
+    min-width: 180px;
+    padding-left: 20px;
+    text-align: left;
+  }
+
+  /* 3. Turma */
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 130px;
+    min-width: 120px;
+  }
+
+  /* 4. Tutor */
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 155px;
+    min-width: 140px;
+    text-align: left;
+  }
+
+  /* 5. Modalidade */
+  th:nth-child(5),
+  td:nth-child(5) {
+    width: 125px;
+    min-width: 115px;
+  }
+
+  /* 6. Versão */
+  th:nth-child(6),
+  td:nth-child(6) {
+    width: 90px;
+    min-width: 80px;
+  }
+
+  /* 7. Nota Final */
+  th:nth-child(7),
+  td:nth-child(7) {
+    width: 115px;
+    min-width: 105px;
+  }
+
+  /* 8. Status (ex.: 'Aguardando revisão do Admin', 'Ajuste solicitado') */
+  th:nth-child(8),
+  td:nth-child(8) {
+    width: 250px;
+    min-width: 240px;
+    white-space: nowrap;
+    padding-inline: 8px;
+  }
+
+  /* 9. Ação */
+  th:nth-child(9),
+  td:nth-child(9) {
+    width: 105px;
+    min-width: 100px;
+  }
+}
+
 /* ---------- Células da Tabela ---------- */
 .alunoLinha {
   display: flex;
@@ -162,6 +247,18 @@
   font-size: 0.85rem;
   font-weight: 600;
   color: $cor-texto;
+}
+
+.statusBadge {
+  min-width: 220px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+  padding: 4px 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
 }
 
 .acoesLinha {

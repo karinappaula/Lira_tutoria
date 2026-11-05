@@ -25,7 +25,8 @@ interface Props<T> {
 }
 
 /**
- * Computador e tablet: tabela no estilo do protótipo.
+ * Computador e tablet: tabela no estilo do protótipo com textos à esquerda,
+ * dados operacionais centralizados e espaçamentos padronizados.
  * Celular: cada linha vira um cartão (sem rolagem horizontal).
  */
 export function Tabela<T>({ colunas, linhas, chaveDaLinha, descricao }: Props<T>) {
@@ -52,6 +53,7 @@ export function Tabela<T>({ colunas, linhas, chaveDaLinha, descricao }: Props<T>
                     scope="col"
                     className={cx(
                       styles.th,
+                      styles[c.alinhamento ?? 'esquerda'],
                       ehAcoes && styles.colunaFixaDireitaTh
                     )}
                   >

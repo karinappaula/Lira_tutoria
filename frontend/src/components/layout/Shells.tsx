@@ -36,8 +36,8 @@ export function ShellAdmin({ children }: { children: ReactNode }) {
         contador: pendentes > 0 ? pendentes : undefined,
       },
       { href: '/admin/historico', rotulo: 'Histórico geral' },
-      { href: '/admin/desempenho', rotulo: 'Desempenho por Turma' },
-      { href: '/admin/questoes', rotulo: 'Banco de Questões' },
+      { href: '/admin/desempenho', rotulo: 'Desempenho por turma' },
+      { href: '/admin/questoes', rotulo: 'Banco de questões' },
       { href: '/admin/comunicados', rotulo: 'Comunicados' },
     ],
     [pendentes],
@@ -74,9 +74,9 @@ export function ShellAluno({ children }: { children: ReactNode }) {
 
   const menu = useMemo<ItemDeMenu[]>(
     () => [
-      { href: '/aluno/redacoes', rotulo: 'Minhas Redações', icone: FileText },
+      { href: '/aluno/redacoes', rotulo: 'Minhas redações', icone: FileText },
       { href: '/aluno/simulados', rotulo: 'Simulados', icone: GraduationCap },
-      { href: '/aluno/caderno-erros', rotulo: 'Caderno de Erros', icone: Notebook },
+      { href: '/aluno/caderno-erros', rotulo: 'Caderno de erros', icone: Notebook },
       { href: '/aluno/estatisticas', rotulo: 'Estatísticas', icone: BarChart3 },
       {
         href: '/aluno/comunicados',
@@ -131,7 +131,7 @@ export function ShellTutor({ children }: { children: ReactNode }) {
       { href: '/tutor/temas', rotulo: 'Banco de temas' },
       { href: '/tutor/fila', rotulo: 'Fila de correção', contador: fila.dados?.length },
       { href: '/tutor/historico', rotulo: 'Histórico' },
-      { href: '/tutor/desempenho', rotulo: 'Desempenho em Redações' },
+      { href: '/tutor/desempenho', rotulo: 'Desempenho em redações' },
       {
         href: '/tutor/comunicados',
         rotulo: 'Comunicados',

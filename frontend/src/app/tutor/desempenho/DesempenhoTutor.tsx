@@ -90,6 +90,7 @@ export function DesempenhoTutor() {
     {
       chave: 'nome',
       titulo: 'Aluno',
+      alinhamento: 'esquerda',
       celula: (a) => <strong>{a.nome}</strong>,
     },
     {
@@ -142,7 +143,7 @@ export function DesempenhoTutor() {
     {
       chave: 'acoes',
       titulo: 'Evolução',
-      alinhamento: 'direita',
+      alinhamento: 'centro',
       noCartao: 'acoes',
       celula: (a) => (
         <Button
@@ -162,6 +163,7 @@ export function DesempenhoTutor() {
     {
       chave: 'nome',
       titulo: 'Aluno',
+      alinhamento: 'esquerda',
       celula: (a) => <strong>{a.nome}</strong>,
     },
     {
@@ -192,7 +194,7 @@ export function DesempenhoTutor() {
     {
       chave: 'acoes',
       titulo: 'Evolução',
-      alinhamento: 'direita',
+      alinhamento: 'centro',
       noCartao: 'acoes',
       celula: (a) => (
         <Button
@@ -215,6 +217,10 @@ export function DesempenhoTutor() {
       <PageHeader
         titulo="Desempenho dos Tutorados"
         descricao="Acompanhe a evolução pedagógica, notas por competência e aproveitamento em simulados dos alunos sob sua tutoria."
+        aoRecarregar={() => {
+          recarregarRedacoes();
+          recarregarSimulados();
+        }}
       />
 
       {/* Grade de KPIs */}

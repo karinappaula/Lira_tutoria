@@ -3,24 +3,22 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, RotateCcw, Send, Trash2 } from 'lucide-react';
+import { ArrowLeft, RotateCcw, Send, X } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { TextoMarcado, type SelecaoDeTrecho } from '@/components/redacao/TextoMarcado';
 import { Alerta } from '@/components/ui/Alerta/Alerta';
-import { Badge } from '@/components/ui/Badge/Badge';
 import { Button } from '@/components/ui/Button/Button';
 import { Card } from '@/components/ui/Card/Card';
-import { Select } from '@/components/ui/Campos/Campos';
+import { Input, Select } from '@/components/ui/Campos/Campos';
 import { ErrorState } from '@/components/ui/Estados/Estados';
 import { Modal } from '@/components/ui/Modal/Modal';
 import { CarregandoPagina } from '@/components/ui/Spinner/Spinner';
 import { useToast } from '@/components/ui/Toast/Toast';
 import { useBuscar } from '@/hooks/useBuscar';
-import { cx } from '@/lib/cx';
 import { numero, sobrepoe, ultimaCorrecao, type MarcaVisual } from '@/lib/correcoes';
 import { ApiError, mensagemDeErro } from '@/lib/erros';
 import { tituloDaRedacao } from '@/lib/redacoes';
-import { COMPETENCIAS, infoDoTipo, LIMITE_SUGESTAO, LIMITE_TEXTO, LIMITE_TRECHO, NIVEIS, TIPOS_DE_ERRO, type Nivel } from '@/lib/rubrica';
+import { CATEGORIAS_MARCACAO, COMPETENCIAS, LIMITE_SUGESTAO, LIMITE_TEXTO, LIMITE_TRECHO, NIVEIS, type Nivel } from '@/lib/rubrica';
 import { redacoesService } from '@/services/redacoes';
 import { avisarFilaMudou, tutorService } from '@/services/tutor';
 import type { NovaCorrecao, RedacaoDetalhada, VersaoComCorrecoes } from '@/types/correcoes';
@@ -98,6 +96,7 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
   );
   const [parecer, setParecer] = useState(anterior?.parecerGeral ?? '');
   const [recado, setRecado] = useState(anterior?.recadoAdmin ?? '');
+
   const [marcas, setMarcas] = useState<MarcaEditavel[]>(() =>
     (anterior?.anotacoes ?? []).map((a) => ({
       chave: a.id,
@@ -110,6 +109,7 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
 
   const [selecao, setSelecao] = useState<SelecaoDeTrecho | null>(null);
   const [tipo, setTipo] = useState('');
+  const [tipoCustomizado, setTipoCustomizado] = useState('');
   const [sugestao, setSugestao] = useState('');
   const [erroMarca, setErroMarca] = useState<string | null>(null);
   const [marcaAtiva, setMarcaAtiva] = useState<number | null>(null);
@@ -129,6 +129,10 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
   const topoRef = useRef<HTMLDivElement>(null);
 
   const aoSelecionar = useCallback((s: SelecaoDeTrecho) => {
+    if (typeof window !== 'undefined') {
+      const sel = window.getSelection();
+      if (!sel || sel.toString().trim().length === 0) return;
+    }
     setSelecao(s);
     setErroMarca(null);
   }, []);
@@ -149,20 +153,22 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
 
   function abrirModalReescrita() {
     if (!podeSolicitarReescrita) {
-      setAvisoGeral('Para solicitar uma reescrita, preencha as notas das competências e insira ao menos um parecer ou comentário orientativo.');
+      setAvisoGeral('Para solicitar uma reescrita, preencha as notas das 5 competências e insira ao menos um parecer ou comentário orientativo.');
       topoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
+    setAvisoGeral(null);
     setErroReescrita(null);
     setConfirmandoReescrita(true);
   }
 
   function adicionarMarca() {
     if (!selecao) return;
-    if (!tipo) return setErroMarca('Escolha o tipo de erro deste trecho.');
+    const tipoFinal = tipo === 'Outro...' ? tipoCustomizado.trim() : tipo;
+    if (!tipoFinal) return setErroMarca(tipo === 'Outro...' ? 'Digite o nome da categoria personalizada.' : 'Escolha a categoria do desvio.');
     if (marcas.some((m) => sobrepoe(m, selecao))) return setErroMarca('Esse trecho já tem uma marcação. Selecione outro trecho ou remova a existente.');
     if (selecao.fim - selecao.inicio > LIMITE_TRECHO) return setErroMarca(`Selecione um trecho menor (até ${LIMITE_TRECHO} caracteres).`);
-    const nova: MarcaEditavel = { chave: proximaChave.current--, inicio: selecao.inicio, fim: selecao.fim, tipoErro: tipo, sugestao: sugestao.trim() };
+    const nova: MarcaEditavel = { chave: proximaChave.current--, inicio: selecao.inicio, fim: selecao.fim, tipoErro: tipoFinal, sugestao: sugestao.trim() };
     setMarcas((atuais) => [...atuais, nova].sort((a, b) => a.inicio - b.inicio));
     cancelarSelecao();
   }
@@ -170,6 +176,7 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
   function cancelarSelecao() {
     setSelecao(null);
     setTipo('');
+    setTipoCustomizado('');
     setSugestao('');
     setErroMarca(null);
     window.getSelection()?.removeAllRanges();
@@ -226,7 +233,7 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
 
   async function solicitarReescritaPelaCorrecao() {
     if (!podeSolicitarReescrita) {
-      setAvisoGeral('Para solicitar uma reescrita, preencha as notas das competências e insira ao menos um parecer ou comentário orientativo.');
+      setAvisoGeral('Para solicitar uma reescrita, preencha as notas das 5 competências e insira ao menos um parecer ou comentário orientativo.');
       setConfirmandoReescrita(false);
       topoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
@@ -276,7 +283,7 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
     <>
       <PageHeader
         titulo={`Corrigir: ${tituloDaRedacao(redacao)}`}
-        descricao={`${redacao.aluno?.usuario.nome ?? 'Aluno'} · ${versao.numeroVersao === 2 ? 'Reescrita (versão 2)' : 'Versão 1'} · ${ehAvaliativa ? 'Redação avaliativa' : 'Redação de treino'}`}
+        descricao={`${redacao.aluno?.usuario.nome ?? 'Aluno'} · ${versao.numeroVersao === 2 ? 'Reescrita' : 'Versão 1'} · ${ehAvaliativa ? 'Redação avaliativa' : 'Redação de treino'}`}
       />
 
       <div ref={topoRef} className={styles.avisos}>
@@ -296,104 +303,65 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
       <div className={styles.layout}>
         <div className={styles.textoColuna}>
           <Card titulo="Texto do aluno">
-            <p className={styles.instrucao}>Selecione um trecho com o mouse (ou com o dedo, no celular) para marcar um erro e escrever a sugestão.</p>
-            <TextoMarcado
-              texto={texto}
-              marcas={marcasVisuais}
-              marcaAtiva={marcaAtiva}
-              aoClicarMarca={(m) => {
-                const chave = Number(m.chave);
-                setMarcaAtiva((a) => (a === chave ? null : chave));
-                const el = document.getElementById(`marca-card-${chave}`);
-                el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-              }}
-              aoSelecionar={aoSelecionar}
-              selecaoPendente={selecao}
-              rotulo="Texto da redação do aluno"
-            />
+            <p className={styles.instrucao}>Selecione um trecho com o mouse para marcar um erro e escrever a sugestão.</p>
+            <div className={styles.containerTextoAluno} onClick={() => setMarcaAtiva(null)}>
+              <TextoMarcado
+                texto={texto}
+                marcas={marcasVisuais}
+                marcaAtiva={marcaAtiva}
+                aoClicarMarca={(m) => {
+                  const chave = Number(m.chave);
+                  setMarcaAtiva((a) => (a === chave ? null : chave));
+                }}
+                aoExcluirMarca={(m) => {
+                  setMarcas((a) => a.filter((x) => x.chave !== m.chave));
+                  if (marcaAtiva === m.chave) setMarcaAtiva(null);
+                }}
+                aoSelecionar={aoSelecionar}
+                selecaoPendente={selecao}
+                rotulo="Texto da redação do aluno"
+              />
+            </div>
           </Card>
 
           {selecao && (
-            <Card titulo="Marcar trecho selecionado" className={styles.painelMarca}>
-              <p className={styles.trecho}>“{texto.slice(selecao.inicio, selecao.fim)}”</p>
-              <Select rotulo="Tipo de erro" value={tipo} onChange={(e) => setTipo(e.target.value)}>
-                <option value="">Escolha o tipo</option>
-                {TIPOS_DE_ERRO.map((t) => (
-                  <option key={t.valor} value={t.valor}>
-                    {t.valor}
-                  </option>
-                ))}
-              </Select>
-              <label className={styles.rotuloSugestao} htmlFor="sugestao-marca">
-                Sugestão para o aluno (opcional)
-              </label>
-              <textarea id="sugestao-marca" className={styles.sugestao} value={sugestao} onChange={(e) => setSugestao(e.target.value)} maxLength={LIMITE_SUGESTAO} rows={3} placeholder="Como o aluno pode melhorar este trecho?" />
-              {erroMarca && <p className={styles.erro} role="alert">{erroMarca}</p>}
-              <div className={styles.botoesMarca}>
-                <Button variante="secundario" onClick={cancelarSelecao}>
-                  Cancelar
-                </Button>
-                <Button onClick={adicionarMarca}>Adicionar marcação</Button>
+            <div className={styles.miniModalOverlay} onClick={cancelarSelecao}>
+              <div className={styles.miniModal} role="dialog" aria-modal="true" aria-labelledby="titulo-mini-modal" onClick={(e) => e.stopPropagation()}>
+                <div className={styles.miniModalCabecalho}>
+                  <h3 id="titulo-mini-modal" className={styles.miniModalTitulo}>Nova marcação no texto</h3>
+                  <button type="button" className={styles.miniModalBotaoFechar} onClick={cancelarSelecao} aria-label="Cancelar">
+                    <X size={18} aria-hidden="true" />
+                  </button>
+                </div>
+                <div className={styles.miniModalCorpo}>
+                  <p className={styles.trecho}>“{texto.slice(selecao.inicio, selecao.fim)}”</p>
+                  <Select rotulo="Categoria / Tipo de Erro" value={tipo} onChange={(e) => setTipo(e.target.value)}>
+                    <option value="">Escolha a categoria</option>
+                    {CATEGORIAS_MARCACAO.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
+                    <option value="Outro...">Outro...</option>
+                  </Select>
+                  {tipo === 'Outro...' && (
+                    <Input
+                      rotulo="Categoria personalizada"
+                      placeholder="Ex: Vocabulário, Sintaxe, Pontuação..."
+                      value={tipoCustomizado}
+                      onChange={(e) => setTipoCustomizado(e.target.value)}
+                      maxLength={60}
+                      autoFocus
+                    />
+                  )}
+                  <label className={styles.rotuloSugestao} htmlFor="sugestao-marca">Sugestão / Explicação</label>
+                  <textarea id="sugestao-marca" className={styles.sugestao} value={sugestao} onChange={(e) => setSugestao(e.target.value)} maxLength={LIMITE_SUGESTAO} rows={3} placeholder="Escreva a sugestão ou explicação pedagógica..." />
+                  {erroMarca && <p className={styles.erro} role="alert">{erroMarca}</p>}
+                </div>
+                <div className={styles.miniModalRodape}>
+                  <Button variante="secundario" onClick={cancelarSelecao}>Cancelar</Button>
+                  <Button onClick={adicionarMarca}>Confirmar</Button>
+                </div>
               </div>
-            </Card>
+            </div>
           )}
         </div>
-
-        <aside className={styles.painelLateralMarcas} aria-label="Painel de marcações da redação">
-          <Card titulo={`Marcações (${marcas.length})`} className={styles.cartaoMarcas}>
-            {marcas.length === 0 ? (
-              <p className={styles.instrucao}>Nenhuma marcação ainda. Selecione trechos no texto para apontar melhorias.</p>
-            ) : (
-              <div className={styles.containerListaMarcas}>
-                <ul className={styles.listaMarcas}>
-                  {marcas.map((m) => {
-                    const ativa = marcaAtiva === m.chave;
-                    return (
-                      <li
-                        key={m.chave}
-                        id={`marca-card-${m.chave}`}
-                        className={cx(styles.itemMarca, ativa && styles.itemMarcaAtivo)}
-                        onClick={() => {
-                          setMarcaAtiva(m.chave);
-                          const el = document.getElementById(`marca-trecho-${m.chave}`);
-                          el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        }}
-                        role="button"
-                        tabIndex={0}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            setMarcaAtiva(m.chave);
-                            const el = document.getElementById(`marca-trecho-${m.chave}`);
-                            el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                          }
-                        }}
-                      >
-                        <div className={styles.conteudoMarcaItem}>
-                          <Badge tom="neutro">{infoDoTipo(m.tipoErro).valor}</Badge>
-                          <p className={styles.trecho}>“{texto.slice(m.inicio, m.fim)}”</p>
-                          {m.sugestao && <p className={styles.sugestaoTexto}>{m.sugestao}</p>}
-                        </div>
-                        <button
-                          type="button"
-                          className={styles.remover}
-                          aria-label={`Remover marcação: ${texto.slice(m.inicio, m.fim)}`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setMarcas((a) => a.filter((x) => x.chave !== m.chave));
-                            if (marcaAtiva === m.chave) setMarcaAtiva(null);
-                          }}
-                        >
-                          <Trash2 size={16} aria-hidden="true" />
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            )}
-          </Card>
-        </aside>
 
         <div className={styles.fichaColuna}>
           {COMPETENCIAS.map((comp, i) => (
@@ -423,8 +391,16 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
           </Card>
 
           {ehAvaliativa && (
-            <Card titulo="Recado para a Administração (opcional)">
-              <textarea className={styles.sugestao} value={recado} onChange={(e) => setRecado(e.target.value)} maxLength={LIMITE_TEXTO} rows={3} aria-label="Recado para a Administração" placeholder="Observações que só a Administração verá." />
+            <Card titulo="Recado para o Admin (opcional)">
+              <textarea
+                className={styles.sugestao}
+                value={recado}
+                onChange={(e) => setRecado(e.target.value)}
+                maxLength={LIMITE_TEXTO}
+                rows={3}
+                aria-label="Recado para o Admin"
+                placeholder="Mensagem ou observação direcionada à administração do sistema."
+              />
               <p className={styles.contador}>
                 {recado.length}/{LIMITE_TEXTO}
               </p>
@@ -444,10 +420,10 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
               variante="secundario"
               icone={<RotateCcw size={16} aria-hidden="true" />}
               onClick={abrirModalReescrita}
-              disabled={enviando || enviandoReescrita || !podeSolicitarReescrita}
+              disabled={enviando || enviandoReescrita}
               title={
                 !podeSolicitarReescrita
-                  ? 'Para solicitar uma reescrita, preencha as notas das competências e insira ao menos um parecer ou comentário orientativo.'
+                  ? 'Para solicitar uma reescrita, preencha as notas das 5 competências e insira ao menos um parecer ou comentário orientativo.'
                   : undefined
               }
             >
@@ -529,7 +505,7 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
             Ao confirmar, o status da redação será alterado para <strong>'Reescrita solicitada'</strong> e o envio será reaberto para o aluno.
           </p>
           <p className={styles.instrucaoModal}>
-            O aluno receberá a notificação de reescrita e poderá redigir a <strong>Versão 2</strong> (com validação obrigatória de 8 a 30 linhas), consultando suas marcações e feedback no painel dele.
+            O aluno receberá a notificação de reescrita e poderá redigir a <strong>Reescrita</strong> (com validação obrigatória de 8 a 30 linhas), consultando suas marcações e feedback no painel dele.
           </p>
         </div>
       </Modal>

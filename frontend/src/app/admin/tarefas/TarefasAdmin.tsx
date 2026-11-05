@@ -389,6 +389,7 @@ export function TarefasAdmin() {
     {
       chave: 'prazo',
       titulo: 'Prazo Sugerido',
+      alinhamento: 'centro',
       celula: (t) => formatarDataHora(t.prazoEntrega),
     },
     {
@@ -418,7 +419,7 @@ export function TarefasAdmin() {
     {
       chave: 'acoes',
       titulo: 'Ações',
-      alinhamento: 'direita',
+      alinhamento: 'centro',
       noCartao: 'acoes',
       celula: (t) => (
         <div className={styles.grupoAcoes}>
@@ -470,6 +471,7 @@ export function TarefasAdmin() {
       <PageHeader
         titulo="Tarefas Gerais"
         descricao="Cadastre tarefas de redação com anexos para que os tutores possam replicar aos seus grupos."
+        aoRecarregar={recarregar}
         acao={
           <Button icone={<Plus size={18} aria-hidden="true" />} onClick={abrirCriacao}>
             Nova tarefa geral
@@ -982,13 +984,6 @@ export function TarefasAdmin() {
             )}
 
             <div className={styles.botoesModal}>
-              <Button
-                variante="secundario"
-                icone={<Edit2 size={16} />}
-                onClick={() => janela?.tipo === 'detalhes' && abrirEdicao(janela.tarefa)}
-              >
-                Editar tarefa
-              </Button>
               <Button onClick={fecharJanela}>Fechar</Button>
             </div>
           </div>
