@@ -17,12 +17,20 @@ export function useBuscar<T>(buscar: (signal: AbortSignal) => Promise<T>, chave:
   const [estado, setEstado] = useState<Estado<T>>({ dados: null, carregando: true, erro: null });
   const [tentativa, setTentativa] = useState(0);
   const buscarRef = useRef(buscar);
+  const ultimaChaveRef = useRef(chave);
   const ultimaRevalidacaoRef = useRef(0);
   buscarRef.current = buscar;
 
   useEffect(() => {
+    const mudouChave = ultimaChaveRef.current !== chave;
+    ultimaChaveRef.current = chave;
+
     const controle = new AbortController();
-    setEstado((atual) => ({ ...atual, carregando: true, erro: null }));
+    setEstado((atual) => ({
+      ...atual,
+      carregando: mudouChave || atual.dados === null,
+      erro: null,
+    }));
     buscarRef
       .current(controle.signal)
       .then((dados) => setEstado({ dados, carregando: false, erro: null }))
