@@ -13,6 +13,7 @@
 
 .selecionavel {
   cursor: text;
+  -webkit-user-select: text;
   user-select: text;
 }
 
@@ -31,10 +32,6 @@
   &:focus-visible {
     outline: 3px solid rgba(0, 107, 112, 0.5);
   }
-}
-
-.marcaSemClique {
-  cursor: text;
 }
 
 .ativa {

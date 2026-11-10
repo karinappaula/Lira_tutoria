@@ -198,44 +198,6 @@
   color: $cor-texto;
 }
 
-.detalheMarcacao {
-  padding: $esp-3 $esp-4;
-  background: $cor-primaria-suave;
-  border-left: 4px solid $cor-primaria;
-  border-radius: $raio-sm;
-  display: flex;
-  flex-direction: column;
-  gap: $esp-2;
-  animation: surgir 0.2s ease-out;
-}
-
-.tipoMarcacao {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: $cor-primaria;
-  margin: 0;
-}
-
-.trechoMarcado {
-  font-size: 0.88rem;
-  font-style: italic;
-  color: $cor-texto;
-  margin: 0;
-}
-
-.sugestaoMarcacao {
-  font-size: 0.85rem;
-  color: $cor-texto;
-  margin: 0;
-}
-
-.dicaClique {
-  font-size: 0.8rem;
-  color: $cor-texto-suave;
-  font-style: italic;
-  margin: 0;
-}
-
 /* Painel Direito: Avaliação, Notas e Parecer */
 .cardNotaGeral {
   display: flex;
@@ -427,16 +389,5 @@
     button {
       width: 100%;
     }
-  }
-}
-
-@keyframes surgir {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }

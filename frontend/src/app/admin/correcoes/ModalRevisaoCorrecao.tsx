@@ -65,12 +65,6 @@ export function ModalRevisaoCorrecao({ correcao, aberto, aoFechar, aoSucesso }: 
     }));
   }, [correcao?.anotacoes]);
 
-  // Anotação atualmente selecionada
-  const anotacaoAtiva = useMemo(() => {
-    if (!correcao || marcaAtiva === null) return null;
-    return correcao.anotacoes.find((a) => a.id === marcaAtiva);
-  }, [correcao, marcaAtiva]);
-
   // Tipos presentes no texto para a legenda
   const tiposPresentes = useMemo(() => {
     if (!correcao?.anotacoes) return [];
@@ -211,7 +205,7 @@ export function ModalRevisaoCorrecao({ correcao, aberto, aoFechar, aoSucesso }: 
                   icone={<RotateCcw size={16} aria-hidden="true" />}
                   carregando={processando}
                   onClick={() => void executarAprovacao(true)}
-                  disabled={processando}
+                  disabled={processando || numeroVersao > 1}
                 >
                   Aprovar Correção + Reescrita
                 </Button>
@@ -223,6 +217,11 @@ export function ModalRevisaoCorrecao({ correcao, aberto, aoFechar, aoSucesso }: 
     >
       <div className={styles.modalRevisao}>
         {erro && <Alerta tom="erro">{erro}</Alerta>}
+        {numeroVersao > 1 && (
+          <Alerta tom="alerta">
+            A única reescrita permitida já foi utilizada. Aprove apenas a correção ou solicite ajuste ao tutor.
+          </Alerta>
+        )}
 
         {/* Metadados Superiores */}
         <div className={styles.cabecalhoMeta}>
@@ -343,27 +342,6 @@ export function ModalRevisaoCorrecao({ correcao, aberto, aoFechar, aoSucesso }: 
                 />
               </div>
 
-              {anotacaoAtiva ? (
-                <div className={styles.detalheMarcacao} role="status">
-                  <p className={styles.tipoMarcacao}>
-                    {infoDoTipo(anotacaoAtiva.tipoErro).valor}
-                    {infoDoTipo(anotacaoAtiva.tipoErro).competencia && (
-                      <span> · Competência {infoDoTipo(anotacaoAtiva.tipoErro).competencia}</span>
-                    )}
-                  </p>
-                  <p className={styles.trechoMarcado}>“{anotacaoAtiva.textoSelecionado}”</p>
-                  <p className={styles.sugestaoMarcacao}>
-                    <strong>Observação do tutor:</strong>{' '}
-                    {anotacaoAtiva.sugestaoComentario || 'Sem comentário específico para este trecho.'}
-                  </p>
-                </div>
-              ) : (
-                correcao.anotacoes.length > 0 && (
-                  <p className={styles.dicaClique}>
-                    Toque ou clique em qualquer trecho marcado acima para inspecionar os detalhes do apontamento.
-                  </p>
-                )
-              )}
             </div>
           </div>
 

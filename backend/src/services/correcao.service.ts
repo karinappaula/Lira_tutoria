@@ -283,6 +283,13 @@ export async function aprovarCorrecao(
   if (correcao.statusAprovacao !== STATUS_CORRECAO.PENDENTE) {
     throw new ErroNegocio("Esta correção não está pendente de aprovação.", 409, "STATUS_INVALIDO");
   }
+  if (aprovarReescrita && correcao.versao.numeroVersao > 1) {
+    throw new ErroNegocio(
+      "A única reescrita permitida já foi utilizada.",
+      409,
+      "LIMITE_REESCRITA"
+    );
+  }
 
   const statusVersao = aprovarReescrita ? "REESCRITA_SOLICITADA" : "CORRIGIDA";
 

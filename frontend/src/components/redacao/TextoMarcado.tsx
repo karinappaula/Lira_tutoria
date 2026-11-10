@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Trash2 } from 'lucide-react';
 import { cx } from '@/lib/cx';
 import { construirSegmentos, sobrepoe, type MarcaVisual } from '@/lib/correcoes';
@@ -49,6 +49,7 @@ function posicaoNoTexto(no: Node, deslocamento: number, raiz: HTMLElement, taman
  */
 export function TextoMarcado({ texto, marcas, marcaAtiva, aoClicarMarca, aoExcluirMarca, aoSelecionar, selecaoPendente, rotulo }: Props) {
   const raiz = useRef<HTMLDivElement>(null);
+  const [marcaInternaAtiva, setMarcaInternaAtiva] = useState<string | number | null>(null);
 
   const todas = useMemo<MarcaVisual[]>(() => {
     const lista = [...marcas];
@@ -79,6 +80,18 @@ export function TextoMarcado({ texto, marcas, marcaAtiva, aoClicarMarca, aoExclu
     if (fim > inicio) aoSelecionar({ inicio, fim });
   };
 
+  const tratarSelecaoPorToque = () => {
+    if (typeof window !== 'undefined') window.requestAnimationFrame(tratarSelecao);
+  };
+
+  const ativarMarca = (marca: MarcaVisual) => {
+    if (aoClicarMarca) {
+      aoClicarMarca(marca);
+    } else {
+      setMarcaInternaAtiva((atual) => (atual === marca.chave ? null : marca.chave));
+    }
+  };
+
   return (
     <div
       ref={raiz}
@@ -87,6 +100,7 @@ export function TextoMarcado({ texto, marcas, marcaAtiva, aoClicarMarca, aoExclu
       aria-label={rotulo}
       data-raiz
       onMouseUp={tratarSelecao}
+      onTouchEnd={tratarSelecaoPorToque}
     >
       {segmentos.map((s) => {
         if (!s.marca) {
@@ -105,38 +119,31 @@ export function TextoMarcado({ texto, marcas, marcaAtiva, aoClicarMarca, aoExclu
         }
         const info = infoDoTipo(s.marca.tipoErro);
         const marca = s.marca;
-        const clicavel = Boolean(aoClicarMarca);
-        const ehAtiva = marcaAtiva === marca.chave || (marcaAtiva !== null && marcaAtiva !== undefined && String(marcaAtiva) === String(marca.chave));
+        const marcaAtivaAtual = marcaAtiva === undefined ? marcaInternaAtiva : marcaAtiva;
+        const ehAtiva = marcaAtivaAtual === marca.chave || (marcaAtivaAtual !== null && String(marcaAtivaAtual) === String(marca.chave));
         return (
           <span
             key={`m-${marca.chave}`}
             id={`marca-trecho-${marca.chave}`}
             data-inicio={s.inicio}
-            role={clicavel ? 'button' : undefined}
-            tabIndex={clicavel ? 0 : undefined}
+            role="button"
+            tabIndex={0}
             aria-label={`Trecho marcado: ${info.valor}. ${marca.sugestao || ''}`}
             className={cx(
               styles.marca,
               styles[info.estilo],
               ehAtiva && styles.ativa,
-              !clicavel && styles.marcaSemClique,
             )}
             onClick={(e) => {
-              if (clicavel) {
-                e.stopPropagation();
-                aoClicarMarca?.(marca);
+              e.stopPropagation();
+              ativarMarca(marca);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                ativarMarca(marca);
               }
             }}
-            onKeyDown={
-              clicavel
-                ? (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      aoClicarMarca?.(marca);
-                    }
-                  }
-                : undefined
-            }
           >
             {s.texto}
             <span
