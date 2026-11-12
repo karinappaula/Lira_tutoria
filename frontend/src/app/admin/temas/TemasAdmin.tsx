@@ -368,7 +368,9 @@ export function TemasAdmin() {
       {/* Modal Criar / Editar Tema */}
       <Modal
         aberto={janela?.tipo === 'novo' || janela?.tipo === 'editar'}
-        aoFechar={fecharJanela}
+        aoFechar={() => {
+          if (janela?.tipo === 'novo' || janela?.tipo === 'editar') fecharJanela();
+        }}
         titulo={janela?.tipo === 'novo' ? 'Novo Tema de Redação' : 'Editar Tema'}
       >
         <form className={styles.formulario} onSubmit={salvar} noValidate>
@@ -425,7 +427,9 @@ export function TemasAdmin() {
       {/* Modal Detalhes do Tema */}
       <Modal
         aberto={janela?.tipo === 'detalhes'}
-        aoFechar={fecharJanela}
+        aoFechar={() => {
+          if (janela?.tipo === 'detalhes') fecharJanela();
+        }}
         titulo={janela?.tipo === 'detalhes' ? janela.tema.tituloTema : 'Detalhes do Tema'}
       >
         {janela?.tipo === 'detalhes' && (

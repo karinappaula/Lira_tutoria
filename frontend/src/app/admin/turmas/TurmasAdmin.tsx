@@ -491,9 +491,11 @@ export function TurmasAdmin() {
         aberto={modalIntegrantesAberto}
         aoFechar={() => {
           setModalIntegrantesAberto(false);
-          setTurmaSelecionada(null);
         }}
-        aoAbrirConvite={(t) => abrirConvite(t)}
+        aoAbrirConvite={(t) => {
+          setModalIntegrantesAberto(false);
+          abrirConvite(t);
+        }}
         aoAtualizarTurma={recarregar}
       />
 

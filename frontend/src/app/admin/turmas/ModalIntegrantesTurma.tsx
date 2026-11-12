@@ -91,10 +91,7 @@ export function ModalIntegrantesTurma({
                 variante="secundario"
                 tamanho="sm"
                 icone={<UserPlus size={16} aria-hidden="true" />}
-                onClick={() => {
-                  aoFechar();
-                  aoAbrirConvite(turma);
-                }}
+                onClick={() => aoAbrirConvite(turma)}
                 disabled={turma.status !== 'ATIVA' || tutores.length >= 6}
               >
                 Convidar tutores
@@ -127,10 +124,7 @@ export function ModalIntegrantesTurma({
                 <Button
                   variante="primario"
                   icone={<UserPlus size={16} aria-hidden="true" />}
-                  onClick={() => {
-                    aoFechar();
-                    aoAbrirConvite(turma);
-                  }}
+                  onClick={() => aoAbrirConvite(turma)}
                   disabled={turma.status !== 'ATIVA'}
                 >
                   Gerar convite de tutor

@@ -38,6 +38,24 @@
   background: $cor-fundo;
 }
 
+.blocoExplicativoReescrita {
+  display: flex;
+  flex-direction: column;
+  gap: $esp-1;
+  padding: $esp-3 $esp-4;
+  border: 1px solid $cor-borda;
+  border-radius: $raio-md;
+  background: $cor-primaria-suave;
+  color: $cor-texto;
+  font-size: 0.9rem;
+  line-height: 1.5;
+
+  strong {
+    color: $cor-primaria;
+    font-size: 0.92rem;
+  }
+}
+
 .layout {
   display: grid;
   grid-template-columns: minmax(0, 53fr) minmax(0, 47fr);

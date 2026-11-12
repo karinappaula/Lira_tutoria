@@ -17,7 +17,7 @@ import { useToast } from '@/components/ui/Toast/Toast';
 import { useBuscar } from '@/hooks/useBuscar';
 import { numero, sobrepoe, ultimaCorrecao, type MarcaVisual } from '@/lib/correcoes';
 import { ApiError, mensagemDeErro } from '@/lib/erros';
-import { tituloDaRedacao } from '@/lib/redacoes';
+import { contarLinhas, tituloDaRedacao } from '@/lib/redacoes';
 import { CATEGORIAS_MARCACAO, COMPETENCIAS, LIMITE_SUGESTAO, LIMITE_TEXTO, LIMITE_TRECHO, NIVEIS, type Nivel } from '@/lib/rubrica';
 import { redacoesService } from '@/services/redacoes';
 import { avisarFilaMudou, tutorService } from '@/services/tutor';
@@ -83,6 +83,7 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
   const anterior = ultimaCorrecao(versao); // em "Corrigir novamente", parte da correção anterior
   const ehAvaliativa = redacao.tipoFluxo === 'AVALIATIVA';
   const texto = versao.conteudoTexto;
+  const linhasRedacao = contarLinhas(texto);
 
   const [niveis, setNiveis] = useState<Niveis>(() =>
     anterior
@@ -309,9 +310,10 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
 
       {ehAvaliativa && versao.numeroVersao === 1 && (
         <div className={styles.avisoReescritaFixo}>
-          <Alerta tom="info">
-            Para redações com nota total abaixo de 700, recomenda-se solicitar uma reescrita ao aluno.
-          </Alerta>
+          <div className={styles.blocoExplicativoReescrita} role="note">
+            <strong>Critério para recomendação de reescrita</strong>
+            <span>Para redações com nota total abaixo de 700, recomenda-se solicitar uma reescrita ao aluno.</span>
+          </div>
         </div>
       )}
 
@@ -333,6 +335,11 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
         <div className={styles.textoColuna}>
           <Card titulo="Texto do aluno">
             <p className={styles.instrucao}>Selecione um trecho com o mouse para marcar um erro e escrever a sugestão.</p>
+            {linhasRedacao > 30 && (
+              <Alerta tom="alerta">
+                Esta redação ultrapassou o limite de 30 linhas ({linhasRedacao} linhas). O tutor pode continuar a correção normalmente.
+              </Alerta>
+            )}
             <div className={styles.containerTextoAluno} onClick={() => setMarcaAtiva(null)}>
               <TextoMarcado
                 texto={texto}
