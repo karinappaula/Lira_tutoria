@@ -30,6 +30,14 @@
   scroll-margin-top: $esp-5;
 }
 
+.avisoReescritaFixo {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  padding-block: $esp-2;
+  background: $cor-fundo;
+}
+
 .layout {
   display: grid;
   grid-template-columns: minmax(0, 53fr) minmax(0, 47fr);

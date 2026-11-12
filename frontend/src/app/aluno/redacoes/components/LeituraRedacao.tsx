@@ -24,6 +24,26 @@ export function LeituraRedacao({ redacao, aoAtualizar }: { redacao: RedacaoDetal
   const toast = useToast();
   const [criando, setCriando] = useState(false);
   const ultima = redacao.versoes[redacao.versoes.length - 1];
+  const versaoUm = redacao.versoes.find((versao) => versao.numeroVersao === 1);
+  const correcaoV1 = versaoUm?.correcoes[versaoUm.correcoes.length - 1];
+  const notasCompetenciasV1 = correcaoV1
+    ? [
+        correcaoV1.notaComp1,
+        correcaoV1.notaComp2,
+        correcaoV1.notaComp3,
+        correcaoV1.notaComp4,
+        correcaoV1.notaComp5,
+      ]
+    : [];
+  const notaTotalV1 = correcaoV1?.notaTotal !== null && correcaoV1?.notaTotal !== undefined
+    ? Number(correcaoV1.notaTotal)
+    : notasCompetenciasV1.length === 5 && notasCompetenciasV1.every((nota) => nota !== null)
+      ? notasCompetenciasV1.reduce<number>((total, nota) => total + Number(nota), 0)
+      : Number.NaN;
+  const podeIniciarReescrita = notaTotalV1 < 700;
+  const statusPermiteReescrita =
+    ultima?.statusVersao === 'AGUARDANDO_REESCRITA' ||
+    ultima?.statusVersao === 'REESCRITA_SOLICITADA';
 
   async function comecarReescrita() {
     setCriando(true);
@@ -53,9 +73,13 @@ export function LeituraRedacao({ redacao, aoAtualizar }: { redacao: RedacaoDetal
               item.numeroVersao === 2
           ))
       }
-      mensagem={(v: VersaoComCorrecoes) => MENSAGEM[v.statusVersao] ?? null}
+      mensagem={(v: VersaoComCorrecoes) =>
+        v.id === ultima?.id && statusPermiteReescrita && !podeIniciarReescrita
+          ? 'A reescrita só pode ser iniciada quando a nota total da versão 1 for abaixo de 700.'
+          : MENSAGEM[v.statusVersao] ?? null
+      }
       acoes={(v) =>
-        v.id === ultima?.id && (v.statusVersao === 'AGUARDANDO_REESCRITA' || v.statusVersao === 'REESCRITA_SOLICITADA') ? (
+        v.id === ultima?.id && statusPermiteReescrita && podeIniciarReescrita ? (
           <Button icone={<PencilLine size={18} aria-hidden="true" />} carregando={criando} onClick={() => void comecarReescrita()}>
             Começar reescrita
           </Button>

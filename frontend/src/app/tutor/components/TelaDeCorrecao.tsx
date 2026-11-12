@@ -146,15 +146,22 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
   const faltam = niveis.filter((n) => n === null).length;
 
   const temNotasC1aC5 = niveis.every((n) => n !== null);
+  const notaAbaixoLimiteReescrita = temNotasC1aC5 && parcial < 700;
   const temOrientacao =
     parecer.trim().length > 0 ||
     marcas.length > 0 ||
     comentarios.some((c) => c.trim().length > 0);
-  const podeSolicitarReescrita = temNotasC1aC5 && temOrientacao;
+  const podeSolicitarReescrita = notaAbaixoLimiteReescrita && temOrientacao;
+  const notaAtingiuLimiteReescrita = parcial >= 700;
+  const mostrarChecklistReescrita = ehAvaliativa && versao.numeroVersao === 1 && !notaAtingiuLimiteReescrita;
 
   function abrirModalReescrita() {
     if (!podeSolicitarReescrita) {
-      setAvisoGeral('Para solicitar uma reescrita, preencha as notas das 5 competências e insira ao menos um parecer ou comentário orientativo.');
+      setAvisoGeral(
+        temNotasC1aC5 && parcial >= 700
+          ? 'A reescrita só pode ser recomendada quando a nota total for abaixo de 700.'
+          : 'Para solicitar uma reescrita, preencha as notas das 5 competências e insira ao menos um parecer ou comentário orientativo.'
+      );
       topoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
@@ -243,7 +250,11 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
 
   async function solicitarReescritaPelaCorrecao() {
     if (!podeSolicitarReescrita) {
-      setAvisoGeral('Para solicitar uma reescrita, preencha as notas das 5 competências e insira ao menos um parecer ou comentário orientativo.');
+      setAvisoGeral(
+        temNotasC1aC5 && parcial >= 700
+          ? 'A reescrita só pode ser solicitada quando a nota total for abaixo de 700.'
+          : 'Para solicitar uma reescrita, preencha as notas das 5 competências e insira ao menos um parecer ou comentário orientativo.'
+      );
       setConfirmandoReescrita(false);
       topoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
@@ -295,6 +306,14 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
         titulo={`Corrigir: ${tituloDaRedacao(redacao)}`}
         descricao={`${redacao.aluno?.usuario.nome ?? 'Aluno'} · ${versao.numeroVersao === 2 ? 'Reescrita' : 'Versão 1'} · ${ehAvaliativa ? 'Redação avaliativa' : 'Redação de treino'}`}
       />
+
+      {ehAvaliativa && versao.numeroVersao === 1 && (
+        <div className={styles.avisoReescritaFixo}>
+          <Alerta tom="info">
+            Para redações com nota total abaixo de 700, recomenda-se solicitar uma reescrita ao aluno.
+          </Alerta>
+        </div>
+      )}
 
       <div ref={topoRef} className={styles.avisos}>
         {avisoGeral && <Alerta tom="erro">{avisoGeral}</Alerta>}
@@ -380,7 +399,11 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
               competencia={comp}
               nivel={niveis[i] ?? null}
               aoEscolherNivel={(n) => {
-                setNiveis((a) => a.map((x, j) => (j === i ? n : x)));
+                const atualizados = niveis.map((x, j) => (j === i ? n : x));
+                if (atualizados.reduce<number>((total, nivel) => total + (nivel ?? 0), 0) >= 700) {
+                  setRecomendarReescrita(false);
+                }
+                setNiveis(atualizados);
                 setErrosNivel((a) => a.map((x, j) => (j === i ? undefined : x)));
               }}
               comentario={comentarios[i] ?? ''}
@@ -427,7 +450,7 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
         <div className={styles.botoesBarraFixa}>
           {ehAvaliativa ? (
             <>
-              {versao.numeroVersao === 1 && (
+              {mostrarChecklistReescrita && (
                 <label className={styles.checkboxReescrita}>
                   <input
                     type="checkbox"
@@ -453,9 +476,11 @@ function FormularioDeCorrecao({ redacao, versao }: { redacao: RedacaoDetalhada; 
                   variante="secundario"
                   icone={<RotateCcw size={16} aria-hidden="true" />}
                   onClick={abrirModalReescrita}
-                  disabled={enviando || enviandoReescrita}
+                  disabled={enviando || enviandoReescrita || (temNotasC1aC5 && parcial >= 700)}
                   title={
-                    !podeSolicitarReescrita
+                    temNotasC1aC5 && parcial >= 700
+                      ? 'A reescrita só pode ser solicitada quando a nota total for abaixo de 700.'
+                      : !podeSolicitarReescrita
                       ? 'Para solicitar uma reescrita, preencha as notas das 5 competências e insira ao menos um parecer ou comentário orientativo.'
                       : undefined
                   }

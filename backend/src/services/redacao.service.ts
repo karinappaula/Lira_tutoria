@@ -1,7 +1,11 @@
 import { prisma } from "../db/prisma";
 import { ErroNegocio } from "../errors/erros";
 import { registrarAuditoria } from "./auditoria.service";
-import { paraVisaoDoAluno, STATUS_VISIVEIS_AO_ALUNO } from "./correcao.service";
+import {
+  LIMITE_NOTA_REESCRITA,
+  paraVisaoDoAluno,
+  STATUS_VISIVEIS_AO_ALUNO,
+} from "./correcao.service";
 import type { PapelAtivo } from "./token.service";
 
 export type TipoFluxoRedacao = "TREINO" | "AVALIATIVA";
@@ -69,6 +73,37 @@ function enriquecerTarefa<T extends { tarefa?: any }>(item: T): T {
 }
 
 const CONTEUDO_MAXIMO = 100_000;
+
+async function exigirNotaReescritaAbaixoDoLimite(idVersao: number) {
+  const correcao = await prisma.correcao.findFirst({
+    where: { idVersao },
+    orderBy: { numeroAjuste: "desc" },
+    select: {
+      notaTotal: true,
+      notaComp1: true,
+      notaComp2: true,
+      notaComp3: true,
+      notaComp4: true,
+      notaComp5: true,
+    },
+  });
+  const notas = correcao
+    ? [correcao.notaComp1, correcao.notaComp2, correcao.notaComp3, correcao.notaComp4, correcao.notaComp5]
+    : [];
+  const notaTotal = correcao?.notaTotal !== null && correcao?.notaTotal !== undefined
+    ? Number(correcao.notaTotal)
+    : notas.length === 5 && notas.every((nota) => nota !== null)
+      ? notas.reduce((total, nota) => total + Number(nota), 0)
+      : Number.NaN;
+
+  if (!(notaTotal < LIMITE_NOTA_REESCRITA)) {
+    throw new ErroNegocio(
+      "A reescrita só pode ser iniciada, editada ou enviada quando a nota total for abaixo de 700.",
+      409,
+      "REESCRITA_NOTA_MINIMA"
+    );
+  }
+}
 
 function validarConteudo(conteudoTexto: string | undefined): string {
   const conteudo = conteudoTexto ?? "";
@@ -263,6 +298,13 @@ export async function salvarRascunho(
       "VERSAO_BLOQUEADA"
     );
   }
+  if (versao.numeroVersao === 2) {
+    const versaoUm = redacao.versoes.find((item) => item.numeroVersao === 1);
+    if (!versaoUm) {
+      throw new ErroNegocio("A versão 1 da redação não foi encontrada.", 409, "REESCRITA_INDISPONIVEL");
+    }
+    await exigirNotaReescritaAbaixoDoLimite(versaoUm.id);
+  }
 
   return prisma.versaoRedacao.update({
     where: { id: versao.id },
@@ -296,6 +338,13 @@ export async function enviarVersao(idUsuarioAluno: number, idRedacao: number) {
       409,
       "VERSAO_BLOQUEADA"
     );
+  }
+  if (versao.numeroVersao === 2) {
+    const versaoUm = redacao.versoes.find((item) => item.numeroVersao === 1);
+    if (!versaoUm) {
+      throw new ErroNegocio("A versão 1 da redação não foi encontrada.", 409, "REESCRITA_INDISPONIVEL");
+    }
+    await exigirNotaReescritaAbaixoDoLimite(versaoUm.id);
   }
   if (!versao.conteudoTexto.trim()) {
     throw new ErroNegocio("Não é possível enviar uma redação vazia.", 400, "CONTEUDO_OBRIGATORIO");
@@ -352,6 +401,7 @@ export async function criarReescrita(idUsuarioAluno: number, idRedacao: number) 
       "REESCRITA_NAO_LIBERADA"
     );
   }
+  await exigirNotaReescritaAbaixoDoLimite(versaoUm.id);
 
   return prisma.$transaction(async (tx) => {
     const versaoDois = await tx.versaoRedacao.create({
@@ -452,11 +502,28 @@ export async function solicitarReescrita(idUsuarioTutor: number, idRedacao: numb
       [ultimaCorrecao.comentarioComp1, ultimaCorrecao.comentarioComp2, ultimaCorrecao.comentarioComp3, ultimaCorrecao.comentarioComp4, ultimaCorrecao.comentarioComp5].some((c) => Boolean(c && c.trim().length > 0))
     );
 
-  if (!tem5Notas || !temOrientacao) {
+  if (!ultimaCorrecao || !tem5Notas || !temOrientacao) {
     throw new ErroNegocio(
       "Para solicitar uma reescrita, preencha as notas das competências e insira ao menos um parecer ou comentário orientativo.",
       400,
       "REESCRITA_AVALIACAO_INCOMPLETA"
+    );
+  }
+  const notasUltimaCorrecao = [
+    ultimaCorrecao.notaComp1,
+    ultimaCorrecao.notaComp2,
+    ultimaCorrecao.notaComp3,
+    ultimaCorrecao.notaComp4,
+    ultimaCorrecao.notaComp5,
+  ];
+  const notaTotalUltimaCorrecao = ultimaCorrecao.notaTotal !== null
+    ? Number(ultimaCorrecao.notaTotal)
+    : notasUltimaCorrecao.reduce((total, nota) => total + Number(nota), 0);
+  if (!(notaTotalUltimaCorrecao < LIMITE_NOTA_REESCRITA)) {
+    throw new ErroNegocio(
+      "A reescrita só pode ser solicitada quando a nota total for abaixo de 700.",
+      409,
+      "REESCRITA_NOTA_MINIMA"
     );
   }
 

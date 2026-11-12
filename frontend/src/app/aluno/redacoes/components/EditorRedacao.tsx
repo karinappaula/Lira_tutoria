@@ -46,6 +46,15 @@ export function EditorRedacao({ redacao }: { redacao: RedacaoDetalhada }) {
   const ehReescrita = versao?.numeroVersao === 2;
   const versaoUm = redacao.versoes.find((v) => v.numeroVersao === 1);
   const correcaoV1 = versaoUm ? ultimaCorrecao(versaoUm) : undefined;
+  const notasV1 = correcaoV1
+    ? [correcaoV1.notaComp1, correcaoV1.notaComp2, correcaoV1.notaComp3, correcaoV1.notaComp4, correcaoV1.notaComp5]
+    : [];
+  const notaTotalV1 = correcaoV1?.notaTotal !== null && correcaoV1?.notaTotal !== undefined
+    ? Number(correcaoV1.notaTotal)
+    : notasV1.length === 5 && notasV1.every((nota) => nota !== null)
+      ? notasV1.reduce<number>((total, nota) => total + Number(nota), 0)
+      : Number.NaN;
+  const reescritaBloqueada = ehReescrita && !(notaTotalV1 < 700);
   const [gaveta, setGaveta] = useState<'correcao' | 'tema' | null>(null);
 
   const prazoVencido = !ehReescrita && redacao.tarefa ? prazoEncerrado(redacao.tarefa.prazoEntrega) : false;
@@ -89,6 +98,10 @@ export function EditorRedacao({ redacao }: { redacao: RedacaoDetalhada }) {
   }
 
   async function enviar() {
+    if (reescritaBloqueada) {
+      setErroDaJanela('A reescrita só pode ser enviada quando a nota total da versão 1 for abaixo de 700.');
+      return;
+    }
     if (linhas < MIN_LINHAS) {
       setErroDaJanela('Sua redação possui menos de 8 linhas. Mínimo exigido: 8 linhas');
       return;
@@ -140,7 +153,7 @@ export function EditorRedacao({ redacao }: { redacao: RedacaoDetalhada }) {
     return { icone: <Check size={16} aria-hidden="true" />, texto: salvoEm ? `Salvo às ${formatarHora(salvoEm)}` : 'Tudo salvo', tom: styles.ok };
   })();
 
-  const bloqueado = estado === 'bloqueado';
+  const bloqueado = estado === 'bloqueado' || reescritaBloqueada;
 
   return (
     <>
@@ -194,9 +207,15 @@ export function EditorRedacao({ redacao }: { redacao: RedacaoDetalhada }) {
 
           {bloqueado && (
             <div className={styles.espaco}>
-              <Alerta tom="erro">
-                Esta versão já foi enviada ou bloqueada. <button type="button" className={styles.link} onClick={() => router.refresh()}>Atualizar a página</button>
-              </Alerta>
+              {reescritaBloqueada ? (
+                <Alerta tom="erro">
+                  A reescrita só pode ser editada ou enviada quando a nota total da versão 1 for abaixo de 700.
+                </Alerta>
+              ) : (
+                <Alerta tom="erro">
+                  Esta versão já foi enviada ou bloqueada. <button type="button" className={styles.link} onClick={() => router.refresh()}>Atualizar a página</button>
+                </Alerta>
+              )}
             </div>
           )}
           {prazoVencido && (

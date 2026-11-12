@@ -4,6 +4,7 @@ import { registrarAuditoria } from "./auditoria.service";
 import type { PapelAtivo } from "./token.service";
 
 export const TAG_REESCRITA = "[RECOMENDAR_REESCRITA]";
+export const LIMITE_NOTA_REESCRITA = 700;
 
 export function enriquecerCorrecaoComReescrita<T extends { recadoAdmin?: string | null }>(correcao: T) {
   const solicitarReescrita = Boolean(correcao.recadoAdmin?.includes(TAG_REESCRITA));
@@ -178,6 +179,14 @@ export async function criarCorrecao(idUsuarioTutor: number, input: CriarCorrecao
 
   const notas = [input.notaComp1, input.notaComp2, input.notaComp3, input.notaComp4, input.notaComp5];
   notas.forEach((nota, index) => validarNota(nota, `notaComp${index + 1}`));
+  const notaTotal = notas.reduce((total, nota) => total + nota, 0);
+  if (input.solicitarReescrita && notaTotal >= LIMITE_NOTA_REESCRITA) {
+    throw new ErroNegocio(
+      "A reescrita só pode ser recomendada quando a nota total for abaixo de 700.",
+      409,
+      "REESCRITA_NOTA_MINIMA"
+    );
+  }
   validarAnotacoes(input.anotacoes, versao.conteudoTexto);
 
   const comentarios = [
@@ -212,7 +221,7 @@ export async function criarCorrecao(idUsuarioTutor: number, input: CriarCorrecao
         notaComp3: input.notaComp3,
         notaComp4: input.notaComp4,
         notaComp5: input.notaComp5,
-        notaTotal: notas.reduce((total, nota) => total + nota, 0),
+        notaTotal,
         comentarioComp1: comentarios[0],
         comentarioComp2: comentarios[1],
         comentarioComp3: comentarios[2],
@@ -288,6 +297,25 @@ export async function aprovarCorrecao(
       "A única reescrita permitida já foi utilizada.",
       409,
       "LIMITE_REESCRITA"
+    );
+  }
+  const notasDaCorrecao = [
+    correcao.notaComp1,
+    correcao.notaComp2,
+    correcao.notaComp3,
+    correcao.notaComp4,
+    correcao.notaComp5,
+  ];
+  const notaTotal = correcao.notaTotal !== null
+    ? Number(correcao.notaTotal)
+    : notasDaCorrecao.every((nota) => nota !== null)
+      ? notasDaCorrecao.reduce((total, nota) => total + Number(nota), 0)
+      : Number.NaN;
+  if (aprovarReescrita && !(notaTotal < LIMITE_NOTA_REESCRITA)) {
+    throw new ErroNegocio(
+      "A reescrita só pode ser aprovada quando a nota total for abaixo de 700.",
+      409,
+      "REESCRITA_NOTA_MINIMA"
     );
   }
 

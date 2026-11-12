@@ -85,7 +85,20 @@ export function ModalRevisaoCorrecao({ correcao, aberto, aoFechar, aoSucesso }: 
     'Tema Geral de Redação';
   const numeroVersao = correcao.versao.numeroVersao;
   const textoRedacao = correcao.versao.conteudoTexto;
-  const notaTotalNum = Number(correcao.notaTotal) || 0;
+  const notasCompetencias = [
+    correcao.notaComp1,
+    correcao.notaComp2,
+    correcao.notaComp3,
+    correcao.notaComp4,
+    correcao.notaComp5,
+  ];
+  const notaTotalCalculada = correcao.notaTotal !== null
+    ? Number(correcao.notaTotal)
+    : notasCompetencias.every((nota) => nota !== null)
+      ? notasCompetencias.reduce<number>((total, nota) => total + Number(nota), 0)
+      : Number.NaN;
+  const notaTotalNum = Number.isFinite(notaTotalCalculada) ? notaTotalCalculada : 0;
+  const podeAprovarReescrita = numeroVersao === 1 && notaTotalCalculada < 700;
 
   const listaCompetencias = [
     {
@@ -205,7 +218,7 @@ export function ModalRevisaoCorrecao({ correcao, aberto, aoFechar, aoSucesso }: 
                   icone={<RotateCcw size={16} aria-hidden="true" />}
                   carregando={processando}
                   onClick={() => void executarAprovacao(true)}
-                  disabled={processando || numeroVersao > 1}
+                  disabled={processando || !podeAprovarReescrita}
                 >
                   Aprovar Correção + Reescrita
                 </Button>
@@ -220,6 +233,11 @@ export function ModalRevisaoCorrecao({ correcao, aberto, aoFechar, aoSucesso }: 
         {numeroVersao > 1 && (
           <Alerta tom="alerta">
             A única reescrita permitida já foi utilizada. Aprove apenas a correção ou solicite ajuste ao tutor.
+          </Alerta>
+        )}
+        {numeroVersao === 1 && !podeAprovarReescrita && (
+          <Alerta tom="alerta">
+            A reescrita só pode ser aprovada quando a nota total for abaixo de 700. Nesta correção, a nota é {Number.isFinite(notaTotalCalculada) ? notaTotalCalculada : 'indisponível'}.
           </Alerta>
         )}
 
